@@ -1,0 +1,1587 @@
+[
+    {
+        "children": [
+            {
+                "name": "Explorations in Mathematics"
+            }
+        ],
+        "name": "Explorations in Mathematics"
+    },
+    {
+        "children": [
+            {
+                "name": "Foundations of Discrete Math"
+            }
+        ],
+        "name": "Foundations of Discrete Math"
+    },
+    {
+        "children": [
+            {
+                "name": "Frontiers in Mathematical Research"
+            }
+        ],
+        "name": "Frontiers in Mathematical Research"
+    },
+    {
+        "children": [
+            {
+                "name": "Honors College Algebra"
+            }
+        ],
+        "name": "Honors College Algebra"
+    },
+    {
+        "children": [
+            {
+                "name": "Interdisciplinary Applications of Calculus I"
+            }
+        ],
+        "name": "Interdisciplinary Applications of Calculus I"
+    },
+    {
+        "children": [
+            {
+                "name": "Interdisciplinary Applications of Calculus II"
+            }
+        ],
+        "name": "Interdisciplinary Applications of Calculus II"
+    },
+    {
+        "children": [
+            {
+                "children": [
+                    {
+                        "children": [
+                            {
+                                "children": [
+                                    {
+                                        "name": "Applied Calculus"
+                                    },
+                                    {
+                                        "children": [
+                                            {
+                                                "children": [
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Differential Geometry"
+                                                                            }
+                                                                        ],
+                                                                        "name": "Advanced Calculus II"
+                                                                    },
+                                                                    {
+                                                                        "name": "Topics in Analysis"
+                                                                    }
+                                                                ],
+                                                                "name": "Advanced Calculus I"
+                                                            },
+                                                            {
+                                                                "name": "Introduction to Complex Variables"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Introduction to Complex Variables"
+                                                                    },
+                                                                    {
+                                                                        "name": "Topics in Advanced Calculus"
+                                                                    },
+                                                                    {
+                                                                        "name": "Mathematical Modeling I"
+                                                                    },
+                                                                    {
+                                                                        "name": "Vector and Tensor Analysis"
+                                                                    },
+                                                                    {
+                                                                        "name": "Optimization"
+                                                                    },
+                                                                    {
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Mathematical Modeling"
+                                                                            }
+                                                                        ],
+                                                                        "name": "Ordinary Differential Equations II"
+                                                                    },
+                                                                    {
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Partial Differential Equations II"
+                                                                            }
+                                                                        ],
+                                                                        "name": "Introduction to Partial Differential Equations"
+                                                                    },
+                                                                    {
+                                                                        "name": "Numerical Methods for Differential Equations"
+                                                                    },
+                                                                    {
+                                                                        "name": "Numerical Methods for Computational  Sciences"
+                                                                    },
+                                                                    {
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Mathematical Biology II"
+                                                                            }
+                                                                        ],
+                                                                        "name": "Mathematical Biology I"
+                                                                    },
+                                                                    {
+                                                                        "name": "Topics in Applied Mathematics"
+                                                                    },
+                                                                    {
+                                                                        "name": "Special Functions"
+                                                                    },
+                                                                    {
+                                                                        "name": "Advanced Mathematics for Engineers"
+                                                                    },
+                                                                    {
+                                                                        "name": "Linear and Nonlinear Waves I"
+                                                                    },
+                                                                    {
+                                                                        "name": "Scientific Computing"
+                                                                    }
+                                                                ],
+                                                                "name": "Ordinary Differential Equations I"
+                                                            },
+                                                            {
+                                                                "name": "Honors Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Optimization"
+                                                            },
+                                                            {
+                                                                "name": "Numerical Methods for Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Scientific Computing"
+                                                            },
+                                                            {
+                                                                "name": "Introduction to Differential Geometry"
+                                                            },
+                                                            {
+                                                                "name": "Introduction to Differential Geometry"
+                                                            }
+                                                        ],
+                                                        "name": "Calculus with Analytic Geometry III"
+                                                    },
+                                                    {
+                                                        "name": "Honors Calculus with Analytic Geometry III"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Topics in Discrete Mathematics"
+                                                            },
+                                                            {
+                                                                "name": "Graph Theory I"
+                                                            }
+                                                        ],
+                                                        "name": "Introduction to Combinatorics"
+                                                    },
+                                                    {
+                                                        "name": "Honors Systems Modeling and Simulation"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Topics in Advanced Calculus"
+                                                            },
+                                                            {
+                                                                "name": "Mathematical Modeling I"
+                                                            },
+                                                            {
+                                                                "name": "Vector and Tensor Analysis"
+                                                            },
+                                                            {
+                                                                "name": "Optimization"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Mathematical Modeling"
+                                                                    }
+                                                                ],
+                                                                "name": "Ordinary Differential Equations II"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Partial Differential Equations II"
+                                                                    }
+                                                                ],
+                                                                "name": "Introduction to Partial Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Partial Differential Equations II"
+                                                            },
+                                                            {
+                                                                "name": "Numerical Methods for Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Numerical Methods for Computational  Sciences"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Mathematical Biology II"
+                                                                    }
+                                                                ],
+                                                                "name": "Mathematical Biology I"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Applied Mathematics"
+                                                            },
+                                                            {
+                                                                "name": "Scientific Computing"
+                                                            }
+                                                        ],
+                                                        "name": "Matrix and Linear Algebra"
+                                                    },
+                                                    {
+                                                        "name": "Honors Matrix and Linear Algebra"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Differential Geometry"
+                                                                            }
+                                                                        ],
+                                                                        "name": "Advanced Calculus II"
+                                                                    },
+                                                                    {
+                                                                        "name": "Topics in Analysis"
+                                                                    }
+                                                                ],
+                                                                "name": "Advanced Calculus I"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Analysis"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Ordinary Differential Equations and  Applications"
+                                                                    }
+                                                                ],
+                                                                "name": "Analysis I"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Discrete Mathematics"
+                                                            },
+                                                            {
+                                                                "name": "Mathematical Modeling I"
+                                                            },
+                                                            {
+                                                                "name": "Vector and Tensor Analysis"
+                                                            },
+                                                            {
+                                                                "name": "Optimization"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Mathematical Modeling"
+                                                                    }
+                                                                ],
+                                                                "name": "Ordinary Differential Equations II"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Partial Differential Equations II"
+                                                                    }
+                                                                ],
+                                                                "name": "Introduction to Partial Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Partial Differential Equations II"
+                                                            },
+                                                            {
+                                                                "name": "Numerical Methods for Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Numerical Methods for Computational  Sciences"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Mathematical Biology II"
+                                                                    }
+                                                                ],
+                                                                "name": "Mathematical Biology I"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Abstract Algebra II"
+                                                                    },
+                                                                    {
+                                                                        "name": "Topics in Algebra"
+                                                                    },
+                                                                    {
+                                                                        "name": "Algebra I"
+                                                                    }
+                                                                ],
+                                                                "name": "Abstract Algebra I"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Algebra"
+                                                            },
+                                                            {
+                                                                "name": "Advanced Linear Algebra and Matrix Theory"
+                                                            },
+                                                            {
+                                                                "name": "Scientific Computing"
+                                                            },
+                                                            {
+                                                                "name": "Introduction to Differential Geometry"
+                                                            },
+                                                            {
+                                                                "name": "Introduction to Topology"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Topology and Geometry"
+                                                            }
+                                                        ],
+                                                        "name": "Linear Algebra"
+                                                    },
+                                                    {
+                                                        "name": "History of Mathematics"
+                                                    }
+                                                ],
+                                                "name": "Calculus with Analytic Geometry II"
+                                            },
+                                            {
+                                                "name": "Honors Calculus with Analytic Geometry II"
+                                            },
+                                            {
+                                                "name": "Techniques of Problem Solving"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Differential Geometry"
+                                                                    }
+                                                                ],
+                                                                "name": "Advanced Calculus II"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Analysis"
+                                                            }
+                                                        ],
+                                                        "name": "Advanced Calculus I"
+                                                    },
+                                                    {
+                                                        "name": "Introduction to Complex Variables"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Topics in Discrete Mathematics"
+                                                            },
+                                                            {
+                                                                "name": "Graph Theory I"
+                                                            }
+                                                        ],
+                                                        "name": "Introduction to Combinatorics"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Topics in Discrete Mathematics"
+                                                            }
+                                                        ],
+                                                        "name": "Introduction to Graph Theory"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Differential Geometry"
+                                                                            }
+                                                                        ],
+                                                                        "name": "Advanced Calculus II"
+                                                                    },
+                                                                    {
+                                                                        "name": "Topics in Analysis"
+                                                                    }
+                                                                ],
+                                                                "name": "Advanced Calculus I"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Analysis"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Ordinary Differential Equations and  Applications"
+                                                                    }
+                                                                ],
+                                                                "name": "Analysis I"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Discrete Mathematics"
+                                                            },
+                                                            {
+                                                                "name": "Mathematical Modeling I"
+                                                            },
+                                                            {
+                                                                "name": "Vector and Tensor Analysis"
+                                                            },
+                                                            {
+                                                                "name": "Optimization"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Mathematical Modeling"
+                                                                    }
+                                                                ],
+                                                                "name": "Ordinary Differential Equations II"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Partial Differential Equations II"
+                                                                    }
+                                                                ],
+                                                                "name": "Introduction to Partial Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Partial Differential Equations II"
+                                                            },
+                                                            {
+                                                                "name": "Numerical Methods for Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Numerical Methods for Computational  Sciences"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Mathematical Biology II"
+                                                                    }
+                                                                ],
+                                                                "name": "Mathematical Biology I"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Abstract Algebra II"
+                                                                    },
+                                                                    {
+                                                                        "name": "Topics in Algebra"
+                                                                    },
+                                                                    {
+                                                                        "name": "Algebra I"
+                                                                    }
+                                                                ],
+                                                                "name": "Abstract Algebra I"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Algebra"
+                                                            },
+                                                            {
+                                                                "name": "Advanced Linear Algebra and Matrix Theory"
+                                                            },
+                                                            {
+                                                                "name": "Scientific Computing"
+                                                            },
+                                                            {
+                                                                "name": "Introduction to Differential Geometry"
+                                                            },
+                                                            {
+                                                                "name": "Introduction to Topology"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Topology and Geometry"
+                                                            }
+                                                        ],
+                                                        "name": "Linear Algebra"
+                                                    },
+                                                    {
+                                                        "name": "Introduction to Number Theory"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Abstract Algebra II"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Algebra"
+                                                            },
+                                                            {
+                                                                "name": "Algebra I"
+                                                            }
+                                                        ],
+                                                        "name": "Abstract Algebra I"
+                                                    },
+                                                    {
+                                                        "name": "Introduction to Topology"
+                                                    }
+                                                ],
+                                                "name": "Logic and Proof in Mathematics"
+                                            }
+                                        ],
+                                        "name": "Calculus with Analytic Geometry I"
+                                    },
+                                    {
+                                        "name": "Honors Calculus with Analytic Geometry I"
+                                    }
+                                ],
+                                "name": "College Trigonometry"
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "name": "Concepts of Calculus"
+                                    },
+                                    {
+                                        "name": "Applied Calculus"
+                                    },
+                                    {
+                                        "children": [
+                                            {
+                                                "children": [
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Differential Geometry"
+                                                                            }
+                                                                        ],
+                                                                        "name": "Advanced Calculus II"
+                                                                    },
+                                                                    {
+                                                                        "name": "Topics in Analysis"
+                                                                    }
+                                                                ],
+                                                                "name": "Advanced Calculus I"
+                                                            },
+                                                            {
+                                                                "name": "Introduction to Complex Variables"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Introduction to Complex Variables"
+                                                                    },
+                                                                    {
+                                                                        "name": "Topics in Advanced Calculus"
+                                                                    },
+                                                                    {
+                                                                        "name": "Mathematical Modeling I"
+                                                                    },
+                                                                    {
+                                                                        "name": "Vector and Tensor Analysis"
+                                                                    },
+                                                                    {
+                                                                        "name": "Optimization"
+                                                                    },
+                                                                    {
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Mathematical Modeling"
+                                                                            }
+                                                                        ],
+                                                                        "name": "Ordinary Differential Equations II"
+                                                                    },
+                                                                    {
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Partial Differential Equations II"
+                                                                            }
+                                                                        ],
+                                                                        "name": "Introduction to Partial Differential Equations"
+                                                                    },
+                                                                    {
+                                                                        "name": "Numerical Methods for Differential Equations"
+                                                                    },
+                                                                    {
+                                                                        "name": "Numerical Methods for Computational  Sciences"
+                                                                    },
+                                                                    {
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Mathematical Biology II"
+                                                                            }
+                                                                        ],
+                                                                        "name": "Mathematical Biology I"
+                                                                    },
+                                                                    {
+                                                                        "name": "Topics in Applied Mathematics"
+                                                                    },
+                                                                    {
+                                                                        "name": "Special Functions"
+                                                                    },
+                                                                    {
+                                                                        "name": "Advanced Mathematics for Engineers"
+                                                                    },
+                                                                    {
+                                                                        "name": "Linear and Nonlinear Waves I"
+                                                                    },
+                                                                    {
+                                                                        "name": "Scientific Computing"
+                                                                    }
+                                                                ],
+                                                                "name": "Ordinary Differential Equations I"
+                                                            },
+                                                            {
+                                                                "name": "Honors Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Optimization"
+                                                            },
+                                                            {
+                                                                "name": "Numerical Methods for Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Scientific Computing"
+                                                            },
+                                                            {
+                                                                "name": "Introduction to Differential Geometry"
+                                                            },
+                                                            {
+                                                                "name": "Introduction to Differential Geometry"
+                                                            }
+                                                        ],
+                                                        "name": "Calculus with Analytic Geometry III"
+                                                    },
+                                                    {
+                                                        "name": "Honors Calculus with Analytic Geometry III"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Topics in Discrete Mathematics"
+                                                            },
+                                                            {
+                                                                "name": "Graph Theory I"
+                                                            }
+                                                        ],
+                                                        "name": "Introduction to Combinatorics"
+                                                    },
+                                                    {
+                                                        "name": "Honors Systems Modeling and Simulation"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Topics in Advanced Calculus"
+                                                            },
+                                                            {
+                                                                "name": "Mathematical Modeling I"
+                                                            },
+                                                            {
+                                                                "name": "Vector and Tensor Analysis"
+                                                            },
+                                                            {
+                                                                "name": "Optimization"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Mathematical Modeling"
+                                                                    }
+                                                                ],
+                                                                "name": "Ordinary Differential Equations II"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Partial Differential Equations II"
+                                                                    }
+                                                                ],
+                                                                "name": "Introduction to Partial Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Partial Differential Equations II"
+                                                            },
+                                                            {
+                                                                "name": "Numerical Methods for Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Numerical Methods for Computational  Sciences"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Mathematical Biology II"
+                                                                    }
+                                                                ],
+                                                                "name": "Mathematical Biology I"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Applied Mathematics"
+                                                            },
+                                                            {
+                                                                "name": "Scientific Computing"
+                                                            }
+                                                        ],
+                                                        "name": "Matrix and Linear Algebra"
+                                                    },
+                                                    {
+                                                        "name": "Honors Matrix and Linear Algebra"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Differential Geometry"
+                                                                            }
+                                                                        ],
+                                                                        "name": "Advanced Calculus II"
+                                                                    },
+                                                                    {
+                                                                        "name": "Topics in Analysis"
+                                                                    }
+                                                                ],
+                                                                "name": "Advanced Calculus I"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Analysis"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Ordinary Differential Equations and  Applications"
+                                                                    }
+                                                                ],
+                                                                "name": "Analysis I"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Discrete Mathematics"
+                                                            },
+                                                            {
+                                                                "name": "Mathematical Modeling I"
+                                                            },
+                                                            {
+                                                                "name": "Vector and Tensor Analysis"
+                                                            },
+                                                            {
+                                                                "name": "Optimization"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Mathematical Modeling"
+                                                                    }
+                                                                ],
+                                                                "name": "Ordinary Differential Equations II"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Partial Differential Equations II"
+                                                                    }
+                                                                ],
+                                                                "name": "Introduction to Partial Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Partial Differential Equations II"
+                                                            },
+                                                            {
+                                                                "name": "Numerical Methods for Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Numerical Methods for Computational  Sciences"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Mathematical Biology II"
+                                                                    }
+                                                                ],
+                                                                "name": "Mathematical Biology I"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Abstract Algebra II"
+                                                                    },
+                                                                    {
+                                                                        "name": "Topics in Algebra"
+                                                                    },
+                                                                    {
+                                                                        "name": "Algebra I"
+                                                                    }
+                                                                ],
+                                                                "name": "Abstract Algebra I"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Algebra"
+                                                            },
+                                                            {
+                                                                "name": "Advanced Linear Algebra and Matrix Theory"
+                                                            },
+                                                            {
+                                                                "name": "Scientific Computing"
+                                                            },
+                                                            {
+                                                                "name": "Introduction to Differential Geometry"
+                                                            },
+                                                            {
+                                                                "name": "Introduction to Topology"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Topology and Geometry"
+                                                            }
+                                                        ],
+                                                        "name": "Linear Algebra"
+                                                    },
+                                                    {
+                                                        "name": "History of Mathematics"
+                                                    }
+                                                ],
+                                                "name": "Calculus with Analytic Geometry II"
+                                            },
+                                            {
+                                                "name": "Honors Calculus with Analytic Geometry II"
+                                            },
+                                            {
+                                                "name": "Techniques of Problem Solving"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Differential Geometry"
+                                                                    }
+                                                                ],
+                                                                "name": "Advanced Calculus II"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Analysis"
+                                                            }
+                                                        ],
+                                                        "name": "Advanced Calculus I"
+                                                    },
+                                                    {
+                                                        "name": "Introduction to Complex Variables"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Topics in Discrete Mathematics"
+                                                            },
+                                                            {
+                                                                "name": "Graph Theory I"
+                                                            }
+                                                        ],
+                                                        "name": "Introduction to Combinatorics"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Topics in Discrete Mathematics"
+                                                            }
+                                                        ],
+                                                        "name": "Introduction to Graph Theory"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "children": [
+                                                                            {
+                                                                                "name": "Differential Geometry"
+                                                                            }
+                                                                        ],
+                                                                        "name": "Advanced Calculus II"
+                                                                    },
+                                                                    {
+                                                                        "name": "Topics in Analysis"
+                                                                    }
+                                                                ],
+                                                                "name": "Advanced Calculus I"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Analysis"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Ordinary Differential Equations and  Applications"
+                                                                    }
+                                                                ],
+                                                                "name": "Analysis I"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Discrete Mathematics"
+                                                            },
+                                                            {
+                                                                "name": "Mathematical Modeling I"
+                                                            },
+                                                            {
+                                                                "name": "Vector and Tensor Analysis"
+                                                            },
+                                                            {
+                                                                "name": "Optimization"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Mathematical Modeling"
+                                                                    }
+                                                                ],
+                                                                "name": "Ordinary Differential Equations II"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Partial Differential Equations II"
+                                                                    }
+                                                                ],
+                                                                "name": "Introduction to Partial Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Partial Differential Equations II"
+                                                            },
+                                                            {
+                                                                "name": "Numerical Methods for Differential Equations"
+                                                            },
+                                                            {
+                                                                "name": "Numerical Methods for Computational  Sciences"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Mathematical Biology II"
+                                                                    }
+                                                                ],
+                                                                "name": "Mathematical Biology I"
+                                                            },
+                                                            {
+                                                                "children": [
+                                                                    {
+                                                                        "name": "Abstract Algebra II"
+                                                                    },
+                                                                    {
+                                                                        "name": "Topics in Algebra"
+                                                                    },
+                                                                    {
+                                                                        "name": "Algebra I"
+                                                                    }
+                                                                ],
+                                                                "name": "Abstract Algebra I"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Algebra"
+                                                            },
+                                                            {
+                                                                "name": "Advanced Linear Algebra and Matrix Theory"
+                                                            },
+                                                            {
+                                                                "name": "Scientific Computing"
+                                                            },
+                                                            {
+                                                                "name": "Introduction to Differential Geometry"
+                                                            },
+                                                            {
+                                                                "name": "Introduction to Topology"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Topology and Geometry"
+                                                            }
+                                                        ],
+                                                        "name": "Linear Algebra"
+                                                    },
+                                                    {
+                                                        "name": "Introduction to Number Theory"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Abstract Algebra II"
+                                                            },
+                                                            {
+                                                                "name": "Topics in Algebra"
+                                                            },
+                                                            {
+                                                                "name": "Algebra I"
+                                                            }
+                                                        ],
+                                                        "name": "Abstract Algebra I"
+                                                    },
+                                                    {
+                                                        "name": "Introduction to Topology"
+                                                    }
+                                                ],
+                                                "name": "Logic and Proof in Mathematics"
+                                            }
+                                        ],
+                                        "name": "Calculus with Analytic Geometry I"
+                                    },
+                                    {
+                                        "name": "Honors Calculus with Analytic Geometry I"
+                                    }
+                                ],
+                                "name": "Pre-Calculus Algebra"
+                            },
+                            {
+                                "name": "Honors Pre-Calculus Algebra"
+                            }
+                        ],
+                        "name": "College Algebra"
+                    },
+                    {
+                        "name": "Finite Mathematics"
+                    }
+                ],
+                "name": "Intermediate Algebra"
+            }
+        ],
+        "name": "Intermediate Algebra"
+    },
+    {
+        "children": [
+            {
+                "children": [
+                    {
+                        "children": [
+                            {
+                                "children": [
+                                    {
+                                        "children": [
+                                            {
+                                                "children": [
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Differential Geometry"
+                                                            }
+                                                        ],
+                                                        "name": "Advanced Calculus II"
+                                                    },
+                                                    {
+                                                        "name": "Topics in Analysis"
+                                                    }
+                                                ],
+                                                "name": "Advanced Calculus I"
+                                            },
+                                            {
+                                                "name": "Introduction to Complex Variables"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Introduction to Complex Variables"
+                                                    },
+                                                    {
+                                                        "name": "Topics in Advanced Calculus"
+                                                    },
+                                                    {
+                                                        "name": "Mathematical Modeling I"
+                                                    },
+                                                    {
+                                                        "name": "Vector and Tensor Analysis"
+                                                    },
+                                                    {
+                                                        "name": "Optimization"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Mathematical Modeling"
+                                                            }
+                                                        ],
+                                                        "name": "Ordinary Differential Equations II"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Partial Differential Equations II"
+                                                            }
+                                                        ],
+                                                        "name": "Introduction to Partial Differential Equations"
+                                                    },
+                                                    {
+                                                        "name": "Numerical Methods for Differential Equations"
+                                                    },
+                                                    {
+                                                        "name": "Numerical Methods for Computational  Sciences"
+                                                    },
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Mathematical Biology II"
+                                                            }
+                                                        ],
+                                                        "name": "Mathematical Biology I"
+                                                    },
+                                                    {
+                                                        "name": "Topics in Applied Mathematics"
+                                                    },
+                                                    {
+                                                        "name": "Special Functions"
+                                                    },
+                                                    {
+                                                        "name": "Advanced Mathematics for Engineers"
+                                                    },
+                                                    {
+                                                        "name": "Linear and Nonlinear Waves I"
+                                                    },
+                                                    {
+                                                        "name": "Scientific Computing"
+                                                    }
+                                                ],
+                                                "name": "Ordinary Differential Equations I"
+                                            },
+                                            {
+                                                "name": "Honors Differential Equations"
+                                            },
+                                            {
+                                                "name": "Optimization"
+                                            },
+                                            {
+                                                "name": "Numerical Methods for Differential Equations"
+                                            },
+                                            {
+                                                "name": "Scientific Computing"
+                                            },
+                                            {
+                                                "name": "Introduction to Differential Geometry"
+                                            },
+                                            {
+                                                "name": "Introduction to Differential Geometry"
+                                            }
+                                        ],
+                                        "name": "Calculus with Analytic Geometry III"
+                                    },
+                                    {
+                                        "name": "Honors Calculus with Analytic Geometry III"
+                                    },
+                                    {
+                                        "children": [
+                                            {
+                                                "name": "Topics in Discrete Mathematics"
+                                            },
+                                            {
+                                                "name": "Graph Theory I"
+                                            }
+                                        ],
+                                        "name": "Introduction to Combinatorics"
+                                    },
+                                    {
+                                        "name": "Honors Systems Modeling and Simulation"
+                                    },
+                                    {
+                                        "children": [
+                                            {
+                                                "name": "Topics in Advanced Calculus"
+                                            },
+                                            {
+                                                "name": "Mathematical Modeling I"
+                                            },
+                                            {
+                                                "name": "Vector and Tensor Analysis"
+                                            },
+                                            {
+                                                "name": "Optimization"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Mathematical Modeling"
+                                                    }
+                                                ],
+                                                "name": "Ordinary Differential Equations II"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Partial Differential Equations II"
+                                                    }
+                                                ],
+                                                "name": "Introduction to Partial Differential Equations"
+                                            },
+                                            {
+                                                "name": "Partial Differential Equations II"
+                                            },
+                                            {
+                                                "name": "Numerical Methods for Differential Equations"
+                                            },
+                                            {
+                                                "name": "Numerical Methods for Computational  Sciences"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Mathematical Biology II"
+                                                    }
+                                                ],
+                                                "name": "Mathematical Biology I"
+                                            },
+                                            {
+                                                "name": "Topics in Applied Mathematics"
+                                            },
+                                            {
+                                                "name": "Scientific Computing"
+                                            }
+                                        ],
+                                        "name": "Matrix and Linear Algebra"
+                                    },
+                                    {
+                                        "name": "Honors Matrix and Linear Algebra"
+                                    },
+                                    {
+                                        "children": [
+                                            {
+                                                "children": [
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Differential Geometry"
+                                                            }
+                                                        ],
+                                                        "name": "Advanced Calculus II"
+                                                    },
+                                                    {
+                                                        "name": "Topics in Analysis"
+                                                    }
+                                                ],
+                                                "name": "Advanced Calculus I"
+                                            },
+                                            {
+                                                "name": "Topics in Analysis"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Ordinary Differential Equations and  Applications"
+                                                    }
+                                                ],
+                                                "name": "Analysis I"
+                                            },
+                                            {
+                                                "name": "Topics in Discrete Mathematics"
+                                            },
+                                            {
+                                                "name": "Mathematical Modeling I"
+                                            },
+                                            {
+                                                "name": "Vector and Tensor Analysis"
+                                            },
+                                            {
+                                                "name": "Optimization"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Mathematical Modeling"
+                                                    }
+                                                ],
+                                                "name": "Ordinary Differential Equations II"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Partial Differential Equations II"
+                                                    }
+                                                ],
+                                                "name": "Introduction to Partial Differential Equations"
+                                            },
+                                            {
+                                                "name": "Partial Differential Equations II"
+                                            },
+                                            {
+                                                "name": "Numerical Methods for Differential Equations"
+                                            },
+                                            {
+                                                "name": "Numerical Methods for Computational  Sciences"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Mathematical Biology II"
+                                                    }
+                                                ],
+                                                "name": "Mathematical Biology I"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Abstract Algebra II"
+                                                    },
+                                                    {
+                                                        "name": "Topics in Algebra"
+                                                    },
+                                                    {
+                                                        "name": "Algebra I"
+                                                    }
+                                                ],
+                                                "name": "Abstract Algebra I"
+                                            },
+                                            {
+                                                "name": "Topics in Algebra"
+                                            },
+                                            {
+                                                "name": "Advanced Linear Algebra and Matrix Theory"
+                                            },
+                                            {
+                                                "name": "Scientific Computing"
+                                            },
+                                            {
+                                                "name": "Introduction to Differential Geometry"
+                                            },
+                                            {
+                                                "name": "Introduction to Topology"
+                                            },
+                                            {
+                                                "name": "Topics in Topology and Geometry"
+                                            }
+                                        ],
+                                        "name": "Linear Algebra"
+                                    },
+                                    {
+                                        "name": "History of Mathematics"
+                                    }
+                                ],
+                                "name": "Calculus with Analytic Geometry II"
+                            },
+                            {
+                                "name": "Honors Calculus with Analytic Geometry II"
+                            },
+                            {
+                                "name": "Techniques of Problem Solving"
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "children": [
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Differential Geometry"
+                                                    }
+                                                ],
+                                                "name": "Advanced Calculus II"
+                                            },
+                                            {
+                                                "name": "Topics in Analysis"
+                                            }
+                                        ],
+                                        "name": "Advanced Calculus I"
+                                    },
+                                    {
+                                        "name": "Introduction to Complex Variables"
+                                    },
+                                    {
+                                        "children": [
+                                            {
+                                                "name": "Topics in Discrete Mathematics"
+                                            },
+                                            {
+                                                "name": "Graph Theory I"
+                                            }
+                                        ],
+                                        "name": "Introduction to Combinatorics"
+                                    },
+                                    {
+                                        "children": [
+                                            {
+                                                "name": "Topics in Discrete Mathematics"
+                                            }
+                                        ],
+                                        "name": "Introduction to Graph Theory"
+                                    },
+                                    {
+                                        "children": [
+                                            {
+                                                "children": [
+                                                    {
+                                                        "children": [
+                                                            {
+                                                                "name": "Differential Geometry"
+                                                            }
+                                                        ],
+                                                        "name": "Advanced Calculus II"
+                                                    },
+                                                    {
+                                                        "name": "Topics in Analysis"
+                                                    }
+                                                ],
+                                                "name": "Advanced Calculus I"
+                                            },
+                                            {
+                                                "name": "Topics in Analysis"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Ordinary Differential Equations and  Applications"
+                                                    }
+                                                ],
+                                                "name": "Analysis I"
+                                            },
+                                            {
+                                                "name": "Topics in Discrete Mathematics"
+                                            },
+                                            {
+                                                "name": "Mathematical Modeling I"
+                                            },
+                                            {
+                                                "name": "Vector and Tensor Analysis"
+                                            },
+                                            {
+                                                "name": "Optimization"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Mathematical Modeling"
+                                                    }
+                                                ],
+                                                "name": "Ordinary Differential Equations II"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Partial Differential Equations II"
+                                                    }
+                                                ],
+                                                "name": "Introduction to Partial Differential Equations"
+                                            },
+                                            {
+                                                "name": "Partial Differential Equations II"
+                                            },
+                                            {
+                                                "name": "Numerical Methods for Differential Equations"
+                                            },
+                                            {
+                                                "name": "Numerical Methods for Computational  Sciences"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Mathematical Biology II"
+                                                    }
+                                                ],
+                                                "name": "Mathematical Biology I"
+                                            },
+                                            {
+                                                "children": [
+                                                    {
+                                                        "name": "Abstract Algebra II"
+                                                    },
+                                                    {
+                                                        "name": "Topics in Algebra"
+                                                    },
+                                                    {
+                                                        "name": "Algebra I"
+                                                    }
+                                                ],
+                                                "name": "Abstract Algebra I"
+                                            },
+                                            {
+                                                "name": "Topics in Algebra"
+                                            },
+                                            {
+                                                "name": "Advanced Linear Algebra and Matrix Theory"
+                                            },
+                                            {
+                                                "name": "Scientific Computing"
+                                            },
+                                            {
+                                                "name": "Introduction to Differential Geometry"
+                                            },
+                                            {
+                                                "name": "Introduction to Topology"
+                                            },
+                                            {
+                                                "name": "Topics in Topology and Geometry"
+                                            }
+                                        ],
+                                        "name": "Linear Algebra"
+                                    },
+                                    {
+                                        "name": "Introduction to Number Theory"
+                                    },
+                                    {
+                                        "children": [
+                                            {
+                                                "name": "Abstract Algebra II"
+                                            },
+                                            {
+                                                "name": "Topics in Algebra"
+                                            },
+                                            {
+                                                "name": "Algebra I"
+                                            }
+                                        ],
+                                        "name": "Abstract Algebra I"
+                                    },
+                                    {
+                                        "name": "Introduction to Topology"
+                                    }
+                                ],
+                                "name": "Logic and Proof in Mathematics"
+                            }
+                        ],
+                        "name": "Calculus with Analytic Geometry I"
+                    }
+                ],
+                "name": "Mathematics for Calculus"
+            }
+        ],
+        "name": "Mathematics for Calculus"
+    },
+    {
+        "children": [
+            {
+                "name": "Post-Secondary Mathematics"
+            }
+        ],
+        "name": "Post-Secondary Mathematics"
+    },
+    {
+        "children": [
+            {
+                "name": "Research Seminar"
+            }
+        ],
+        "name": "Research Seminar"
+    },
+    {
+        "children": [
+            {
+                "name": "STEM Seminar I"
+            }
+        ],
+        "name": "STEM Seminar I"
+    },
+    {
+        "children": [
+            {
+                "name": "STEM Seminar II"
+            }
+        ],
+        "name": "STEM Seminar II"
+    }
+]

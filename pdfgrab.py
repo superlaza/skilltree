@@ -1,4 +1,5 @@
 import re
+import json
 
 # not matching 0-5(0,1-5) 
 
@@ -118,3 +119,34 @@ for course in sorted(math_courses, key=lambda c: c.name):
 	print course.name
 	for c in course.precedes:
 		print "\t"+c.name
+
+print 'BREAK!'
+zero_tier = []
+for course in sorted(math_courses, key=lambda c: c.name):
+	if len(course.precursors) == 0:
+		zero_tier.append(course)
+		# print course.name
+
+def fill_desc(course):
+	if len(course.precedes) == 0:
+		# print {"name": course.name}
+		return {"name": course.name}
+
+	children = []
+	for c in course.precedes:
+		children.append(fill_desc(c))
+
+	# print {'name': course.name, 'children': children}
+	return {'name': course.name, 'children': children}
+
+output = []
+for course in zero_tier:
+	output.append({
+		"name": course.name,
+		"children": [fill_desc(course)]
+		})
+
+outputs = json.dumps(output, sort_keys=True, indent=4, separators=(',', ': '))
+print outputs
+with open('output.json', 'w') as out:
+	out.write(outputs)
