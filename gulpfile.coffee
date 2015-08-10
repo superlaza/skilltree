@@ -36,7 +36,7 @@ path =
 	css:         "./#{root}src/sass/"
 	cssOut:      "./#{root}assets/css/"
 
-coffeeScripts = ["./#{root}src/coffee/**/*.coffee"]
+coffeeScripts = ["./#{root}src/coffee/*.coffee"]
 scssFiles 	  = ["#{path.css}**/*.scss"]
 html 		  = ["./#{root}*.html"]
 
@@ -46,7 +46,7 @@ gulp.task 'js', ->
 	gulp.src coffeeScripts
 		# .pipe sourcemaps.init()
 		# .pipe coffee().on 'error', errHandle
-		.pipe coffee().on 'error', notify.onError
+		.pipe coffee({bare: true}).on 'error', notify.onError
 			title: "coffeeScript compliation failed"
 			message: "Error: <%= error.message %><%= console.log(error)%>"
 		.pipe uglify()
