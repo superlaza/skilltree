@@ -1,1 +1,0 @@
-var SkilltreeCtrl,deps;deps=["$scope"],SkilltreeCtrl=function(e){return e.test="tesasdgt"},SkilltreeCtrl.$inject=deps,Skilltree.controller("SkilltreeCtrl",SkilltreeCtrl);
