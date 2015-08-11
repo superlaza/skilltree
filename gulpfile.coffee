@@ -8,6 +8,10 @@ uglify        = require 'gulp-uglify' # minify and mangle js
 minifyCss     = require 'gulp-minify-css'
 debug 		  = require 'gulp-debug' # for biopics of piped streams
 notify		  = require 'gulp-notify'
+coffeex 	  = require 'gulp-coffee-react-transform'
+# coffeex 	  = require 'gulp-coffee-react'
+react 		  = require 'gulp-react'
+babel		  = require 'gulp-babel'
 
 # ngAnnotate    = require 'gulp-ng-annotate' # protect angular dependency injection from minify
 # hashsum       = require 'gulp-hashsum-json'
@@ -35,10 +39,23 @@ path =
 	jsOut:       "./#{root}assets/js/"
 	css:         "./#{root}src/sass/"
 	cssOut:      "./#{root}assets/css/"
+	es6:		 "./#{root}src/es6/"
+	es6Out:		 "./#{root}assets/js/"
 
+ECMAScripts   = ["./#{root}src/es6/*.js"]
 coffeeScripts = ["./#{root}src/coffee/*.coffee"]
 scssFiles 	  = ["#{path.css}**/*.scss"]
 html 		  = ["./#{root}*.html"]
+
+gulp.task 'es6', ->
+	# Minify and copy all JavaScript (except vendor scripts)
+	# with sourcemaps all the way down
+	gulp.src ECMAScripts
+		.pipe babel().on 'error', notify.onError
+			title: "Babel Transpile Failed"
+			message: "Error: <%= error.message %><%= console.log(error)%>"
+		.pipe gulp.dest(path.es6Out)
+		.pipe livereload()
 
 gulp.task 'js', ->
 	# Minify and copy all JavaScript (except vendor scripts)
@@ -46,12 +63,19 @@ gulp.task 'js', ->
 	gulp.src coffeeScripts
 		# .pipe sourcemaps.init()
 		# .pipe coffee().on 'error', errHandle
+		# .pipe coffeex().on 'error', notify.onError
+		# 	title: "Failed to compile JSX"
+		# 	message: "Error: <%= error.message %><%= console.log(error)%>"
+		# .pipe coffeex().on 'error', notify.onError
+		# 	title: "coffeeScript JSX compliation failed"
+		# 	message: "Error: <%= error.message %><%= console.log(error)%>"
 		.pipe coffee({bare: true}).on 'error', notify.onError
 			title: "coffeeScript compliation failed"
 			message: "Error: <%= error.message %><%= console.log(error)%>"
-		.pipe uglify()
+		# .pipe uglify()
 		# .pipe concat('all.min.js') # big kahuna js file
 		# .pipe sourcemaps.write()
+		.pipe react()
 		.pipe gulp.dest(path.jsOut)
 		.pipe livereload()
 
@@ -73,9 +97,10 @@ gulp.task 'html', ->
 # Rerun the task when a file changes
 gulp.task 'watch', ->
 	livereload.listen()
+	gulp.watch ECMAScripts, ['es6']
 	gulp.watch coffeeScripts, ['js']
 	gulp.watch scssFiles, ['css']
 	gulp.watch html, ['html']
 
 # The default task (called when you run `gulp` from cli)
-gulp.task 'default', ['js', 'css', 'html', 'watch']
+gulp.task 'default', ['es6', 'js', 'css', 'html', 'watch']
