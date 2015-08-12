@@ -1,37 +1,40 @@
+
+i = 0
+
 class TreeRender
 	@create = (el, props, state) ->
 		# the containing svg of the tree
-		console.log 'props', props
-		{width, height} = props.dims
-		console.log height
-		margin = props.margin
+		{width, height} = props.dim
 		svg = d3.select(el)
 				.append("svg")
 		 		.attr("width", width+margin.right+margin.left)
-		 		.attr("height", height+margin.top+margin.bottom)
+		 		.attr("height", height + margin.top + margin.bottom)
 		 		.append("g")
 		 		.attr("transform", "translate(#{margin.left},#{margin.top})")
 		 		.attr("class", "d3-skilltree")
-		
-		@update svg.node(), state
 
-	@update = (el, state) ->
+		
+		@update svg.node(), props.dim, state
+
+	@update = (el, props, state) ->
 		# Re-compute the scales, and render the data points
 		# scales = @_scales(el, state.domain)
-		@draw el, state.data
+		@draw el, props, state.data
 
 	@destroy = (el) ->
 		# Any clean-up would go here
 		# in this example there is nothing to do
 
-	@draw = (el, data) ->
+	@draw = (el, props, data) ->
 		console.log 'drawing points'
+		# handles drawing of links
+
+		{width, height} = props
 
 		tree = d3.layout
-				 .tree()
-		 		 .size [height, width]
-
-		# handles drawing of links
+			 	.tree()
+				.size [height, width]
+		
 		diagonal = d3.svg
 					 .diagonal()
 		 			 .projection (d) -> [d.y, d.x]
@@ -45,7 +48,7 @@ class TreeRender
 
 		svg = d3.select(el)
 		node = svg.selectAll("g.node")
-				 .data(nodes, (d) -> d.id)
+				 .data(nodes, (d) -> d.id || (d.id = ++i))
 
 		nodeEnter = node.enter()
 					    .append("g")
@@ -59,7 +62,7 @@ class TreeRender
 		nodeEnter.append("text")
 			     .attr("x", (d) -> if d.children? then -70 else 20)
 			     .attr("dy", ".35em")
-			     .attr("text-anchor", (d) -> if d.children? then (if d._children? then 'end' else 'start') else null)
+			     .attr("text-anchor", (d) -> if d._children? then 'end' else 'start')
 			     .text( (d) -> d.name)
 			     .style("fill-opacity", 1);
 
@@ -72,18 +75,6 @@ class TreeRender
 			.insert("path", "g")
 			.attr("class", "link")
 			.attr("d", diagonal)
-		# g = d3.select(el).selectAll('.d3-points')
-		# point = g.selectAll('.d3-point').data(data, (d) -> d.id)
-		# # ENTER
-		# point.enter()
-		# 	 .append('circle')
-		# 	 .attr('class', 'd3-point')
-		# ENTER & UPDATE
-		# point.attr('cx', (d) -> scales.x d.x)
-		# 	 .attr('cy', (d) -> scales.y d.y)
-		# 	 .attr('r', (d) -> scales.z d.z)
-		# EXIT
-		# point.exit().remove()
 
 
 class Tree extends React.Component
@@ -93,10 +84,15 @@ class Tree extends React.Component
 	@defaultProps =
 		nodeCount: 0
 
+	constructor: (props) ->
+		super props
+		@state =
+			data: props.data
+
 	componentDidMount: ->
 		console.log 'mounted', @getTreeState()
 		el = React.findDOMNode this
-		TreeRender.create el, @props, @getTreeState()
+		TreeRender.create(el, {dim:this.props.dim, margin:this.props.margin}, @getTreeState())
 
 	componentDidUpdate: ->
 		console.log 'updated'
@@ -104,7 +100,7 @@ class Tree extends React.Component
 	# TreeRender.update(el, this.getChartState())
 
 	getTreeState: ->
-	 	data: this.props.data
+	 	this.state
 
 	componentWillUnmount: ->
 		console.log 'will unmount'
@@ -113,6 +109,18 @@ class Tree extends React.Component
 
 	render: ->
 		return  `<div className={this.props.className}></div>`
+
+class App extends React.Component
+	constructor: (props) ->
+		super props
+		@state =
+			data: props.data
+
+	render: () ->
+		`<div className="App">
+	        <Tree
+	          {...this.props}/>
+	    </div>`
 
 treeData = [
     "name": "Top Level"
@@ -132,31 +140,13 @@ treeData = [
         "parent": "Top Level"
     ]
 ]
-
 margin =
 	top: 20
 	right: 120
 	bottom: 20
 	left: 120
-dims =
-	width: 960 - margin.right - margin.left
-	height: 500 - margin.top - margin.bottom
+dim =
+	width: 960-margin.right-margin.left
+	height: 500-margin.top-margin.bottom
 
-class App extends React.Component
-	constructor: (props) ->
-		super props
-		@state =
-			data: props.data
-			dims: props.dims
-
-	render: () ->
-		`<div className="App">
-	        <Tree {...this.props}/>
-	    </div>`
-
-appProps =
-	data: treeData
-	dims: dims
-	margin: margin
-
-React.render `<App {...appProps}/>`, document.getElementById 'react'
+React.render `<App data={treeData} dim={dim} margin={margin}/>`, document.getElementById 'react'
