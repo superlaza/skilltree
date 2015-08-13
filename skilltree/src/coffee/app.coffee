@@ -1,3 +1,10 @@
+###
+ISSUES
+	- think of changing Node class into Tree class, where the old
+		Tree class would be called Root and it extends the Tree class.
+		That way, every "node" is just an instance of a tree, and we have one
+		root node
+###
 
 i = 0
 
@@ -6,6 +13,11 @@ class Node extends React.Component
 		super props
 		@state =
 			children: @props.children
+			parent: @props.parent
+
+	handleClick: (thing) => # honor context in which this was defined
+		console.log 'clicked'
+		console.log 'heres the thing', thing
 
 	render: ->
 		circleStyle =
@@ -13,17 +25,42 @@ class Node extends React.Component
 		textStyle =
 			fillOpacity: "1"
 
-		`<g className={this.props.gNode.className}
-			transform={this.props.gNode.transform}
-			onClick={this.props.onClick}>
-			<circle r="10"
-					style={circleStyle}>
-			</circle>
-			<text x={this.props.textElement.x}
-				  dy={this.props.textElement.dy}
-				  textAnchor={this.props.textElement.anchor}
-				  style={textStyle}>{this.props.textElement.text}
-			</text>
+		console.log 'node depth', @props.depth
+
+		renderChildren = []
+		if @state.children? # render only if node has children
+			children = (child for child in @state.children when child.depth is @props.depth)
+			for child in children
+				childProps =
+					gNode:
+						className: 'node'
+						transform: "translate(#{child.y}, #{child.x})"
+					textElement:
+						x: '13'
+						dy: '0.35em'
+						anchor: "start"
+						text: child.name
+					parent: if child.parent is "null" then null else child.parent
+					children: child.children ? null # children if exists, null if not
+					onClick: @handleClick
+					depth: @props.depth+1
+
+				renderChildren.push `<Node {...childProps} key={children.indexOf(child)}/>`
+
+		`<g>
+			<g className={this.props.gNode.className}
+				transform={this.props.gNode.transform}
+				onClick={this.props.onClick}>
+				<circle r="10"
+						style={circleStyle}>
+				</circle>
+				<text x={this.props.textElement.x}
+					  dy={this.props.textElement.dy}
+					  textAnchor={this.props.textElement.anchor}
+					  style={textStyle}>{this.props.textElement.text}
+				</text>
+			</g>
+			{renderChildren}
 		</g>
 		`
 
@@ -36,16 +73,34 @@ class Link extends React.Component
 			   d={this.props.d}></path>
 		`
 class Tree extends React.Component
-	@propTypes =
+	@propTypes:
 		treeRecord: React.PropTypes.array
 		nodeCount: React.PropTypes.number
-	@defaultProps =
-		nodeCount: 0
+
+	nodeCount: 0
+	depth: 0
 
 	constructor: (props) ->
 		super props # assign instance props
+
+		# COMPUTE TREE STATE
+		# ==================
+		# Compute the new tree layout
+		{width, height} = @props.dim
+		tree = d3.layout
+			 	.tree()
+				.size [height, width]
+
+		nodes = tree.nodes(@props.treeRecord[0]).reverse()
+		links = tree.links(nodes)
+
+		# Normalize for fixed-depth.
+		nodes.forEach (d) -> d.y = d.depth * 180
+
 		@state =
-			treeRecord: props.treeRecord
+			tree:
+				nodes: nodes
+				links: links
 
 	# exposed to instances
 	getTreeState: ->
@@ -91,22 +146,15 @@ class Tree extends React.Component
 
 		# STATE-BASED MANIPULATIONS
 		#=========================
-		tree = d3.layout
-			 	.tree()
-				.size [height, width]
-		
 		diagonal = d3.svg
 					 .diagonal()
 		 			 .projection (d) -> [d.y, d.x]
 
-		# Compute the new tree layout.
-		nodes = tree.nodes(@state.treeRecord[0]).reverse()
-		links = tree.links(nodes)
+		{nodes, links} = @state.tree
 
-		# Normalize for fixed-depth.
-		nodes.forEach (d) -> d.y = d.depth * 180
+		# this might be an overly expensive filter, check here first for perf bottlenecks
+		nodes = (node for node in nodes when node.depth is @depth)
 
-		console.log 'nodes', nodes
 		renderNodes = []
 		for node in nodes
 			nodeProps =
@@ -118,8 +166,10 @@ class Tree extends React.Component
 					dy: '0.35em'
 					anchor: "start"
 					text: node.name
+				parent: if node.parent is "null" then null else node.parent
 				children: node.children ? null # children if exists, null if not
 				onClick: @handleClick
+				depth: @depth+1
 
 			renderNodes.push `<Node {...nodeProps} key={nodes.indexOf(node)}/>`
 
@@ -130,9 +180,6 @@ class Tree extends React.Component
 				d: diagonal link
 
 			renderLinks.push `<Link {...linkProps} key={links.indexOf(link)}/>`
-			console.log 'link something', diagonal(link)
-
-		console.log 'links', links
 
 		`<div className="Skilltree">
 			<svg width={winWidth}
