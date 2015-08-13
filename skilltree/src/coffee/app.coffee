@@ -8,19 +8,24 @@ ISSUES
 	- apparently, NO CALLING this.state DIRECTLY! FIX IT
 ###
 
+# globals
 i = 0
+diagonal = d3.svg
+			 .diagonal()
+ 			 .projection (d) -> [d.y, d.x]
 
 class Node extends React.Component
 	constructor: (props) ->
 		super props
 		@state =
 			children: @props.children
+			links: @props.links
 			hideChildren: false
 			parent: @props.parent
 
 	handleClick: (e) => # honor context in which this was defined
 		console.log 'named of clickee', @props.textElement.text
-		@setState hideChildren : !@state.hideChildren
+		@setState hideChildren : !@state.hideChildren #super's method
 
 	render: ->
 		circleStyle =
@@ -28,8 +33,20 @@ class Node extends React.Component
 		textStyle =
 			fillOpacity: "1"
 
-		renderChildren = []
 
+		# incoming links
+		if @state.links.into?
+			renderLinks = []
+			for link in @state.links.into
+				console.log 'link', link
+				linkProps =
+					className: 'link'
+					d: diagonal link
+
+				renderLinks.push `<Link {...linkProps} key={this.state.links.into.indexOf(link)}/>`
+
+
+		renderChildren = []
 		if @state.children? and !@state.hideChildren # render only if node has children
 			children = (child for child in @state.children when child.depth is @props.depth)
 			for child in children
@@ -44,11 +61,21 @@ class Node extends React.Component
 						text: child.name
 					parent: if child.parent is "null" then null else child.parent
 					children: child.children ? null # children if exists, null if not
+					links: child.links
 					depth: @props.depth+1
 
 				renderChildren.push `<Node {...childProps} key={children.indexOf(child)}/>`
 
+				if @state.links.outof?
+					for link in @state.links.outof
+						console.log 'outlink', link
+						linkProps =
+							className: 'link'
+							d: diagonal link
+
+						renderLinks.push `<Link {...linkProps} key={this.state.links.outof.indexOf(link)}/>`
 		`<g>
+			{renderLinks}
 			<g onClick={this.handleClick} className={this.props.gNode.className}
 				transform={this.props.gNode.transform}>
 				<circle r="10"
@@ -146,14 +173,21 @@ class Tree extends React.Component
 
 		# STATE-BASED MANIPULATIONS
 		#=========================
-		diagonal = d3.svg
-					 .diagonal()
-		 			 .projection (d) -> [d.y, d.x]
-
 		{nodes, links} = @state.tree
 
 		# this might be an overly expensive filter, check here first for perf bottlenecks
 		nodes = (node for node in nodes when node.depth is @depth)
+
+		# should be done by popping from links list
+		attachLinks = (nodeList)->
+			for node in nodeList
+				node.links = 
+					into: (link for link in links when link.target is node)
+					outof: (link for link in links when link.source is node)
+				attachLinks node.children if node.children?
+
+		attachLinks nodes
+		console.log 'new nodes', nodes
 
 		# todo: check for children, just to cover bases
 		renderNodes = []
@@ -169,24 +203,17 @@ class Tree extends React.Component
 					text: node.name
 				parent: if node.parent is "null" then null else node.parent
 				children: node.children ? null # children if exists, null if not
+				links: node.links
 				depth: @depth+1
+				
 
 			renderNodes.push `<Node {...nodeProps} key={nodes.indexOf(node)}/>`
-
-		renderLinks = []
-		for link in links
-			linkProps =
-				className: 'link'
-				d: diagonal link
-
-			renderLinks.push `<Link {...linkProps} key={links.indexOf(link)}/>`
 
 		`<div className="Skilltree">
 			<svg width={winWidth}
 				 height={winHeight}>
 				 <g transform={this.props.gtree.transform}
 				 	className={this.props.gtree.class}>
-				 	{renderLinks}
 				 	{renderNodes}
 				 </g>
 			</svg>
