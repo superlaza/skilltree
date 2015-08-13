@@ -75,7 +75,9 @@ gulp.task 'js', ->
 		# .pipe uglify()
 		# .pipe concat('all.min.js') # big kahuna js file
 		# .pipe sourcemaps.write()
-		.pipe react()
+		.pipe react().on 'error', notify.onError
+			title: "JSX compilation failed"
+			message: "Error: <%= error.message %><%= console.log(error)%>"
 		.pipe gulp.dest(path.jsOut)
 		.pipe livereload()
 
