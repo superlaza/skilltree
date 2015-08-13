@@ -4,6 +4,8 @@ ISSUES
 		Tree class would be called Root and it extends the Tree class.
 		That way, every "node" is just an instance of a tree, and we have one
 		root node
+
+	- apparently, NO CALLING this.state DIRECTLY! FIX IT
 ###
 
 i = 0
@@ -13,11 +15,12 @@ class Node extends React.Component
 		super props
 		@state =
 			children: @props.children
+			hideChildren: false
 			parent: @props.parent
 
-	handleClick: (thing) => # honor context in which this was defined
-		console.log 'clicked'
-		console.log 'heres the thing', thing
+	handleClick: (e) => # honor context in which this was defined
+		console.log 'named of clickee', @props.textElement.text
+		@setState hideChildren : !@state.hideChildren
 
 	render: ->
 		circleStyle =
@@ -25,10 +28,9 @@ class Node extends React.Component
 		textStyle =
 			fillOpacity: "1"
 
-		console.log 'node depth', @props.depth
-
 		renderChildren = []
-		if @state.children? # render only if node has children
+
+		if @state.children? and !@state.hideChildren # render only if node has children
 			children = (child for child in @state.children when child.depth is @props.depth)
 			for child in children
 				childProps =
@@ -42,15 +44,13 @@ class Node extends React.Component
 						text: child.name
 					parent: if child.parent is "null" then null else child.parent
 					children: child.children ? null # children if exists, null if not
-					onClick: @handleClick
 					depth: @props.depth+1
 
 				renderChildren.push `<Node {...childProps} key={children.indexOf(child)}/>`
 
 		`<g>
-			<g className={this.props.gNode.className}
-				transform={this.props.gNode.transform}
-				onClick={this.props.onClick}>
+			<g onClick={this.handleClick} className={this.props.gNode.className}
+				transform={this.props.gNode.transform}>
 				<circle r="10"
 						style={circleStyle}>
 				</circle>
@@ -155,6 +155,7 @@ class Tree extends React.Component
 		# this might be an overly expensive filter, check here first for perf bottlenecks
 		nodes = (node for node in nodes when node.depth is @depth)
 
+		# todo: check for children, just to cover bases
 		renderNodes = []
 		for node in nodes
 			nodeProps =
@@ -168,7 +169,6 @@ class Tree extends React.Component
 					text: node.name
 				parent: if node.parent is "null" then null else node.parent
 				children: node.children ? null # children if exists, null if not
-				onClick: @handleClick
 				depth: @depth+1
 
 			renderNodes.push `<Node {...nodeProps} key={nodes.indexOf(node)}/>`
