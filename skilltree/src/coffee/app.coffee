@@ -2,9 +2,10 @@
 i = 0
 
 class TreeRender
-	@create = (el, props, state) ->
+	@create = (el, createData) ->
 		# the containing svg of the tree
-		{width, height} = props.dim
+		{width, height} = createData.dim
+		margin = createData.margin
 		svg = d3.select(el)
 				.append("svg")
 		 		.attr("width", width+margin.right+margin.left)
@@ -13,23 +14,27 @@ class TreeRender
 		 		.attr("transform", "translate(#{margin.left},#{margin.top})")
 		 		.attr("class", "d3-skilltree")
 
-		
-		@update svg.node(), props.dim, state
+		updateData =
+			treeRecord: createData.treeRecord
+			dim: createData.dim
 
-	@update = (el, props, state) ->
+		@update svg.node(), updateData
+
+	@update = (el, updateData) ->
 		# Re-compute the scales, and render the data points
 		# scales = @_scales(el, state.domain)
-		@draw el, props, state.data
+		@draw el, updateData
 
 	@destroy = (el) ->
 		# Any clean-up would go here
 		# in this example there is nothing to do
 
-	@draw = (el, props, data) ->
+	@draw = (el, renderData) ->
 		console.log 'drawing points'
 		# handles drawing of links
 
-		{width, height} = props
+		{width, height} = renderData.dim
+		treeRecord = renderData.treeRecord
 
 		tree = d3.layout
 			 	.tree()
@@ -40,7 +45,7 @@ class TreeRender
 		 			 .projection (d) -> [d.y, d.x]
 
 		# Compute the new tree layout.
-		nodes = tree.nodes(data[0]).reverse()
+		nodes = tree.nodes(treeRecord[0]).reverse()
 		links = tree.links(nodes)
 
 		# Normalize for fixed-depth.
@@ -54,6 +59,7 @@ class TreeRender
 					    .append("g")
 					    .attr("class", "node")
 					    .attr("transform", (d) -> "translate(#{d.y},#{d.x})")
+					    .on('click', (d,i) -> console.log "click heard on #{i}")
 
 		nodeEnter.append("circle")
 				 .attr("r", 10)
@@ -79,7 +85,7 @@ class TreeRender
 
 class Tree extends React.Component
 	@propTypes =
-		data: React.PropTypes.array
+		treeRecord: React.PropTypes.array
 		nodeCount: React.PropTypes.number
 	@defaultProps =
 		nodeCount: 0
@@ -87,20 +93,27 @@ class Tree extends React.Component
 	constructor: (props) ->
 		super props
 		@state =
-			data: props.data
+			treeRecord: props.treeRecord
 
 	componentDidMount: ->
-		console.log 'mounted', @getTreeState()
-		el = React.findDOMNode this
-		TreeRender.create(el, {dim:this.props.dim, margin:this.props.margin}, @getTreeState())
+		TreeElement = React.findDOMNode this
+
+		createData =
+			treeRecord: @getTreeState().treeRecord
+			dim: @props.dim
+			margin: @props.margin
+
+		TreeRender.create TreeElement, createData
+
 
 	componentDidUpdate: ->
 		console.log 'updated'
 	# el = this.getDOMNode()
 	# TreeRender.update(el, this.getChartState())
 
+	# exposed to instances
 	getTreeState: ->
-	 	this.state
+	 	@state
 
 	componentWillUnmount: ->
 		console.log 'will unmount'
@@ -114,7 +127,7 @@ class App extends React.Component
 	constructor: (props) ->
 		super props
 		@state =
-			data: props.data
+			treeRecord: props.treeRecord
 
 	render: () ->
 		`<div className="App">
@@ -140,6 +153,7 @@ treeData = [
         "parent": "Top Level"
     ]
 ]
+
 margin =
 	top: 20
 	right: 120
@@ -149,4 +163,9 @@ dim =
 	width: 960-margin.right-margin.left
 	height: 500-margin.top-margin.bottom
 
-React.render `<App data={treeData} dim={dim} margin={margin}/>`, document.getElementById 'react'
+treeProps = 
+	treeRecord    : treeData
+	dim			  : dim
+	margin  	  : margin
+
+React.render `<App {...treeProps}/>`, document.getElementById 'react'
