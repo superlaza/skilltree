@@ -44,7 +44,7 @@ path =
 
 ECMAScripts   = ["./#{root}src/es6/*.js"]
 coffeeScripts = ["./#{root}src/coffee/*.coffee"]
-scssFiles 	  = ["#{path.css}**/*.scss"]
+scssFiles 	  = ["./#{root}src/sass/*.scss"]
 html 		  = ["./#{root}*.html"]
 
 gulp.task 'es6', ->
