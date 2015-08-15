@@ -12,6 +12,10 @@ ISSUES
 
 # globals
 i = 0
+# debug flags
+lifecycles = false
+
+
 diagonal = d3.svg
 			 .diagonal()
  			 .projection (d) -> [d.y, d.x]
@@ -115,7 +119,6 @@ class Root extends React.Component
 		
 		tree = @state.treeRecord
 
-		console.log 'treebefore', tree
 		findNode = (tree, id) ->
 			# root node
 			if tree.id == id then return tree
@@ -132,26 +135,34 @@ class Root extends React.Component
 		node = findNode tree[0], nodeId
 
 		# might be silly to lookup index when we could've pulled it from findnode
-		node.parent.children.splice node.parent.children.indexOf(node), 1
+		nodeIndex = node.parent.children.indexOf(node)
+
 		node.parent.links.outof = null # all outgoing links must be redrawn
-		node.parent.children.push child for child in node.children if node.children?
 
+		# remove selected node and insert its children in its placing, respecting order
+		spliceArgs = [nodeIndex, 1]
+		spliceArgs = spliceArgs.concat node.children if node.children?
+		node.parent.children.splice.apply node.parent.children, spliceArgs
 
+		# update state, fire re-render
 		@setState {treeRecord: tree}
 
 	# COMPONENT LIFECYCLE
 	# ===================
 	componentDidMount: ->
-		lg 'mounted', 'green'
-		console.log "\t#{@constructor.name} #{@props.id}"
+		if lifecycles
+			lg 'mounted', 'green'
+			console.log "\t#{@constructor.name} #{@props.id}"
 
 	componentDidUpdate: ->
-		lg 'update', 'blue'
-		console.log "\t#{@constructor.name} #{@props.id}"
+		if lifecycles
+			lg 'update', 'blue'
+			console.log "\t#{@constructor.name} #{@props.id}"
 
 	componentWillUnmount: ->
-		lg 'will unmount', 'red'
-		console.log "\t#{@constructor.name} #{@props.id}"
+		if lifecycles
+			lg 'will unmount', 'red'
+			console.log "\t#{@constructor.name} #{@props.id}"
 
 	# ===================
 
@@ -168,6 +179,7 @@ class Root extends React.Component
 		@setState dialogState : {show: show, coords: nodeData.coords, id: nodeData.nodeId}
 	
 	# given a tree (a subtree of childreen and links), build corresponding react components
+	# this will be called in the context of Node and Root classes, so be mindful of using @props and @state
 	_buildComponents: (tree, customProps) ->
 		[nodes, links] = tree
 		renderLinks = []
@@ -175,6 +187,7 @@ class Root extends React.Component
 		for node in nodes
 			nodeProps =
 				id: node.id
+				name: node.name
 				coords:
 					x: node.x
 					y: node.y
@@ -192,16 +205,17 @@ class Root extends React.Component
 			renderNodes.push `<Node {...nodeProps} {...customProps} key={node.id}/>`
 			++Root.nodeCount
 
-		if links and links.outof?
-			for link in links.outof
-				linkProps =
-					id: Root.linkCount
-					className: 'link'
-					d: diagonal link
-					_links: link # for debuggin only, remove
+			if node.links?.outof?
+				for link in node.links.outof
+					linkProps =
+						id: link.id
+						className: 'link'
+						d: diagonal link
+						_link: link # for debuggin' only, remove
 
-				renderLinks.push `<Link {...linkProps} key={Root.linkCount}/>`
-				++Root.linkCount
+					renderLinks.push `<Link {...linkProps} key={link.id}/>`
+					++Root.linkCount
+
 
 		renderNodes: renderNodes
 		renderLinks: renderLinks
@@ -218,14 +232,11 @@ class Root extends React.Component
 		nodes = tree.nodes(@state.treeRecord[0]).reverse()
 		links = tree.links(nodes)
 
-		console.log 'links', links
-
 		# Normalize for fixed-depth and set ids
 		nodes.forEach (node, index) -> 
 			node.y = node.depth * 180
 		links.forEach (link, index) ->
 			link.id = index
-
 
 		# STATIC PROPS COMPU
 		#=========================
@@ -238,18 +249,24 @@ class Root extends React.Component
 		# STATE-BASED COMPU
 		#=========================
 
-		# this might be an overly expensive filter, check here first for perf bottlenecks
-		nodes = (node for node in nodes when node.depth is @props.depth)
-
 		# should be done by popping from links list
 		attachLinks = (nodeList)->
 			for node in nodeList
 				node.links = 
 					into: (link for link in links when link.target is node)
 					outof: (link for link in links when link.source is node)
+				if node.id is 0
+					lg 'node 0 links', 'red'
+					console.log node.links
 				attachLinks node.children if node.children?
 
 		attachLinks nodes
+
+
+		# this might be an overly expensive filter, check here first for perf bottlenecks
+		nodes = (node for node in nodes when node.depth is @props.depth)
+
+		console.log 'nodes', nodes
 
 		customProps =
 			depth: @props.depth+1
@@ -272,6 +289,7 @@ class Root extends React.Component
 				 height={winHeight}>
 				 <g transform={this.props.gtree.transform}
 				 	className={this.props.gtree.class}>
+				 	{renderLinks}
 				 	{renderNodes}
 				 </g>
 			</svg>
@@ -303,7 +321,6 @@ class Node extends Root
 	className: 'node-circle'
 
 	constructor: (props) ->
-		console.log 'node name and links', props.textElement.text, props.links
 		@props = props
 		@state =
 			children: @props.children
@@ -348,7 +365,6 @@ class Node extends Root
 		if @state.children? and !@state.hideChildren # render only if node has children
 			{renderNodes, renderLinks} = @_buildComponents [@state.children, @state.links], customProps
 
-
 		`<g>
 			{renderLinks}
 			<g  onClick={this.handleClick}
@@ -373,7 +389,13 @@ class Node extends Root
 			{renderNodes}
 		</g>
 		`
-
+###
+@props:
+	id: link.id
+	className: 'link'
+	d: diagonal link
+	_link: link # for debuggin' only, remove
+###
 class Link extends React.Component
 	constructor: (props) ->
 		super props
@@ -381,31 +403,34 @@ class Link extends React.Component
 	# COMPONENT LIFECYCLE
 	# ===================
 	componentDidMount: ->
-		lg 'mounted', 'green'
-		console.log "\t#{@constructor.name} #{@props.id}"
+		if lifecycles
+			lg 'mounted', 'green'
+			console.log "\t#{@constructor.name} #{@props.id}"
 
 	componentDidUpdate: ->
-		lg 'update', 'blue'
-		console.log "\t#{@constructor.name} #{@props.id}"
+		if lifecycles
+			lg 'update', 'blue'
+			console.log "\t#{@constructor.name} #{@props.id}"
 
 	componentWillUnmount: ->
-		lg 'will unmount', 'red'
-		console.log "\t#{@constructor.name} #{@props.id}"
+		if lifecycles
+			lg 'will unmount', 'red'
+			console.log "\t#{@constructor.name} #{@props.id}"
 
 	# ===================
 
 	render: ->
+		# only for debugging
 		textStyle =
 			fillOpacity: "1"
-		console.log 'lisdfgnks', @props._links
-		src = @props._links.source
-		trg = @props._links.target
+		src = @props._link.source
+		trg = @props._link.target
 		[aX, aY] = [src.x, src.y]
 		[bX, bY] = [trg.x, trg.y]
 		midX = Math.abs(aX+bX)/2
 		midY = Math.abs(aY+bY)/2
-		console.log aX, aY, bX, bY
-		console.log midX, midY
+		# only for debugging
+
 		`<g>
 			{/*TEXT (AND WRAPPING GROUP) FOR DEBUGGING ONLY*/}
 			{/*WRAPPING GROUP ABOUT AS NECESSARY AS D12*/}
@@ -478,6 +503,19 @@ treeData = [
             name: "Daughter of B"
             id: 6
             parent: "Level 2: B"
+        ]
+      ,
+        name: "Level 3: C"
+        id: 7
+        parent: "Top Level"
+        children: [
+            name: "Son of C"
+            id: 8
+            parent: "Level 3: C"
+          ,
+            name: "Daughter of C"
+            id: 9
+            parent: "Level 3: C"
         ]
     ]
 ]
