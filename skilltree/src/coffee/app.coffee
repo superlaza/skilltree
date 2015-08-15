@@ -16,6 +16,20 @@ diagonal = d3.svg
 			 .diagonal()
  			 .projection (d) -> [d.y, d.x]
 
+lg = (_string...) ->
+		args = arguments
+		clr = args[args.length-1]
+		if clr is 'blue' or clr is 'red' or clr is 'green'
+			switch clr
+				when 'blue'
+					args[args.length-1] = 'color: #2175d9'
+				when 'red'
+					args[args.length-1] = 'color: #ff3232'
+				when 'green'
+					args[args.length-1] = 'color: #00d27f'
+			args[0] = '%c '+args[0]
+		console.log.apply console, (arg for index,arg of args)
+
 ###
 @props:
 	nodeId
@@ -63,6 +77,208 @@ class Dialog extends React.Component
 		</div>`
 ###
 @props:
+	treeRecord    : treeData
+	dim			  : dim
+	margin  	  : margin
+	gtree 		  :
+					transform: "translate(120,20)"
+					class: "d3-skilltree"
+	depth 		  : 0 # initialize depth
+###
+class Root extends React.Component
+	@propTypes:
+		treeRecord: React.PropTypes.array
+		nodeCount: React.PropTypes.number
+
+	@nodeCount: 0
+	@linkCount: 0
+
+	constructor: (props) ->
+		super props # assign instance props
+
+
+		# initialize state
+		@state =
+			treeRecord: @props.treeRecord
+			dialogState:
+				show: false
+				coords:
+					x: 0
+					y: 0
+				id: -1
+
+	# exposed to instances
+	getTreeState: ->
+	 	@state
+
+	_delete: (nodeId) =>
+		
+		tree = @state.treeRecord
+
+		console.log 'treebefore', tree
+		findNode = (tree, id) ->
+			# root node
+			if tree.id == id then return tree
+			# leaf node
+			if !tree.children then return null
+			for child in tree.children
+				if child.id == id
+					return child
+				else
+					node = findNode child, id
+					if node isnt null then return node
+			null
+
+		node = findNode tree[0], nodeId
+
+		# might be silly to lookup index when we could've pulled it from findnode
+		node.parent.children.splice node.parent.children.indexOf(node), 1
+		node.parent.links.outof = null # all outgoing links must be redrawn
+		node.parent.children.push child for child in node.children if node.children?
+
+
+		@setState {treeRecord: tree}
+
+	# COMPONENT LIFECYCLE
+	# ===================
+	componentDidMount: ->
+		lg 'mounted', 'green'
+		console.log "\t#{@constructor.name} #{@props.id}"
+
+	componentDidUpdate: ->
+		lg 'update', 'blue'
+		console.log "\t#{@constructor.name} #{@props.id}"
+
+	componentWillUnmount: ->
+		lg 'will unmount', 'red'
+		console.log "\t#{@constructor.name} #{@props.id}"
+
+	# ===================
+
+	utils:
+		deleteNode: (id) =>
+			console.log 'delete requested', id
+
+
+	handleClick: (thing) => # honor context in which this was defined
+		console.log 'clicked'
+		console.log 'heres the thing', thing
+
+	showDialog: (show, nodeData) =>
+		@setState dialogState : {show: show, coords: nodeData.coords, id: nodeData.nodeId}
+	
+	# given a tree (a subtree of childreen and links), build corresponding react components
+	_buildComponents: (tree, customProps) ->
+		[nodes, links] = tree
+		renderLinks = []
+		renderNodes = []
+		for node in nodes
+			nodeProps =
+				id: node.id
+				coords:
+					x: node.x
+					y: node.y
+				gNode:
+					className: 'node'
+				textElement:
+					x: '13'
+					dy: '0.35em'
+					anchor: "start"
+					text: node.name
+				parent: if node.parent is "null" then null else node.parent
+				children: node.children ? null # children if exists, null if not
+				links: node.links
+
+			renderNodes.push `<Node {...nodeProps} {...customProps} key={node.id}/>`
+			++Root.nodeCount
+
+		if links and links.outof?
+			for link in links.outof
+				linkProps =
+					id: Root.linkCount
+					className: 'link'
+					d: diagonal link
+					_links: link # for debuggin only, remove
+
+				renderLinks.push `<Link {...linkProps} key={Root.linkCount}/>`
+				++Root.linkCount
+
+		renderNodes: renderNodes
+		renderLinks: renderLinks
+
+	render: ->
+		# COMPUTE TREE STATE
+		# ==================
+		# Compute the new tree layout
+		{width, height} = @props.dim
+		tree = d3.layout
+			 	.tree()
+				.size [height, width]
+
+		nodes = tree.nodes(@state.treeRecord[0]).reverse()
+		links = tree.links(nodes)
+
+		console.log 'links', links
+
+		# Normalize for fixed-depth and set ids
+		nodes.forEach (node, index) -> 
+			node.y = node.depth * 180
+		links.forEach (link, index) ->
+			link.id = index
+
+
+		# STATIC PROPS COMPU
+		#=========================
+		# calculate window dimensions
+		margin = @props.margin
+		{width, height} = @props.dim
+		winWidth = width+margin.right+margin.left
+		winHeight = height+margin.top+margin.bottom
+
+		# STATE-BASED COMPU
+		#=========================
+
+		# this might be an overly expensive filter, check here first for perf bottlenecks
+		nodes = (node for node in nodes when node.depth is @props.depth)
+
+		# should be done by popping from links list
+		attachLinks = (nodeList)->
+			for node in nodeList
+				node.links = 
+					into: (link for link in links when link.target is node)
+					outof: (link for link in links when link.source is node)
+				attachLinks node.children if node.children?
+
+		attachLinks nodes
+
+		customProps =
+			depth: @props.depth+1
+			_delete: @_delete
+		{renderNodes, renderLinks} = @_buildComponents [nodes, null], customProps
+
+		# setup dialog
+		dialogJSX = `<Dialog 
+						nodeId={this.state.dialogState.id}
+						coords={this.state.dialogState.coords}
+						margin={this.props.margin}
+						_showDialog={this.showDialog}
+						_delete={this.delete}/>`
+		dialog = if @state.dialogState.show then [dialogJSX] else [] 
+
+		`<div className="Skilltree">
+			{dialog}
+			<svg id="skilltree-canvas"
+				 width={winWidth}
+				 height={winHeight}>
+				 <g transform={this.props.gtree.transform}
+				 	className={this.props.gtree.class}>
+				 	{renderNodes}
+				 </g>
+			</svg>
+		</div>
+		`
+###
+@props:
 	id:
 	coords:
 		x
@@ -82,12 +298,13 @@ class Dialog extends React.Component
 	_delete: <Tree> function used to delete node
 	_showDialog: <App> function used to toggle the node dialog
 ###
-class Node extends React.Component
+class Node extends Root
 	radius: 13
 	className: 'node-circle'
 
 	constructor: (props) ->
-		super props
+		console.log 'node name and links', props.textElement.text, props.links
+		@props = props
 		@state =
 			children: @props.children
 			links: @props.links
@@ -101,55 +318,36 @@ class Node extends React.Component
 		}
 
 	handleClick: (e) => # honor context in which this was defined
-		console.log 'named of clickee', @props.textElement.text
-		@setState hideChildren : !@state.hideChildren #super's method
+		# console.log 'named of clickee', @props.textElement.text
+		# @setState hideChildren : !@state.hideChildren #inherited method
+
+		@props._delete @props.id
+
+	delete: =>
+		console.log 'node delete'
+		console.log 'state check', @state
+		super @props.id
 
 	render: ->
+		# exports = @_render(@props, @state)
+
+		# static styles
 		circleStyle =
 			fill: "rgb(255,255,255)"
 		textStyle =
 			fillOpacity: "1"
 
-		# STATIC PROPS COMPU
+		# props computations
 		translation = "translate(#{@props.coords.y}, #{@props.coords.x})"
 
-		renderLinks = []
-		renderChildren = []
+		customProps =
+			depth: @props.depth+1
+			_delete: @props._delete
+
+		# state computations
 		if @state.children? and !@state.hideChildren # render only if node has children
-			children = (child for child in @state.children when child.depth is @props.depth)
-			for child in children
-				childProps =
-					id: child.id
-					coords:
-						x: child.x
-						y: child.y
-					gNode:
-						className: 'node'
-					textElement:
-						x: '13'
-						dy: '0.35em'
-						anchor: "start"
-						text: child.name
-					parent: if child.parent is "null" then null else child.parent
-					children: child.children ? null # children if exists, null if not
-					links: child.links
-					depth: @props.depth+1
-					_delete: @props._delete
-					_showDialog: @props._showDialog
+			{renderNodes, renderLinks} = @_buildComponents [@state.children, @state.links], customProps
 
-				++Tree.nodeCount
-
-				renderChildren.push `<Node {...childProps} key={child.id}/>`
-
-				if @state.links.outof?
-					for link in @state.links.outof
-						linkProps =
-							className: 'link'
-							d: diagonal link
-
-						renderLinks.push `<Link {...linkProps} key={Tree.linkCount}/>`
-
-						++Tree.linkCount
 
 		`<g>
 			{renderLinks}
@@ -172,7 +370,7 @@ class Node extends React.Component
 					  style={textStyle}>{this.props.textElement.text}
 				</text>
 			</g>
-			{renderChildren}
+			{renderNodes}
 		</g>
 		`
 
@@ -180,184 +378,45 @@ class Link extends React.Component
 	constructor: (props) ->
 		super props
 
-	render: ->
-		`<path className={this.props.className}
-			   d={this.props.d}></path>
-		`
-
-###
-@props:
-	treeRecord    :
-	dim			  :
-	margin  	  :
-	gtree 		  :
-					transform: "translate(120,20)"
-					class: "d3-skilltree"
-	_showDialog:
-###
-class Tree extends React.Component
-	@propTypes:
-		treeRecord: React.PropTypes.array
-		nodeCount: React.PropTypes.number
-
-	@nodeCount: 0
-	@linkCount: 0
-	depth: 0
-
-	constructor: (props) ->
-		super props # assign instance props
-
-		# COMPUTE TREE STATE
-		# ==================
-		# Compute the new tree layout
-		{width, height} = @props.dim
-		tree = d3.layout
-			 	.tree()
-				.size [height, width]
-
-		nodes = tree.nodes(@props.treeRecord[0]).reverse()
-		links = tree.links(nodes)
-
-		# Normalize for fixed-depth and set ids
-		nodes.forEach (node, index) -> 
-			node.y = node.depth * 180
-			node.id = index
-		links.forEach (link, index) ->
-			link.id = index
-
-		# initialize state
-		@state =
-			tree:
-				nodes: nodes
-				links: links
-			dialogState:
-				show: false
-				coords:
-					x: 0
-					y: 0
-				id: -1
-
-	# exposed to instances
-	@getTreeState: ->
-	 	@state
-
-	delete: (nodeId) =>
-		node = @state.tree.nodes[nodeId]
-		parent = node.parent
-		parentLink = parent.links
-		console.log 'nodes', @state.tree.nodes[2..]
-		sel = d3.select('#skilltree-canvas').selectAll('g.node')
-
-		console.log 'sel1', sel[0]
-		sel[0].sort (a,b) ->
-			Number(a.id)-Number(b.id)
-
-		res = sel.data [1,2]
-		res.enter().append('g')
-		console.log 'res', res.exit().remove()
-
 	# COMPONENT LIFECYCLE
 	# ===================
 	componentDidMount: ->
-		console.log 'mounted'
-		console.log @state
+		lg 'mounted', 'green'
+		console.log "\t#{@constructor.name} #{@props.id}"
 
 	componentDidUpdate: ->
-		console.log 'updated'
+		lg 'update', 'blue'
+		console.log "\t#{@constructor.name} #{@props.id}"
 
 	componentWillUnmount: ->
-		console.log 'will unmount'
+		lg 'will unmount', 'red'
+		console.log "\t#{@constructor.name} #{@props.id}"
 
 	# ===================
 
-	utils:
-		deleteNode: (id) =>
-			console.log 'delete requested', id
-
-
-	handleClick: (thing) => # honor context in which this was defined
-		console.log 'clicked'
-		console.log 'heres the thing', thing
-
-	showDialog: (show, nodeData) =>
-		console.log 'still calling showDialog', nodeData
-		@setState dialogState : {show: show, coords: nodeData.coords, id: nodeData.nodeId}
-
 	render: ->
-		# STATIC PROPS COMPU
-		#=========================
-		# calculate window dimensions
-		margin = this.props.margin
-		{width, height} = this.props.dim
-		winWidth = width+margin.right+margin.left
-		winHeight = height+margin.top+margin.bottom
+		textStyle =
+			fillOpacity: "1"
+		console.log 'lisdfgnks', @props._links
+		src = @props._links.source
+		trg = @props._links.target
+		[aX, aY] = [src.x, src.y]
+		[bX, bY] = [trg.x, trg.y]
+		midX = Math.abs(aX+bX)/2
+		midY = Math.abs(aY+bY)/2
+		console.log aX, aY, bX, bY
+		console.log midX, midY
+		`<g>
+			{/*TEXT (AND WRAPPING GROUP) FOR DEBUGGING ONLY*/}
+			{/*WRAPPING GROUP ABOUT AS NECESSARY AS D12*/}
+			<text style={textStyle}
+				x={midY}
+				dy={midX}>{this.props.id}
+			</text>
 
-		# STATE-BASED COMPU
-		#=========================
-		{nodes, links} = @state.tree
-
-		# this might be an overly expensive filter, check here first for perf bottlenecks
-		nodes = (node for node in nodes when node.depth is @depth)
-
-		# should be done by popping from links list
-		attachLinks = (nodeList)->
-			for node in nodeList
-				node.links = 
-					into: (link for link in links when link.target is node)
-					outof: (link for link in links when link.source is node)
-				attachLinks node.children if node.children?
-
-		attachLinks nodes
-
-		console.log nodes
-
-		# todo: check for children, just to cover bases
-		renderNodes = []
-		for node in nodes
-			nodeProps =
-				id: node.id
-				coords:
-					x: node.x
-					y: node.y
-				gNode:
-					className: 'node'
-				textElement:
-					x: '13'
-					dy: '0.35em'
-					anchor: "start"
-					text: node.name
-				parent: if node.parent is "null" then null else node.parent
-				children: node.children ? null # children if exists, null if not
-				links: node.links
-				depth: @depth+1
-				_delete: @delete
-				_showDialog: @showDialog
-
-			++Tree.nodeCount
-				
-
-			renderNodes.push `<Node {...nodeProps} key={node.id}/>`
-
-		# setup dialog
-		dialogJSX = `<Dialog 
-						nodeId={this.state.dialogState.id}
-						coords={this.state.dialogState.coords}
-						margin={this.props.margin}
-						_showDialog={this.showDialog}
-						_delete={this.delete}/>`
-		dialog = if @state.dialogState.show then [dialogJSX] else [] 
-
-		`<div className="Skilltree">
-			{dialog}
-			<svg id="skilltree-canvas"
-				 width={winWidth}
-				 height={winHeight}>
-				 <g transform={this.props.gtree.transform}
-				 	className={this.props.gtree.class}>
-				 	{renderNodes}
-				 </g>
-			</svg>
-		</div>
+			<path className={this.props.className}
+			   d={this.props.d}></path>
+		</g>
 		`
 
 class App extends React.Component
@@ -386,27 +445,40 @@ class App extends React.Component
 
 		`<div className="App">
 			{dialog}
-	        <Tree
+	        <Root
 	        	{...this.props}/>
 	    </div>`
 
 treeData = [
-    "name": "Top Level"
-    "parent": "null"
-    "test": 'whatever'
-    "children": [
-        "name": "Level 2: A"
-        "parent": "Top Level"
-        "children": [
-            "name": "Son of A"
-            "parent": "Level 2: A"
+    name: "Top Level"
+    id: 0
+    parent: "null"
+    children: [
+        name: "Level 2: A"
+        id: 1
+        parent: "Top Level"
+        children: [
+            name: "Son of A"
+            id: 2
+            parent: "Level 2: A"
           ,
-            "name": "Daughter of A"
-            "parent": "Level 2: A"
+            name: "Daughter of A"
+            id: 3
+            parent: "Level 2: A"
         ]
       ,
-        "name": "Level 2: B"
-        "parent": "Top Level"
+        name: "Level 2: B"
+        id: 4
+        parent: "Top Level"
+        children: [
+            name: "Son of B"
+            id: 5
+            parent: "Level 2: B"
+          ,
+            name: "Daughter of B"
+            id: 6
+            parent: "Level 2: B"
+        ]
     ]
 ]
 
@@ -426,5 +498,6 @@ treeProps =
 	gtree 		  :
 					transform: "translate(120,20)"
 					class: "d3-skilltree"
+	depth 		  : 0 # initialize depth
 
 React.render `<App {...treeProps}/>`, document.getElementById 'react'
