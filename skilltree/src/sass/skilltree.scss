@@ -1,7 +1,10 @@
 #dialog-box {
-	background: grey;
+	background: white;
+	border: solid 1px;
+	visibility: 'hidden';
 	&:hover {
-		background: grey;
+		background: white;
+		visibility: 'visible' !important;
 	}
 
 	// maybe in the future :(

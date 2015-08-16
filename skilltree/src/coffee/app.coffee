@@ -54,33 +54,72 @@ class Dialog extends React.Component
 
 	constructor: (props) ->
 		super props
-	
+
+		@state =
+			show: @props.showDialog
+			onComplete: @props._onComplete
+
+	# COMPONENT LIFECYCLE
+	# ===================
+	componentDidMount: ->
+		if lifecycles
+			lg 'mounted', 'green'
+			console.log "\t#{@constructor.name} #{@props.id}"
+
+	componentWillReceiveProps: (newProps) ->
+		newState = 
+			show:newProps.showDialog
+			onComplete:newProps._onComplete
+
+		@setState newState
+
+	componentWillUpdate: ->
+		if lifecycles
+			lg 'will update', 'blue'
+			console.log "\t#{@constructor.name} #{@props.id}"
+
+	componentDidUpdate: ->
+		if lifecycles
+			lg 'update', 'blue'
+			console.log "\t#{@constructor.name} #{@props.id}"
+
+		@state.show = @props.showDialog
+
+	componentWillUnmount: ->
+		if lifecycles
+			lg 'will unmount', 'red'
+			console.log "\t#{@constructor.name} #{@props.id}"
+
+	# ===================
+
 	# continuous showing of dialog, even when mouse has left node area
 	onMouseEvent: (e) =>
-		@props._showDialog e.type is 'mouseenter', {
-				coords: @props.coords
-				nodeId: @props.nodeId
-		}
+		if e.type is 'mouseenter'
+			@setState show:true
+		if e.type is 'mouseleave'
+			@setState show:false
+
 
 	handleClick: (e) =>
-		console.log e.target.text # check if delete
-		@props._delete(@props.nodeId)
+		console.log @state.onComplete(e.target.text)
 
 	render: ->
-		console.log @props
 		dialogStyle =
 			width: @width
 			height: @height
+			visibility: (if @state.show then 'visible' else 'hidden')
 			position: 'absolute'
 			left: "#{@props.coords.y+@props.margin.left-(@width/2)}px" # move the dialog to the invoking node
 			top: "#{@props.coords.x+@props.margin.top-30}px"
 		
-		`<div id={"dialog-"+this.id}
+		`<div id={this.id}
 			  style={dialogStyle}
-			  onMouseEnter={this.onMouseEvent}
+			  onMouseLeave={this.onMouseEvent}
 			  onMouseLeave={this.onMouseEvent}>
 			  <a onClick={this.handleClick}
-			  	 href="#">test</a>
+			  	 href="#">delete</a>
+			  <a onClick={this.handleClick}
+			  	 href="#">insert</a>
 		</div>`
 ###
 @props:
@@ -113,6 +152,7 @@ class Root extends React.Component
 					x: 0
 					y: 0
 				id: -1
+				_onComplete: null
 
 	# exposed to instances
 	getTreeState: ->
@@ -137,8 +177,6 @@ class Root extends React.Component
 		console.log @props, @state
 		tree = @state.treeRecord
 
-		console.log @state.treeRecord
-
 		node = @findNode tree[0], nodeId
 		lg (if node? then "node found" else "node not found!"), 'red'
 		console.log "lajksdffsldj", node
@@ -150,6 +188,7 @@ class Root extends React.Component
 		++Root.nodeCount
 
 		# first child!
+		console.log 'found node', node
 		if !node.children?
 			node.children = [newNode]
 		else
@@ -157,8 +196,46 @@ class Root extends React.Component
 
 		console.log 'new tree',tree
 
+		nodes = @props.dTree.nodes(tree[0]).reverse()
+		links = @props.dTree.links(nodes)
 
-		setTimeout (=> @setState {treeRecord: tree}), 0
+		nodes.forEach (node, index) -> 
+			node.y = node.depth * horizontal_dist
+
+		# links.forEach (link, index) ->
+		# 	link.id = index
+
+		svg = d3.select('svg')
+		node = svg.selectAll "g.node"
+				 .data nodes, (d) -> d?.id ? d
+
+		console.log 'nodesel', node
+
+		delay = 1000
+		node.transition()
+			.duration(delay)
+			.attr('transform', (d) -> 
+				"translate(#{d.y}, #{d.x})")
+
+		# link = d3.select('svg g').selectAll ".link"
+		# 			.data links, (d) -> 
+		# 				if d?
+		# 					parseInt ''+d.source.id+d.target.id
+		# 				else
+		# 					d
+
+		# console.log 'link data', link
+		# link.enter().insert("path", 'g')
+		# 			.attr("class", "link")
+		# 			.attr("d", diagonal)
+
+		# link.transition()
+		# 	.duration(delay)
+		# 	.attr('d', diagonal)
+
+		set = =>
+			@setState {treeRecord: tree}
+		setTimeout set, delay
 
 	_delete: (nodeId) =>
 		
@@ -202,29 +279,30 @@ class Root extends React.Component
 
 		console.log 'nodesel', node
 
-		delay = 1000
+		delay = 500
 		node.transition()
 			.duration(delay)
 			.attr('transform', (d) -> 
 				"translate(#{d.y}, #{d.x})")
 
-		console.log 'did selection work?', d3.select('svg g')
-		link = d3.select('svg g').selectAll ".link"
-					.data links, (d) -> 
-						if d?
-							parseInt ''+d.source.id+d.target.id
-						else
-							d
+		# link = d3.select('svg g').selectAll ".link"
+		# 			.data links, (d) -> 
+		# 				if d?
+		# 					parseInt ''+d.source.id+d.target.id
+		# 				else
+		# 					d
+
+		# link = d3.select('svg g').selectAll ".link"
+		# 			.data links, (d) -> 
+		# 				if d?
+		# 					parseInt ''+d.source.id+d.target.id
+		# 				else
+		# 					d
 
 		# console.log 'link data', link
 		# link.enter().insert("path", 'g')
 		# 			.attr("class", "link")
-		# 			.attr("d", (d) ->
-		# 				console.log 'enter', d
-		# 				# o = {x: source.x0, y: source.y0}
-		# 				# return diagonal {source: o, target: o}
-		# 				diagonal d
-		# 			)
+		# 			.attr("d", diagonal)
 
 		# link.transition()
 		# 	.duration(delay)
@@ -232,7 +310,7 @@ class Root extends React.Component
 
 
 		# update state, fire re-render (after transition)
-		setTimeout (=> @setState {treeRecord: tree}), 2*delay
+		setTimeout (=> @setState {treeRecord: tree}), delay
 
 	# COMPONENT LIFECYCLE
 	# ===================
@@ -261,15 +339,22 @@ class Root extends React.Component
 		console.log 'clicked'
 		console.log 'heres the thing', thing
 
-	showDialog: (show, nodeData) =>
-		@setState dialogState : {show: show, coords: nodeData.coords, id: nodeData.nodeId}
-	
-	# given a tree (a subtree of childreen and links), build corresponding react components
+	_showDialog: (show, nodeData, onComplete) =>
+		newState =
+			dialogState :
+				show: show
+				coords: nodeData.coords
+				id: nodeData.nodeId
+				_onComplete: onComplete
+
+		@setState newState
+			# given a tree (a subtree of childreen and links), build corresponding react components
 	# this will be called in the context of Node and Root classes, so be mindful of using @props and @state
 	_buildComponents: (tree, customProps) ->
 		[nodes, links] = tree
 		renderLinks = []
 		renderNodes = []
+		console.log @props.name if @props.name?
 		for node in nodes
 			nodeProps =
 				id: node.id
@@ -308,6 +393,7 @@ class Root extends React.Component
 		renderLinks: renderLinks
 
 	render: ->
+		console.log 'updated state', @state
 		# COMPUTE TREE STATE
 		# ==================
 		# Compute the new tree layout
@@ -324,14 +410,8 @@ class Root extends React.Component
 
 			temp
 
-		# tree = clone @state.treeRecord[0]
-		# console.log 'tree is ', tree
-
-		# console.log 'before', @state.treeRecord
-		# # tree = jQuery.extend(true, {}, @state.treeRecord[0])
 		nodes = @props.dTree.nodes(@state.treeRecord[0]).reverse()
 		links = @props.dTree.links(nodes)
-		# console.log 'after', @state.treeRecord
 
 		# Normalize for fixed-depth and set ids
 		nodes.forEach (node, index) -> 
@@ -357,32 +437,29 @@ class Root extends React.Component
 					into: (link for link in links when link.target is node)
 					outof: (link for link in links when link.source is node)
 				if node.id is 0
-					lg 'node 0 links', 'red'
 					console.log node.links
 				attachLinks node.children if node.children?
 
 		attachLinks nodes
 
-
-		# this might be an overly expensive filter, check here first for perf bottlenecks
-		nodes = (node for node in nodes when node.depth is @props.depth)
-
-		console.log 'nodes', nodes
-
 		customProps =
 			depth: @props.depth+1
 			_delete: @_delete
 			_insert: @_insert
+			_showDialog: @_showDialog
 		{renderNodes, renderLinks} = @_buildComponents [nodes, null], customProps
 
+		console.log 'get oncomplete?', @state.dialogState._onComplete
 		# setup dialog
 		dialogJSX = `<Dialog 
 						nodeId={this.state.dialogState.id}
 						coords={this.state.dialogState.coords}
 						margin={this.props.margin}
-						_showDialog={this.showDialog}
+						showDialog={this.state.dialogState.show}
+						_onComplete={this.state.dialogState._onComplete}
 						_delete={this.delete}/>`
-		dialog = if @state.dialogState.show then [dialogJSX] else [] 
+		# dialog = if @state.dialogState.show then [dialogJSX] else [] 
+		dialog = dialogJSX
 
 		`<div className="Skilltree">
 			{dialog}
@@ -400,6 +477,7 @@ class Root extends React.Component
 ###
 @props:
 	id:
+	name:
 	coords:
 		x
 		y
@@ -454,10 +532,17 @@ class Node extends Root
 	# ===================
 
 	onMouseEvent: (e) =>
-		@props._showDialog e.type is 'mouseenter', {
+		onComplete = (action) =>
+			switch action
+				when 'delete'
+					@props._delete(@props.id)
+				when 'insert'
+					@props._insert(@props.id)
+
+		@props._showDialog true, {
 				coords: @props.coords
 				nodeId: @props.id
-		}
+		}, onComplete
 
 	handleClick: (e) => # honor context in which this was defined
 		# console.log 'named of clickee', @props.textElement.text
@@ -484,37 +569,24 @@ class Node extends Root
 		# props computations
 		translation = "translate(#{@props.coords.y}, #{@props.coords.x})"
 
-		customProps =
-			depth: @props.depth+1
-			_delete: @props._delete
-			_insert: @props._insert
+		`<g  onClick={this.handleClick}
+			id={"node-"+this.props.id}
+			className={this.props.gNode.className}
+			transform={translation}>
 
-		# state computations
-		if @state.children? and !@state.hideChildren # render only if node has children
-			{renderNodes, renderLinks} = @_buildComponents [@state.children, @state.links], customProps
+			{/* MAIN NODE */}
+			<circle r={this.radius}
+					style={circleStyle}
+					className={this.className}
+					onMouseEnter={this.onMouseEvent}
+					onMouseLeave={this.onMouseEvent}>
+			</circle>
 
-		`<g>
-			{renderLinks}
-			<g  onClick={this.handleClick}
-				id={"node-"+this.props.id}
-				className={this.props.gNode.className}
-				transform={translation}>
-
-				{/* MAIN NODE */}
-				<circle r={this.radius}
-						style={circleStyle}
-						className={this.className}
-						onMouseEnter={this.onMouseEvent}
-						onMouseLeave={this.onMouseEvent}>
-				</circle>
-
-				<text x={this.props.textElement.x}
-					  dy={this.props.textElement.dy}
-					  textAnchor={this.props.textElement.anchor}
-					  style={textStyle}>{this.props.textElement.text}
-				</text>
-			</g>
-			{renderNodes}
+			<text x={this.props.textElement.x}
+				  dy={this.props.textElement.dy}
+				  textAnchor={this.props.textElement.anchor}
+				  style={textStyle}>{this.props.textElement.text}
+			</text>
 		</g>
 		`
 ###
@@ -589,9 +661,6 @@ class App extends React.Component
 					x: 0
 					y: 0
 				id: -1
-
-	showDialog: (show, nodeData) =>
-		@setState dialogState : {show: show, coords: nodeData.coords, id: nodeData.nodeId}
 
 	render: ->
 		dialogProps = null
