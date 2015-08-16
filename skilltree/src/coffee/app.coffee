@@ -15,6 +15,9 @@ i = 0
 # debug flags
 lifecycles = false
 
+# tree properties
+horizontal_dist = 180
+
 
 diagonal = d3.svg
 			 .diagonal()
@@ -115,29 +118,57 @@ class Root extends React.Component
 	getTreeState: ->
 	 	@state
 
+	# get node specified by id
+	findNode: (tree, id) ->
+		# root node
+		if tree.id == id then return tree
+		# leaf node
+		if !tree.children then return null
+		for child in tree.children
+			if child.id == id
+				return child
+			else
+				node = @findNode child, id
+				if node isnt null then return node
+		null
+
+	_insert: (nodeId) =>
+		console.log 'called insert'
+		console.log @props, @state
+		tree = @state.treeRecord
+
+		console.log @state.treeRecord
+
+		node = @findNode tree[0], nodeId
+		lg (if node? then "node found" else "node not found!"), 'red'
+		console.log "lajksdffsldj", node
+
+		newNode =
+			name: "New Name"
+			id: Root.nodeCount
+			parent: node.name
+		++Root.nodeCount
+
+		# first child!
+		if !node.children?
+			node.children = [newNode]
+		else
+			node.children.push newNode
+
+		console.log 'new tree',tree
+
+
+		setTimeout (=> @setState {treeRecord: tree}), 0
+
 	_delete: (nodeId) =>
 		
 		tree = @state.treeRecord
 
-		# get node specified by id
-		findNode = (tree, id) ->
-			# root node
-			if tree.id == id then return tree
-			# leaf node
-			if !tree.children then return null
-			for child in tree.children
-				if child.id == id
-					return child
-				else
-					node = findNode child, id
-					if node isnt null then return node
-			null
-
-		node = findNode tree[0], nodeId
+		node = @findNode tree[0], nodeId
 
 		lg (if node? then "node found" else "node not found!"), 'red'
 
-		# MANIFEST THE ABOVE CHANGES IN THE MODEL
+		# MANIFEST THE CHANGES IN THE MODEL
 
 		# might be silly to lookup index when we could've pulled it from findnode
 		nodeIndex = node.parent.children.indexOf(node)
@@ -160,10 +191,10 @@ class Root extends React.Component
 		links = @props.dTree.links(nodes)
 
 		nodes.forEach (node, index) -> 
-			node.y = node.depth * 180
-		
-		links.forEach (link, index) ->
-			link.id = index
+			node.y = node.depth * horizontal_dist
+
+		# links.forEach (link, index) ->
+		# 	link.id = index
 
 		svg = d3.select('svg')
 		node = svg.selectAll "g.node"
@@ -175,14 +206,18 @@ class Root extends React.Component
 		node.transition()
 			.duration(delay)
 			.attr('transform', (d) -> 
-				console.log 'datum', d
 				"translate(#{d.y}, #{d.x})")
 
-		# link = svg.selectAll ".link"
-		# 			.data links, (d) -> d?.id ? d
-		# 		  # .data links, (d) -> d?.id ? d
+		console.log 'did selection work?', d3.select('svg g')
+		link = d3.select('svg g').selectAll ".link"
+					.data links, (d) -> 
+						if d?
+							parseInt ''+d.source.id+d.target.id
+						else
+							d
 
-		# link.enter().insert("path")
+		# console.log 'link data', link
+		# link.enter().insert("path", 'g')
 		# 			.attr("class", "link")
 		# 			.attr("d", (d) ->
 		# 				console.log 'enter', d
@@ -197,7 +232,7 @@ class Root extends React.Component
 
 
 		# update state, fire re-render (after transition)
-		setTimeout (=> @setState {treeRecord: tree}), delay
+		setTimeout (=> @setState {treeRecord: tree}), 2*delay
 
 	# COMPONENT LIFECYCLE
 	# ===================
@@ -221,7 +256,6 @@ class Root extends React.Component
 	utils:
 		deleteNode: (id) =>
 			console.log 'delete requested', id
-
 
 	handleClick: (thing) => # honor context in which this was defined
 		console.log 'clicked'
@@ -259,13 +293,14 @@ class Root extends React.Component
 
 			if node.links?.outof?
 				for link in node.links.outof
+					l_id = parseInt ''+link.source.id+link.target.id
 					linkProps =
-						id: link.id
+						id: l_id
 						className: 'link'
 						d: diagonal link
 						_link: link # for debuggin' only, remove
 
-					renderLinks.push `<Link {...linkProps} key={link.id}/>`
+					renderLinks.push `<Link {...linkProps} key={l_id}/>`
 					++Root.linkCount
 
 
@@ -278,12 +313,29 @@ class Root extends React.Component
 		# Compute the new tree layout
 		{width, height} = @props.dim
 
+		clone = (obj) ->
+			if obj == null or typeof(obj) is not 'object'
+				return obj
+
+			temp = Object.create(obj)
+			for key in obj
+				console.log 'key', key
+				temp[key] = clone obj[key]
+
+			temp
+
+		# tree = clone @state.treeRecord[0]
+		# console.log 'tree is ', tree
+
+		# console.log 'before', @state.treeRecord
+		# # tree = jQuery.extend(true, {}, @state.treeRecord[0])
 		nodes = @props.dTree.nodes(@state.treeRecord[0]).reverse()
 		links = @props.dTree.links(nodes)
+		# console.log 'after', @state.treeRecord
 
 		# Normalize for fixed-depth and set ids
 		nodes.forEach (node, index) -> 
-			node.y = node.depth * 180
+			node.y = node.depth * horizontal_dist
 		links.forEach (link, index) ->
 			link.id = index
 
@@ -320,6 +372,7 @@ class Root extends React.Component
 		customProps =
 			depth: @props.depth+1
 			_delete: @_delete
+			_insert: @_insert
 		{renderNodes, renderLinks} = @_buildComponents [nodes, null], customProps
 
 		# setup dialog
@@ -410,7 +463,9 @@ class Node extends Root
 		# console.log 'named of clickee', @props.textElement.text
 		# @setState hideChildren : !@state.hideChildren #inherited method
 
-		@props._delete @props.id
+		# @props._delete @props.id
+
+		@props._insert @props.id
 
 	delete: =>
 		console.log 'node delete'
@@ -432,6 +487,7 @@ class Node extends Root
 		customProps =
 			depth: @props.depth+1
 			_delete: @props._delete
+			_insert: @props._insert
 
 		# state computations
 		if @state.children? and !@state.hideChildren # render only if node has children
@@ -517,6 +573,8 @@ class Link extends React.Component
 			<path className={this.props.className}
 			   	  d={this.props.d}
 			   	  id={"link-"+this.props.id}></path>
+
+			<g id={"link-wrapper-"+this.props.id}></g>
 		</g>
 		`
 
@@ -602,7 +660,7 @@ margin =
 	bottom: 20
 	left: 120
 dim =
-	width: 600-margin.right-margin.left
+	width: 1000-margin.right-margin.left
 	height: 500-margin.top-margin.bottom
 
 dTree = d3.layout
