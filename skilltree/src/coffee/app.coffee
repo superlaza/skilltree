@@ -72,7 +72,7 @@ class Dialog extends React.Component
 			left: "#{@props.coords.y+@props.margin.left-(@width/2)}px" # move the dialog to the invoking node
 			top: "#{@props.coords.x+@props.margin.top-30}px"
 		
-		`<div id={this.id}
+		`<div id={"dialog-"+this.id}
 			  style={dialogStyle}
 			  onMouseEnter={this.onMouseEvent}
 			  onMouseLeave={this.onMouseEvent}>
@@ -119,6 +119,7 @@ class Root extends React.Component
 		
 		tree = @state.treeRecord
 
+		# get node specified by id
 		findNode = (tree, id) ->
 			# root node
 			if tree.id == id then return tree
@@ -134,6 +135,10 @@ class Root extends React.Component
 
 		node = findNode tree[0], nodeId
 
+		lg (if node? then "node found" else "node not found!"), 'red'
+
+		# MANIFEST THE ABOVE CHANGES IN THE MODEL
+
 		# might be silly to lookup index when we could've pulled it from findnode
 		nodeIndex = node.parent.children.indexOf(node)
 
@@ -143,9 +148,56 @@ class Root extends React.Component
 		spliceArgs = [nodeIndex, 1]
 		spliceArgs = spliceArgs.concat node.children if node.children?
 		node.parent.children.splice.apply node.parent.children, spliceArgs
+						
 
-		# update state, fire re-render
-		@setState {treeRecord: tree}
+
+		# ANIMATE MODEL CHANGES
+		# I could create the node array passed to data from the state,
+		# which is basically a flatten but I'm letting d3 handle that 
+		# so I don't have to reason about making it in a way robust 
+		# enough to handle cycles	
+		nodes = @props.dTree.nodes(tree[0]).reverse()
+		links = @props.dTree.links(nodes)
+
+		nodes.forEach (node, index) -> 
+			node.y = node.depth * 180
+		
+		links.forEach (link, index) ->
+			link.id = index
+
+		svg = d3.select('svg')
+		node = svg.selectAll "g.node"
+				 .data nodes, (d) -> d?.id ? d
+
+		console.log 'nodesel', node
+
+		delay = 1000
+		node.transition()
+			.duration(delay)
+			.attr('transform', (d) -> 
+				console.log 'datum', d
+				"translate(#{d.y}, #{d.x})")
+
+		# link = svg.selectAll ".link"
+		# 			.data links, (d) -> d?.id ? d
+		# 		  # .data links, (d) -> d?.id ? d
+
+		# link.enter().insert("path")
+		# 			.attr("class", "link")
+		# 			.attr("d", (d) ->
+		# 				console.log 'enter', d
+		# 				# o = {x: source.x0, y: source.y0}
+		# 				# return diagonal {source: o, target: o}
+		# 				diagonal d
+		# 			)
+
+		# link.transition()
+		# 	.duration(delay)
+		# 	.attr('d', diagonal)
+
+
+		# update state, fire re-render (after transition)
+		setTimeout (=> @setState {treeRecord: tree}), delay
 
 	# COMPONENT LIFECYCLE
 	# ===================
@@ -225,12 +277,9 @@ class Root extends React.Component
 		# ==================
 		# Compute the new tree layout
 		{width, height} = @props.dim
-		tree = d3.layout
-			 	.tree()
-				.size [height, width]
 
-		nodes = tree.nodes(@state.treeRecord[0]).reverse()
-		links = tree.links(nodes)
+		nodes = @props.dTree.nodes(@state.treeRecord[0]).reverse()
+		links = @props.dTree.links(nodes)
 
 		# Normalize for fixed-depth and set ids
 		nodes.forEach (node, index) -> 
@@ -328,6 +377,29 @@ class Node extends Root
 			hideChildren: false
 			parent: @props.parent
 
+	# COMPONENT LIFECYCLE
+	# ===================
+	componentDidMount: ->
+		# invoked once, after first render
+		if lifecycles
+			lg 'mounted', 'green'
+			console.log "\t#{@constructor.name} #{@props.id}"
+
+		# bind d3 __data__ to mounted DOM el
+		# we can pass a native DOM el to d3 for selection, but I was too
+		# lazy to look that up when this was written, hence this note
+		d3.select("#node-#{@props.id}").data [@props.id]
+	componentDidUpdate: ->
+		if lifecycles
+			lg 'update', 'blue'
+			console.log "\t#{@constructor.name} #{@props.id}"
+
+	componentWillUnmount: ->
+		if lifecycles
+			lg 'will unmount', 'red'
+			console.log "\t#{@constructor.name} #{@props.id}"
+	# ===================
+
 	onMouseEvent: (e) =>
 		@props._showDialog e.type is 'mouseenter', {
 				coords: @props.coords
@@ -368,7 +440,7 @@ class Node extends Root
 		`<g>
 			{renderLinks}
 			<g  onClick={this.handleClick}
-				id={this.props.id}
+				id={"node-"+this.props.id}
 				className={this.props.gNode.className}
 				transform={translation}>
 
@@ -407,6 +479,9 @@ class Link extends React.Component
 			lg 'mounted', 'green'
 			console.log "\t#{@constructor.name} #{@props.id}"
 
+			# bind d3 __data__ to mounted DOM el
+			d3.select("#link-#{@props.id}").data [@props.id]
+
 	componentDidUpdate: ->
 		if lifecycles
 			lg 'update', 'blue'
@@ -440,7 +515,8 @@ class Link extends React.Component
 			</text>
 
 			<path className={this.props.className}
-			   d={this.props.d}></path>
+			   	  d={this.props.d}
+			   	  id={"link-"+this.props.id}></path>
 		</g>
 		`
 
@@ -529,8 +605,12 @@ dim =
 	width: 600-margin.right-margin.left
 	height: 500-margin.top-margin.bottom
 
+dTree = d3.layout
+	 	 .tree()
+		 .size [dim.height, dim.width]
 treeProps = 
 	treeRecord    : treeData
+	dTree 		  : dTree
 	dim			  : dim
 	margin  	  : margin
 	gtree 		  :

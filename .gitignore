@@ -1,3 +1,5 @@
 node_modules
 skilltree/assets
 error.txt
+*.sublime-project
+*.sublime-workspace
