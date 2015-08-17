@@ -116,11 +116,103 @@ class Dialog extends React.Component
 			  style={dialogStyle}
 			  onMouseLeave={this.onMouseEvent}
 			  onMouseLeave={this.onMouseEvent}>
-			  <a onClick={this.handleClick}
-			  	 href="#">delete</a>
-			  <a onClick={this.handleClick}
-			  	 href="#">insert</a>
+			  
 		</div>`
+
+class Dialog2 extends React.Component
+	id: 'dialog-box'
+	width: 100
+	height: 75
+
+	constructor: (props) ->
+		super props
+
+		@state =
+			show: @props.showDialog
+
+	# COMPONENT LIFECYCLE
+	# ===================
+	componentDidMount: ->
+		if lifecycles
+			lg 'mounted', 'green'
+			console.log "\t#{@constructor.name} #{@props.id}"
+
+		jQuery('#btn-delete', React.findDOMNode @).click (e) =>
+			@props.onDialogSelection(e.target.name)
+		jQuery('#btn-insert', React.findDOMNode @).click (e) =>
+			@props.onDialogSelection(e.target.name)
+
+	# componentWillReceiveProps: (newProps) ->
+	# 	newState = 
+	# 		show:newProps.showDialog
+	# 		onComplete:newProps._onComplete
+
+	# 	@setState newState
+
+	componentWillUpdate: ->
+		if lifecycles
+			lg 'will update', 'blue'
+			console.log "\t#{@constructor.name} #{@props.id}"
+
+	componentDidUpdate: ->
+		if lifecycles
+			lg 'update', 'blue'
+			console.log "\t#{@constructor.name} #{@props.id}"
+
+		# @state.show = @props.showDialog
+
+	componentWillUnmount: ->
+		if lifecycles
+			lg 'will unmount', 'red'
+			console.log "\t#{@constructor.name} #{@props.id}"
+
+	# ===================
+
+	# continuous showing of dialog, even when mouse has left node area
+	onMouseEvent: (e) =>
+		if e.type is 'mouseenter'
+			@setState show:true
+		if e.type is 'mouseleave'
+			@setState show:false
+
+
+	handleClick: (e) =>
+		console.log e.target.name
+		console.log @state.onComplete(e.target.text)
+
+	render: ->
+		# dialogStyle =
+		# 	width: @width
+		# 	height: @height
+		# 	visibility: (if @state.show then 'visible' else 'hidden')
+		# 	position: 'absolute'
+		# 	left: "#{@props.coords.y+@props.margin.left-(@width/2)}px" # move the dialog to the invoking node
+		# 	top: "#{@props.coords.x+@props.margin.top-30}px"
+
+		dialogAttrs =
+			x: @props.coords.x
+			y: @props.coords.y
+
+		dialogStyle =
+			visibility: if @props.show then 'visible' else 'hidden'
+			border: 'solid 1px'
+			textAlign: 'center'
+
+		`<foreignObject width={String(this.width)}
+						height={String(this.height)}
+						x={dialogAttrs.x-this.width/2}
+						y={dialogAttrs.y-this.height/2-30}>
+		    <div style={dialogStyle}
+		    	 xmlns="http://www.w3.org/1999/xhtml">
+		        <button  id='btn-insert'
+		        		 onclick={this.handleClick}
+		        		 name="insert">insert</button>
+		       	<div style={{visibility:'hidden'}}>Gap!</div>
+		        <button  id='btn-delete'
+		        		 onclick={this.handleClick}
+		        		 name="delete">delete</button>
+		    </div>
+		</foreignObject>`
 ###
 @props:
 	treeRecord    : treeData
@@ -507,6 +599,7 @@ class Node extends Root
 			links: @props.links
 			hideChildren: false
 			parent: @props.parent
+			showDialog: false
 
 	# COMPONENT LIFECYCLE
 	# ===================
@@ -539,10 +632,12 @@ class Node extends Root
 				when 'insert'
 					@props._insert(@props.id)
 
-		@props._showDialog true, {
-				coords: @props.coords
-				nodeId: @props.id
-		}, onComplete
+		# @props._showDialog true, {
+		# 		coords: @props.coords
+		# 		nodeId: @props.id
+		# }, onComplete
+
+		@setState showDialog:(e.type is 'mouseenter')
 
 	handleClick: (e) => # honor context in which this was defined
 		# console.log 'named of clickee', @props.textElement.text
@@ -551,6 +646,13 @@ class Node extends Root
 		# @props._delete @props.id
 
 		@props._insert @props.id
+
+	onDialogSelection: (res) =>
+		switch res
+			when 'insert'
+				@props._insert @props.id
+			when 'delete'
+				@props._delete @props.id
 
 	delete: =>
 		console.log 'node delete'
@@ -566,27 +668,39 @@ class Node extends Root
 		textStyle =
 			fillOpacity: "1"
 
+		dialogProps =
+			show: @state.showDialog
+			nodeId: @props.id
+			coords:
+				x: @props.coords.y
+				y: @props.coords.x
+			onDialogSelection: @onDialogSelection
+			# showDialog={this.state.dialogState.sho
+
+
 		# props computations
 		translation = "translate(#{@props.coords.y}, #{@props.coords.x})"
 
-		`<g  onClick={this.handleClick}
-			id={"node-"+this.props.id}
-			className={this.props.gNode.className}
-			transform={translation}>
+		`<g onMouseEnter={this.onMouseEvent}
+			onMouseLeave={this.onMouseEvent}>
+			<Dialog2 {...dialogProps}/>
+			<g  onClick={this.handleClick}
+				id={"node-"+this.props.id}
+				className={this.props.gNode.className}
+				transform={translation}>
 
-			{/* MAIN NODE */}
-			<circle r={this.radius}
-					style={circleStyle}
-					className={this.className}
-					onMouseEnter={this.onMouseEvent}
-					onMouseLeave={this.onMouseEvent}>
-			</circle>
+				{/* MAIN NODE */}
+				<circle r={this.radius}
+						style={circleStyle}
+						className={this.className}>
+				</circle>
 
-			<text x={this.props.textElement.x}
-				  dy={this.props.textElement.dy}
-				  textAnchor={this.props.textElement.anchor}
-				  style={textStyle}>{this.props.textElement.text}
-			</text>
+				<text x={this.props.textElement.x}
+					  dy={this.props.textElement.dy}
+					  textAnchor={this.props.textElement.anchor}
+					  style={textStyle}>{this.props.textElement.text}
+				</text>
+			</g>
 		</g>
 		`
 ###
