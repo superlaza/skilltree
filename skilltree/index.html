@@ -9,8 +9,6 @@
 		
 		<!-- VENDOR -->
 		<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-		<script src="https://fb.me/react-0.13.3.js"></script>
-		<!-- // <script src="https://fb.me/JSXTransformer-0.13.3.js"></script> -->
 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 
@@ -18,42 +16,14 @@
 
 		<!-- delete livereload -->
 		<script src="http://localhost:35729/livereload.js"></script>
-
-		<style>
-
-		 .node circle {
-		   fill: #fff;
-		   stroke: steelblue;
-		   stroke-width: 3px;
-		 }
-
-		 .node text { font: 12px sans-serif; }
-
-		 .link {
-		   fill: none;
-		   stroke: #ccc;
-		   stroke-width: 2px;
-		 }
-		 
-		</style>
+		<!-- only for slider -->
+		<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+		<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 	</head>
 	<body>
-		<div id="react">
-		</div>
-	<!-- REACT AFTER DOM READY -->
-	<!--
-	<script src="assets/js/vendor/system.js"></script>
-	<script>
-		System.config({
-		    baseURL: './src/es6'
-		});
+		<div id="slider"></div>
 
-		// loads /app/main.js
-		System.import('app_es6.js');
-	</script>
-	-->
-	<!-- // <script src="assets/js/app_es6.js"></script>  -->
-	<script src="assets/js/app.js"></script> 
+		<script src="assets/js/app.js"></script> 
 	</body>
 </html>
 

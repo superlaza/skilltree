@@ -1,23 +1,13 @@
-#dialog-box {
-	background: white;
-	border: solid 1px;
-	visibility: 'hidden';
-	&:hover {
-		background: white;
-		visibility: 'visible' !important;
-	}
-
-	// maybe in the future :(
-	// width: 0;
-	// height: 0;
-	// border-left: 70px solid transparent;
-	// border-right: 70px solid transparent;
-	// border-top: 100px solid red;
-	// -moz-border-radius: 50%;
-	// -webkit-border-radius: 50%;
-	// border-radius: 50%;
+.node circle {
+	fill: #fff;
+	stroke: steelblue;
+	stroke-width: 3px;
 }
 
-.hide {
-	display: none;
+.node text { font: 12px sans-serif; }
+
+.link {
+	fill: none;
+	stroke: #ccc;
+	stroke-width: 2px;
 }
