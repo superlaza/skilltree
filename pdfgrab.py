@@ -1,5 +1,5 @@
-import re
-import json
+import re, json
+from py2neo import authenticate, Graph, Node, Relationship
 
 # not matching 0-5(0,1-5) 
 
@@ -21,12 +21,12 @@ import json
 # Logic and Proof in Mathematics:
 
 courses = []
+courseNodes = {}
 math_courses= []
 
 class Course:
 
 	precursors = []
-
 	precedes = []
 
 	def __init__(self, properties):
@@ -38,7 +38,28 @@ class Course:
 		self.name 	 = properties['name']
 		self.prereqs = properties['prereqs']
 
+	@property
+	def json(self):	
+		if len(self.precedes) == 0:
+			# print {"name": course.name}
+			return {"name": self.name}
 
+		children = []
+		for course in self.precedes:
+			children.append(course.json)
+
+		# print {'name': course.name, 'children': children}
+		return {'name': self.name, 'children': children}
+
+	@property
+	def string(self):
+		s = "{}{} - {}".format(self.prefix, self.number, self.name)+'\n'
+		print self.prereqs
+		for pc in self.prereqs:
+			s += '\t'+pc+'\n'
+		return s
+
+# to match stuff like this ZOO 5748C COM-BSBS 5(3,2)
 regex = re.compile('(\w{3}) ([0-9]{4}[A-Z]?) (.*(?:\s.*)?) (\d\(\d,\d\))\n?')
 
 count = 0
@@ -59,6 +80,8 @@ with open('courses.txt', 'r') as f:
 					'college': college,
 					'credits': credits
 					})
+
+				courseNodes[prefix+number] = Node("Course", name=(prefix+number))
 			except ValueError:
 				print 'error line', line
 				print match.group()
@@ -106,47 +129,50 @@ with open('courses.txt', 'r') as f:
 		else:
 			line = f.readline()
 
+authenticate("localhost:7474", 'neo4j', 'admin')
+graph = Graph()
 
-for course in sorted(math_courses, key=lambda c: c.name):
-	check = lambda c: c.prefix+c.number in course.prereqs
-	course.precursors = [c for c in math_courses if check(c)]
-	# print course.name
-	# for c in course.precursors:
-	# 	print "\t"+c.name
+for course in courses:
+	name = course.prefix+course.number
 
-	check = lambda c: course.prefix+course.number in c.prereqs
-	course.precedes = [c for c in math_courses if check(c)]
-	print course.name
-	for c in course.precedes:
-		print "\t"+c.name
+	for pre in course.prereqs:
+		print 'adding rel', name, pre
+		try:
+			graph.create(Relationship(courseNodes[name], 'REQUIRES', courseNodes[pre]))
+		except:
+			print 'could not add', name, pre
+
+
+# for course in sorted(math_courses, key=lambda c: c.name):
+# 	check = lambda c: c.prefix+c.number in course.prereqs
+# 	course.precursors = [c for c in math_courses if check(c)]
+# 	# print course.name
+# 	# for c in course.precursors:
+# 	# 	print "\t"+c.name
+
+# 	check = lambda c: course.prefix+course.number in c.prereqs
+# 	course.precedes = [c for c in math_courses if check(c)]
+# 	print course.name
+# 	for c in course.precedes:
+# 		print "\t"+c.name
 
 print 'BREAK!'
-zero_tier = []
-for course in sorted(math_courses, key=lambda c: c.name):
-	if len(course.precursors) == 0:
-		zero_tier.append(course)
-		# print course.name
+# COLLECT ZERO TIER COURSES
+# these are courses that have no prerequisites
+# zero_tier = []
+# for course in sorted(math_courses, key=lambda c: c.name):
+# 	if len(course.precursors) == 0:
+# 		zero_tier.append(course)
+# 		# print course.name
 
-def fill_desc(course):
-	if len(course.precedes) == 0:
-		# print {"name": course.name}
-		return {"name": course.name}
+# output = []
+# for course in zero_tier:
+# 	output.append({
+# 		"name": course.name,
+# 		"children": [course.json]
+# 		})
 
-	children = []
-	for c in course.precedes:
-		children.append(fill_desc(c))
-
-	# print {'name': course.name, 'children': children}
-	return {'name': course.name, 'children': children}
-
-output = []
-for course in zero_tier:
-	output.append({
-		"name": course.name,
-		"children": [fill_desc(course)]
-		})
-
-outputs = json.dumps(output, sort_keys=True, indent=4, separators=(',', ': '))
-print outputs
-with open('output.json', 'w') as out:
-	out.write(outputs)
+# outputs = json.dumps(output, sort_keys=True, indent=4, separators=(',', ': '))
+# print outputs
+# with open('output.json', 'w') as out:
+# 	out.write(outputs)
