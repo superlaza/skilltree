@@ -1,6 +1,8 @@
 import re, json
 from py2neo import authenticate, Graph, Node, Relationship
+import matplotlib.pyplot as plt
 
+#notes
 # not matching 0-5(0,1-5) 
 
 # need to handle case when PR is followed by newline
@@ -25,11 +27,8 @@ courseNodes = {}
 math_courses= []
 
 class Course:
-
-	precursors = []
-	precedes = []
-
 	def __init__(self, properties):
+		self.id 	 = properties['id']
 		self.prefix  = properties['prefix']
 		self.number  = properties['number']
 		self.college = properties['college']
@@ -59,11 +58,71 @@ class Course:
 			s += '\t'+pc+'\n'
 		return s
 
+class Graph:
+	def __init__(self, adjList={}):
+		self.adjList = adjList
+
+	def addNode(self, Node):
+		self.adjList[Node.id] = {
+			'node': Node,
+			'children': []
+		}
+
+	def addEdge(self, edge):
+		source, target = edge
+		if source in self.adjList and target in self.adjList:
+			self.adjList[source]['children'].append(self.adjList[target]['node'])
+		else:
+			# at the point of entry of some prereqs, those prqs don't exist in the nodelist
+			pass
+
+	@property
+	def d3_json(self):
+	    _ = self.adjList.keys()
+	    nodeMap = { _[index]:index for index in range(len(_)) }
+	    nodes = [{'name': node['node'].name} for node in self.adjList.values()]
+	    links = []
+	    for nodeList in self.adjList.values():
+	    	for node in nodeList['children']:
+				links.append({
+					"source": nodeMap[nodeList['node'].id],
+					"target": nodeMap[node.id]
+				})
+
+	    print json.dumps({
+	    	"nodes": nodes,
+	    	"links": links
+	    }, indent=4)
+
+
+	def filterCollege(self, college):
+		adjList = {}
+		for id, nodeList in self.adjList.items():
+			node, children = nodeList['node'], nodeList['children']
+			if college in node.college:
+				adjList[id] = {
+					'node': node,
+					'children' : [child for child in children if college in child.college]
+				}
+
+		return Graph(adjList)
+
+	def bfs(self, start):
+	    visited, queue = set(), [start]
+	    while queue:
+	        vertex = queue.pop(0)
+	        if vertex not in visited:
+	            visited.add(vertex)
+	            queue.extend(graph[vertex] - visited)
+	    return visited
+
 # to match stuff like this ZOO 5748C COM-BSBS 5(3,2)
 regex = re.compile('(\w{3}) ([0-9]{4}[A-Z]?) (.*(?:\s.*)?) (\d\(\d,\d\))\n?')
 
 count = 0
-with open('courses.txt', 'r') as f:
+id = 0
+g = Graph()
+with open('course_list.txt', 'r') as f:
 	line = f.readline()
 	# print line
 	while(line is not ''):
@@ -81,7 +140,14 @@ with open('courses.txt', 'r') as f:
 					'credits': credits
 					})
 
-				courseNodes[prefix+number] = Node("Course", name=(prefix+number))
+				if (prefix+number) not in courseNodes:
+					courseNodes[prefix+number] = {
+						'id': id,
+						'node': Node("Course", name=(prefix+number)),
+						'name': prefix+number
+					}
+
+					id += 1
 			except ValueError:
 				print 'error line', line
 				print match.group()
@@ -111,36 +177,44 @@ with open('courses.txt', 'r') as f:
 			# regex match the course prefx and number
 			prereq_matches =  re.compile('(\w{3})\s(?:\s)?([0-9]{4}[A-Z]?)').findall(_prereqs)
 			prereqs = map(lambda t: ''.join(list(t)), prereq_matches)
-			# print name, len(prereqs), prereqs
-			# if len(prereqs) == 0:
-			# 	print repr(_prereqs)
-
-			# if 'Calculus' in name:
-			# 	# print repr(_prereqs)
-			# 	# print prereq_matches
 
 			properties['prereqs'] = prereqs
 			properties['name'] = name.replace('\n', ' ')
 
-			courses.append(Course(properties))
+			properties['id'] = prefix+number
+
+			courseNodes[prefix+number]['name'] = properties['name']
+
+			course = Course(properties)
+			courses.append(course)
+			g.addNode(course)
+			for prq in prereqs:
+				g.addEdge([course.id, prq])
+
 			if college == "COS-MATH":
+				courseNodes[prefix+number]['group'] = 16
 				math_courses.append(Course(properties))
+			if "ECS" in college:
+				courseNodes[prefix+number]['group'] = 2
 
 		else:
 			line = f.readline()
 
-authenticate("localhost:7474", 'neo4j', 'admin')
-graph = Graph()
+def add2neo(courses):
+	authenticate("localhost:7474", 'neo4j', 'admin')
+	graph = Graph()
+	for course in courses:
+		name = course.prefix+course.number
 
-for course in courses:
-	name = course.prefix+course.number
+		for pre in course.prereqs:
+			print 'adding rel', name, pre
+			try:
+				graph.create(Relationship(courseNodes[name]['node'], 'REQUIRES', courseNodes[pre]['node']))
+			except:
+				print 'could not add', name, pre
 
-	for pre in course.prereqs:
-		print 'adding rel', name, pre
-		try:
-			graph.create(Relationship(courseNodes[name], 'REQUIRES', courseNodes[pre]))
-		except:
-			print 'could not add', name, pre
+# toD3(courses)
+g.filterCollege('COS-MATH').d3_json
 
 
 # for course in sorted(math_courses, key=lambda c: c.name):
@@ -156,7 +230,6 @@ for course in courses:
 # 	for c in course.precedes:
 # 		print "\t"+c.name
 
-print 'BREAK!'
 # COLLECT ZERO TIER COURSES
 # these are courses that have no prerequisites
 # zero_tier = []
