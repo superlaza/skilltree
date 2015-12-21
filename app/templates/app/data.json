@@ -1,0 +1,494 @@
+{
+    "nodes": [
+        {
+            "name": "History of Mathematics"
+        }, 
+        {
+            "name": "Partial Differential Equations II"
+        }, 
+        {
+            "name": "Honors Calculus with Analytic Geometry I"
+        }, 
+        {
+            "name": "Introduction to Partial Differential Equations"
+        }, 
+        {
+            "name": "STEM Seminar II"
+        }, 
+        {
+            "name": "Mathematical Biology I"
+        }, 
+        {
+            "name": "Post-Secondary Mathematics"
+        }, 
+        {
+            "name": "Linear and Nonlinear Waves I"
+        }, 
+        {
+            "name": "Topics in Topology and Geometry"
+        }, 
+        {
+            "name": "Introduction to Complex Variables"
+        }, 
+        {
+            "name": "Analysis I"
+        }, 
+        {
+            "name": "Optimization"
+        }, 
+        {
+            "name": "Vector and Tensor Analysis"
+        }, 
+        {
+            "name": "Numerical Methods for Computational  Sciences"
+        }, 
+        {
+            "name": "Honors Matrix and Linear Algebra"
+        }, 
+        {
+            "name": "Honors Differential Equations"
+        }, 
+        {
+            "name": "Calculus with Analytic Geometry I"
+        }, 
+        {
+            "name": "Introduction to Differential Geometry"
+        }, 
+        {
+            "name": "Topics in Algebra"
+        }, 
+        {
+            "name": "Topics in Analysis"
+        }, 
+        {
+            "name": "Topics in Applied Mathematics"
+        }, 
+        {
+            "name": "Honors Systems Modeling and Simulation"
+        }, 
+        {
+            "name": "Introduction to Differential Geometry"
+        }, 
+        {
+            "name": "Research Seminar"
+        }, 
+        {
+            "name": "Scientific Computing"
+        }, 
+        {
+            "name": "Logic and Proof in Mathematics"
+        }, 
+        {
+            "name": "College Algebra"
+        }, 
+        {
+            "name": "Ordinary Differential Equations and  Applications"
+        }, 
+        {
+            "name": "STEM Seminar I"
+        }, 
+        {
+            "name": "Explorations in Mathematics"
+        }, 
+        {
+            "name": "Finite Mathematics"
+        }, 
+        {
+            "name": "Honors College Algebra"
+        }, 
+        {
+            "name": "Advanced Linear Algebra and Matrix Theory"
+        }, 
+        {
+            "name": "Abstract Algebra I"
+        }, 
+        {
+            "name": "Abstract Algebra II"
+        }, 
+        {
+            "name": "Mathematics for Calculus"
+        }, 
+        {
+            "name": "Advanced Calculus II"
+        }, 
+        {
+            "name": "Special Functions"
+        }, 
+        {
+            "name": "Graph Theory I"
+        }, 
+        {
+            "name": "Topics in Advanced Calculus"
+        }, 
+        {
+            "name": "Calculus with Analytic Geometry III"
+        }, 
+        {
+            "name": "Mathematical Biology II"
+        }, 
+        {
+            "name": "Interdisciplinary Applications of Calculus II"
+        }, 
+        {
+            "name": "Interdisciplinary Applications of Calculus I"
+        }, 
+        {
+            "name": "Honors Calculus with Analytic Geometry II"
+        }, 
+        {
+            "name": "Introduction to Combinatorics"
+        }, 
+        {
+            "name": "Advanced Mathematics for Engineers"
+        }, 
+        {
+            "name": "Introduction to Number Theory"
+        }, 
+        {
+            "name": "Mathematical Modeling"
+        }, 
+        {
+            "name": "Mathematical Modeling I"
+        }, 
+        {
+            "name": "Ordinary Differential Equations II"
+        }, 
+        {
+            "name": "Numerical Methods for Differential Equations"
+        }, 
+        {
+            "name": "Introduction to Graph Theory"
+        }, 
+        {
+            "name": "Algebra I"
+        }, 
+        {
+            "name": "Ordinary Differential Equations I"
+        }, 
+        {
+            "name": "Introduction to Topology"
+        }, 
+        {
+            "name": "Calculus with Analytic Geometry II"
+        }, 
+        {
+            "name": "Applied Calculus"
+        }, 
+        {
+            "name": "Techniques of Problem Solving"
+        }, 
+        {
+            "name": "Linear Algebra"
+        }, 
+        {
+            "name": "Honors Pre-Calculus Algebra"
+        }, 
+        {
+            "name": "Foundations of Discrete Math"
+        }, 
+        {
+            "name": "Matrix and Linear Algebra"
+        }, 
+        {
+            "name": "Honors Calculus with Analytic Geometry III"
+        }, 
+        {
+            "name": "College Trigonometry"
+        }, 
+        {
+            "name": "Concepts of Calculus"
+        }, 
+        {
+            "name": "Topics in Discrete Mathematics"
+        }, 
+        {
+            "name": "Advanced Calculus I"
+        }, 
+        {
+            "name": "Differential Geometry"
+        }, 
+        {
+            "name": "Frontiers in Mathematical Research"
+        }, 
+        {
+            "name": "Intermediate Algebra"
+        }, 
+        {
+            "name": "Pre-Calculus Algebra"
+        }
+    ], 
+    "links": [
+        {
+            "source": 0, 
+            "target": 56
+        }, 
+        {
+            "source": 1, 
+            "target": 3
+        }, 
+        {
+            "source": 2, 
+            "target": 71
+        }, 
+        {
+            "source": 2, 
+            "target": 64
+        }, 
+        {
+            "source": 3, 
+            "target": 54
+        }, 
+        {
+            "source": 5, 
+            "target": 54
+        }, 
+        {
+            "source": 7, 
+            "target": 54
+        }, 
+        {
+            "source": 8, 
+            "target": 59
+        }, 
+        {
+            "source": 11, 
+            "target": 40
+        }, 
+        {
+            "source": 11, 
+            "target": 54
+        }, 
+        {
+            "source": 12, 
+            "target": 54
+        }, 
+        {
+            "source": 13, 
+            "target": 54
+        }, 
+        {
+            "source": 14, 
+            "target": 56
+        }, 
+        {
+            "source": 15, 
+            "target": 40
+        }, 
+        {
+            "source": 16, 
+            "target": 71
+        }, 
+        {
+            "source": 16, 
+            "target": 64
+        }, 
+        {
+            "source": 16, 
+            "target": 71
+        }, 
+        {
+            "source": 16, 
+            "target": 35
+        }, 
+        {
+            "source": 17, 
+            "target": 40
+        }, 
+        {
+            "source": 17, 
+            "target": 59
+        }, 
+        {
+            "source": 18, 
+            "target": 59
+        }, 
+        {
+            "source": 18, 
+            "target": 33
+        }, 
+        {
+            "source": 19, 
+            "target": 67
+        }, 
+        {
+            "source": 20, 
+            "target": 54
+        }, 
+        {
+            "source": 21, 
+            "target": 56
+        }, 
+        {
+            "source": 22, 
+            "target": 40
+        }, 
+        {
+            "source": 24, 
+            "target": 40
+        }, 
+        {
+            "source": 24, 
+            "target": 54
+        }, 
+        {
+            "source": 24, 
+            "target": 62
+        }, 
+        {
+            "source": 24, 
+            "target": 59
+        }, 
+        {
+            "source": 25, 
+            "target": 16
+        }, 
+        {
+            "source": 27, 
+            "target": 10
+        }, 
+        {
+            "source": 30, 
+            "target": 70
+        }, 
+        {
+            "source": 32, 
+            "target": 59
+        }, 
+        {
+            "source": 33, 
+            "target": 59
+        }, 
+        {
+            "source": 34, 
+            "target": 33
+        }, 
+        {
+            "source": 36, 
+            "target": 67
+        }, 
+        {
+            "source": 36, 
+            "target": 67
+        }, 
+        {
+            "source": 37, 
+            "target": 54
+        }, 
+        {
+            "source": 38, 
+            "target": 45
+        }, 
+        {
+            "source": 40, 
+            "target": 56
+        }, 
+        {
+            "source": 41, 
+            "target": 5
+        }, 
+        {
+            "source": 44, 
+            "target": 16
+        }, 
+        {
+            "source": 45, 
+            "target": 56
+        }, 
+        {
+            "source": 46, 
+            "target": 54
+        }, 
+        {
+            "source": 48, 
+            "target": 50
+        }, 
+        {
+            "source": 49, 
+            "target": 54
+        }, 
+        {
+            "source": 50, 
+            "target": 54
+        }, 
+        {
+            "source": 51, 
+            "target": 40
+        }, 
+        {
+            "source": 51, 
+            "target": 54
+        }, 
+        {
+            "source": 53, 
+            "target": 33
+        }, 
+        {
+            "source": 54, 
+            "target": 40
+        }, 
+        {
+            "source": 55, 
+            "target": 25
+        }, 
+        {
+            "source": 55, 
+            "target": 59
+        }, 
+        {
+            "source": 56, 
+            "target": 16
+        }, 
+        {
+            "source": 57, 
+            "target": 71
+        }, 
+        {
+            "source": 57, 
+            "target": 64
+        }, 
+        {
+            "source": 58, 
+            "target": 16
+        }, 
+        {
+            "source": 59, 
+            "target": 56
+        }, 
+        {
+            "source": 60, 
+            "target": 26
+        }, 
+        {
+            "source": 62, 
+            "target": 56
+        }, 
+        {
+            "source": 63, 
+            "target": 56
+        }, 
+        {
+            "source": 64, 
+            "target": 26
+        }, 
+        {
+            "source": 65, 
+            "target": 71
+        }, 
+        {
+            "source": 66, 
+            "target": 45
+        }, 
+        {
+            "source": 66, 
+            "target": 52
+        }, 
+        {
+            "source": 68, 
+            "target": 36
+        }, 
+        {
+            "source": 71, 
+            "target": 26
+        }
+    ]
+}
