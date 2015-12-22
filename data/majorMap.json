@@ -1,0 +1,1914 @@
+{
+    "nodes": [
+        {
+            "type": "major", 
+            "name": "Accounting"
+        }, 
+        {
+            "type": "major", 
+            "name": "Advertising Public Relations"
+        }, 
+        {
+            "type": "major", 
+            "name": "Aerospace Engineering"
+        }, 
+        {
+            "type": "major", 
+            "name": "Anthropology"
+        }, 
+        {
+            "type": "major", 
+            "name": "Architecture"
+        }, 
+        {
+            "type": "major", 
+            "name": "Art Education"
+        }, 
+        {
+            "type": "major", 
+            "name": "Art Emerging Media Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Art History Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Art Studio Art Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Art Studio Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Art Visual Arts and Emerging Media Management Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Athletic Training"
+        }, 
+        {
+            "type": "major", 
+            "name": "Biology"
+        }, 
+        {
+            "type": "major", 
+            "name": "Biology Preprofessional Concentration"
+        }, 
+        {
+            "type": "major", 
+            "name": "Biomedical Sciences"
+        }, 
+        {
+            "type": "major", 
+            "name": "Biomedical Sciences Preprofessional Concentration"
+        }, 
+        {
+            "type": "major", 
+            "name": "Biotechnology"
+        }, 
+        {
+            "type": "major", 
+            "name": "Chemistry"
+        }, 
+        {
+            "type": "major", 
+            "name": "Chemistry Biochemistry Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Civil Engineering"
+        }, 
+        {
+            "type": "major", 
+            "name": "Communication Sciences and Disorders BA"
+        }, 
+        {
+            "type": "major", 
+            "name": "Communication and Conflict"
+        }, 
+        {
+            "type": "major", 
+            "name": "Computer Engineering"
+        }, 
+        {
+            "type": "major", 
+            "name": "Computer Science"
+        }, 
+        {
+            "type": "major", 
+            "name": "Construction Engineering"
+        }, 
+        {
+            "type": "major", 
+            "name": "Criminal Justice BA"
+        }, 
+        {
+            "type": "major", 
+            "name": "Criminal Justice Scholars Track BA"
+        }, 
+        {
+            "type": "major", 
+            "name": "Digital Media"
+        }, 
+        {
+            "type": "major", 
+            "name": "Early Childhood Development and Education Track 1 Education Pre Kindergarten Primary PK 3"
+        }, 
+        {
+            "type": "major", 
+            "name": "Early Childhood Development and Education Track 2 Early Childhood Development"
+        }, 
+        {
+            "type": "major", 
+            "name": "Early Childhood Development and Education Track 3 Early Childhood Careers"
+        }, 
+        {
+            "type": "major", 
+            "name": "Economics"
+        }, 
+        {
+            "type": "major", 
+            "name": "Economics Business"
+        }, 
+        {
+            "type": "major", 
+            "name": "Electrical Engineering"
+        }, 
+        {
+            "type": "major", 
+            "name": "Elementary Education"
+        }, 
+        {
+            "type": "major", 
+            "name": "English Creative Writing"
+        }, 
+        {
+            "type": "major", 
+            "name": "English Language Arts Education"
+        }, 
+        {
+            "type": "major", 
+            "name": "English Literature"
+        }, 
+        {
+            "type": "major", 
+            "name": "English Technical Communication"
+        }, 
+        {
+            "type": "major", 
+            "name": "Environmental Engineering"
+        }, 
+        {
+            "type": "major", 
+            "name": "Event Management"
+        }, 
+        {
+            "type": "major", 
+            "name": "Film"
+        }, 
+        {
+            "type": "major", 
+            "name": "Film Cinema Studies Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Finance"
+        }, 
+        {
+            "type": "major", 
+            "name": "Forensic Science Analysis Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Forensic Science Biochemistry Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "French"
+        }, 
+        {
+            "type": "major", 
+            "name": "Health Informatics and Information Management"
+        }, 
+        {
+            "type": "major", 
+            "name": "Health Sciences Pre Clinical Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Health Services Administration"
+        }, 
+        {
+            "type": "major", 
+            "name": "History"
+        }, 
+        {
+            "type": "major", 
+            "name": "Hospitality Management"
+        }, 
+        {
+            "type": "major", 
+            "name": "Human Communication"
+        }, 
+        {
+            "type": "major", 
+            "name": "Humanities and Cultural Studies"
+        }, 
+        {
+            "type": "major", 
+            "name": "Industrial Engineering"
+        }, 
+        {
+            "type": "major", 
+            "name": "Information Technology"
+        }, 
+        {
+            "type": "major", 
+            "name": "Integrated Business"
+        }, 
+        {
+            "type": "major", 
+            "name": "Interdisciplinary Studies BA"
+        }, 
+        {
+            "type": "major", 
+            "name": "Interdisciplinary Studies Environmental Studies Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Interdisciplinary Studies Womens Studies Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "International and Global Studies"
+        }, 
+        {
+            "type": "major", 
+            "name": "Journalism"
+        }, 
+        {
+            "type": "major", 
+            "name": "Latin American Studies"
+        }, 
+        {
+            "type": "major", 
+            "name": "Legal Studies BA"
+        }, 
+        {
+            "type": "major", 
+            "name": "Management"
+        }, 
+        {
+            "type": "major", 
+            "name": "Marketing"
+        }, 
+        {
+            "type": "major", 
+            "name": "Mathematics"
+        }, 
+        {
+            "type": "major", 
+            "name": "Mathematics Education"
+        }, 
+        {
+            "type": "major", 
+            "name": "Mechanical Engineering"
+        }, 
+        {
+            "type": "major", 
+            "name": "Medical Laboratory Sciences"
+        }, 
+        {
+            "type": "major", 
+            "name": "Music"
+        }, 
+        {
+            "type": "major", 
+            "name": "Music Education"
+        }, 
+        {
+            "type": "major", 
+            "name": "Music Jazz Studies Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Music Music Composition Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Music Music Performance Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Nursing"
+        }, 
+        {
+            "type": "major", 
+            "name": "Nursing Concurrent ASN to BSN Enrollment Option"
+        }, 
+        {
+            "type": "major", 
+            "name": "Nursing RN to BSN Program"
+        }, 
+        {
+            "type": "major", 
+            "name": "Philosophy"
+        }, 
+        {
+            "type": "major", 
+            "name": "Photography"
+        }, 
+        {
+            "type": "major", 
+            "name": "Photonic Science and Engineering"
+        }, 
+        {
+            "type": "major", 
+            "name": "Physics"
+        }, 
+        {
+            "type": "major", 
+            "name": "Political Science"
+        }, 
+        {
+            "type": "major", 
+            "name": "Political Science Prelaw Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Psychology"
+        }, 
+        {
+            "type": "major", 
+            "name": "Public Administration BA"
+        }, 
+        {
+            "type": "major", 
+            "name": "Radio Television"
+        }, 
+        {
+            "type": "major", 
+            "name": "Real Estate"
+        }, 
+        {
+            "type": "major", 
+            "name": "Religion and Cultural Studies"
+        }, 
+        {
+            "type": "major", 
+            "name": "Restaurant and Foodservice Management"
+        }, 
+        {
+            "type": "major", 
+            "name": "Science Education Biology"
+        }, 
+        {
+            "type": "major", 
+            "name": "Science Education Chemistry"
+        }, 
+        {
+            "type": "major", 
+            "name": "Science Education Physics"
+        }, 
+        {
+            "type": "major", 
+            "name": "Social Science Education"
+        }, 
+        {
+            "type": "major", 
+            "name": "Social Sciences"
+        }, 
+        {
+            "type": "major", 
+            "name": "Social Work"
+        }, 
+        {
+            "type": "major", 
+            "name": "Sociology"
+        }, 
+        {
+            "type": "major", 
+            "name": "Spanish"
+        }, 
+        {
+            "type": "major", 
+            "name": "Sport and Exercise Science"
+        }, 
+        {
+            "type": "major", 
+            "name": "Statistics"
+        }, 
+        {
+            "type": "major", 
+            "name": "Technical Education and Industry Training"
+        }, 
+        {
+            "type": "major", 
+            "name": "Theatre"
+        }, 
+        {
+            "type": "major", 
+            "name": "Theatre Musical Theatre Track"
+        }, 
+        {
+            "type": "major", 
+            "name": "Theatre Studies"
+        }, 
+        {
+            "type": "major", 
+            "name": "World Languages Education French"
+        }, 
+        {
+            "type": "major", 
+            "name": "World Languages Education Spanish"
+        }, 
+        {
+            "type": "major", 
+            "name": "Writing and Rhetoric"
+        }
+    ], 
+    "links": [
+        {
+            "source": 0, 
+            "strength": 0.21052631578947367, 
+            "target": 32
+        }, 
+        {
+            "source": 0, 
+            "strength": 0.22556390977443608, 
+            "target": 43
+        }, 
+        {
+            "source": 0, 
+            "strength": 0.21052631578947367, 
+            "target": 56
+        }, 
+        {
+            "source": 0, 
+            "strength": 0.21052631578947367, 
+            "target": 64
+        }, 
+        {
+            "source": 0, 
+            "strength": 0.21052631578947367, 
+            "target": 65
+        }, 
+        {
+            "source": 0, 
+            "strength": 0.20300751879699247, 
+            "target": 87
+        }, 
+        {
+            "source": 1, 
+            "strength": 0.11278195488721804, 
+            "target": 86
+        }, 
+        {
+            "source": 2, 
+            "strength": 0.14285714285714285, 
+            "target": 19
+        }, 
+        {
+            "source": 2, 
+            "strength": 0.13533834586466165, 
+            "target": 22
+        }, 
+        {
+            "source": 2, 
+            "strength": 0.13533834586466165, 
+            "target": 24
+        }, 
+        {
+            "source": 2, 
+            "strength": 0.13533834586466165, 
+            "target": 33
+        }, 
+        {
+            "source": 2, 
+            "strength": 0.13533834586466165, 
+            "target": 39
+        }, 
+        {
+            "source": 2, 
+            "strength": 0.15037593984962405, 
+            "target": 54
+        }, 
+        {
+            "source": 2, 
+            "strength": 0.15789473684210525, 
+            "target": 66
+        }, 
+        {
+            "source": 2, 
+            "strength": 0.21052631578947367, 
+            "target": 68
+        }, 
+        {
+            "source": 2, 
+            "strength": 0.13533834586466165, 
+            "target": 80
+        }, 
+        {
+            "source": 3, 
+            "strength": 0.12781954887218044, 
+            "target": 62
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.11278195488721804, 
+            "target": 6
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.10526315789473684, 
+            "target": 10
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.14285714285714285, 
+            "target": 28
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.14285714285714285, 
+            "target": 29
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.12781954887218044, 
+            "target": 30
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.18045112781954886, 
+            "target": 34
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.3609022556390977, 
+            "target": 36
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.3383458646616541, 
+            "target": 67
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.12030075187969924, 
+            "target": 71
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.3383458646616541, 
+            "target": 90
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.3383458646616541, 
+            "target": 91
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.3458646616541353, 
+            "target": 92
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.37593984962406013, 
+            "target": 93
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.3609022556390977, 
+            "target": 104
+        }, 
+        {
+            "source": 5, 
+            "strength": 0.3609022556390977, 
+            "target": 105
+        }, 
+        {
+            "source": 6, 
+            "strength": 0.10526315789473684, 
+            "target": 9
+        }, 
+        {
+            "source": 6, 
+            "strength": 0.11278195488721804, 
+            "target": 10
+        }, 
+        {
+            "source": 6, 
+            "strength": 0.14285714285714285, 
+            "target": 27
+        }, 
+        {
+            "source": 7, 
+            "strength": 0.12781954887218044, 
+            "target": 10
+        }, 
+        {
+            "source": 8, 
+            "strength": 0.3007518796992481, 
+            "target": 9
+        }, 
+        {
+            "source": 8, 
+            "strength": 0.11278195488721804, 
+            "target": 10
+        }, 
+        {
+            "source": 9, 
+            "strength": 0.11278195488721804, 
+            "target": 10
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.3233082706766917, 
+            "target": 13
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.24812030075187969, 
+            "target": 14
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.24060150375939848, 
+            "target": 15
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.21052631578947367, 
+            "target": 16
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.15789473684210525, 
+            "target": 17
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.17293233082706766, 
+            "target": 18
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.17293233082706766, 
+            "target": 44
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.19548872180451127, 
+            "target": 45
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.15789473684210525, 
+            "target": 48
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.14285714285714285, 
+            "target": 58
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.11278195488721804, 
+            "target": 66
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.10526315789473684, 
+            "target": 69
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.12781954887218044, 
+            "target": 90
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.10526315789473684, 
+            "target": 91
+        }, 
+        {
+            "source": 12, 
+            "strength": 0.12030075187969924, 
+            "target": 99
+        }, 
+        {
+            "source": 13, 
+            "strength": 0.23308270676691728, 
+            "target": 14
+        }, 
+        {
+            "source": 13, 
+            "strength": 0.23308270676691728, 
+            "target": 15
+        }, 
+        {
+            "source": 13, 
+            "strength": 0.20300751879699247, 
+            "target": 16
+        }, 
+        {
+            "source": 13, 
+            "strength": 0.15037593984962405, 
+            "target": 17
+        }, 
+        {
+            "source": 13, 
+            "strength": 0.16541353383458646, 
+            "target": 18
+        }, 
+        {
+            "source": 13, 
+            "strength": 0.16541353383458646, 
+            "target": 44
+        }, 
+        {
+            "source": 13, 
+            "strength": 0.18796992481203006, 
+            "target": 45
+        }, 
+        {
+            "source": 13, 
+            "strength": 0.15789473684210525, 
+            "target": 48
+        }, 
+        {
+            "source": 13, 
+            "strength": 0.12030075187969924, 
+            "target": 66
+        }, 
+        {
+            "source": 13, 
+            "strength": 0.10526315789473684, 
+            "target": 69
+        }, 
+        {
+            "source": 13, 
+            "strength": 0.11278195488721804, 
+            "target": 90
+        }, 
+        {
+            "source": 13, 
+            "strength": 0.11278195488721804, 
+            "target": 99
+        }, 
+        {
+            "source": 14, 
+            "strength": 0.518796992481203, 
+            "target": 15
+        }, 
+        {
+            "source": 14, 
+            "strength": 0.43609022556390975, 
+            "target": 16
+        }, 
+        {
+            "source": 14, 
+            "strength": 0.14285714285714285, 
+            "target": 17
+        }, 
+        {
+            "source": 14, 
+            "strength": 0.16541353383458646, 
+            "target": 18
+        }, 
+        {
+            "source": 14, 
+            "strength": 0.15789473684210525, 
+            "target": 44
+        }, 
+        {
+            "source": 14, 
+            "strength": 0.20300751879699247, 
+            "target": 45
+        }, 
+        {
+            "source": 14, 
+            "strength": 0.18796992481203006, 
+            "target": 48
+        }, 
+        {
+            "source": 14, 
+            "strength": 0.11278195488721804, 
+            "target": 66
+        }, 
+        {
+            "source": 14, 
+            "strength": 0.18045112781954886, 
+            "target": 69
+        }, 
+        {
+            "source": 14, 
+            "strength": 0.10526315789473684, 
+            "target": 90
+        }, 
+        {
+            "source": 14, 
+            "strength": 0.11278195488721804, 
+            "target": 99
+        }, 
+        {
+            "source": 15, 
+            "strength": 0.3609022556390977, 
+            "target": 16
+        }, 
+        {
+            "source": 15, 
+            "strength": 0.14285714285714285, 
+            "target": 17
+        }, 
+        {
+            "source": 15, 
+            "strength": 0.16541353383458646, 
+            "target": 18
+        }, 
+        {
+            "source": 15, 
+            "strength": 0.15789473684210525, 
+            "target": 44
+        }, 
+        {
+            "source": 15, 
+            "strength": 0.20300751879699247, 
+            "target": 45
+        }, 
+        {
+            "source": 15, 
+            "strength": 0.18796992481203006, 
+            "target": 48
+        }, 
+        {
+            "source": 15, 
+            "strength": 0.11278195488721804, 
+            "target": 66
+        }, 
+        {
+            "source": 15, 
+            "strength": 0.15789473684210525, 
+            "target": 69
+        }, 
+        {
+            "source": 15, 
+            "strength": 0.10526315789473684, 
+            "target": 90
+        }, 
+        {
+            "source": 15, 
+            "strength": 0.11278195488721804, 
+            "target": 99
+        }, 
+        {
+            "source": 16, 
+            "strength": 0.14285714285714285, 
+            "target": 17
+        }, 
+        {
+            "source": 16, 
+            "strength": 0.16541353383458646, 
+            "target": 18
+        }, 
+        {
+            "source": 16, 
+            "strength": 0.15789473684210525, 
+            "target": 44
+        }, 
+        {
+            "source": 16, 
+            "strength": 0.20300751879699247, 
+            "target": 45
+        }, 
+        {
+            "source": 16, 
+            "strength": 0.15789473684210525, 
+            "target": 48
+        }, 
+        {
+            "source": 16, 
+            "strength": 0.11278195488721804, 
+            "target": 66
+        }, 
+        {
+            "source": 16, 
+            "strength": 0.12030075187969924, 
+            "target": 69
+        }, 
+        {
+            "source": 16, 
+            "strength": 0.11278195488721804, 
+            "target": 99
+        }, 
+        {
+            "source": 17, 
+            "strength": 0.2556390977443609, 
+            "target": 18
+        }, 
+        {
+            "source": 17, 
+            "strength": 0.10526315789473684, 
+            "target": 39
+        }, 
+        {
+            "source": 17, 
+            "strength": 0.18796992481203006, 
+            "target": 44
+        }, 
+        {
+            "source": 17, 
+            "strength": 0.16541353383458646, 
+            "target": 45
+        }, 
+        {
+            "source": 17, 
+            "strength": 0.12030075187969924, 
+            "target": 66
+        }, 
+        {
+            "source": 17, 
+            "strength": 0.11278195488721804, 
+            "target": 81
+        }, 
+        {
+            "source": 17, 
+            "strength": 0.10526315789473684, 
+            "target": 91
+        }, 
+        {
+            "source": 17, 
+            "strength": 0.10526315789473684, 
+            "target": 99
+        }, 
+        {
+            "source": 18, 
+            "strength": 0.18045112781954886, 
+            "target": 44
+        }, 
+        {
+            "source": 18, 
+            "strength": 0.18796992481203006, 
+            "target": 45
+        }, 
+        {
+            "source": 18, 
+            "strength": 0.12030075187969924, 
+            "target": 66
+        }, 
+        {
+            "source": 18, 
+            "strength": 0.10526315789473684, 
+            "target": 81
+        }, 
+        {
+            "source": 18, 
+            "strength": 0.11278195488721804, 
+            "target": 91
+        }, 
+        {
+            "source": 18, 
+            "strength": 0.10526315789473684, 
+            "target": 99
+        }, 
+        {
+            "source": 19, 
+            "strength": 0.12781954887218044, 
+            "target": 22
+        }, 
+        {
+            "source": 19, 
+            "strength": 0.2706766917293233, 
+            "target": 24
+        }, 
+        {
+            "source": 19, 
+            "strength": 0.12781954887218044, 
+            "target": 33
+        }, 
+        {
+            "source": 19, 
+            "strength": 0.24060150375939848, 
+            "target": 39
+        }, 
+        {
+            "source": 19, 
+            "strength": 0.13533834586466165, 
+            "target": 54
+        }, 
+        {
+            "source": 19, 
+            "strength": 0.14285714285714285, 
+            "target": 66
+        }, 
+        {
+            "source": 19, 
+            "strength": 0.14285714285714285, 
+            "target": 68
+        }, 
+        {
+            "source": 19, 
+            "strength": 0.12781954887218044, 
+            "target": 80
+        }, 
+        {
+            "source": 21, 
+            "strength": 0.17293233082706766, 
+            "target": 52
+        }, 
+        {
+            "source": 22, 
+            "strength": 0.13533834586466165, 
+            "target": 23
+        }, 
+        {
+            "source": 22, 
+            "strength": 0.12781954887218044, 
+            "target": 24
+        }, 
+        {
+            "source": 22, 
+            "strength": 0.22556390977443608, 
+            "target": 33
+        }, 
+        {
+            "source": 22, 
+            "strength": 0.12030075187969924, 
+            "target": 39
+        }, 
+        {
+            "source": 22, 
+            "strength": 0.15037593984962405, 
+            "target": 54
+        }, 
+        {
+            "source": 22, 
+            "strength": 0.18045112781954886, 
+            "target": 66
+        }, 
+        {
+            "source": 22, 
+            "strength": 0.14285714285714285, 
+            "target": 68
+        }, 
+        {
+            "source": 22, 
+            "strength": 0.18796992481203006, 
+            "target": 80
+        }, 
+        {
+            "source": 23, 
+            "strength": 0.18796992481203006, 
+            "target": 66
+        }, 
+        {
+            "source": 23, 
+            "strength": 0.11278195488721804, 
+            "target": 81
+        }, 
+        {
+            "source": 23, 
+            "strength": 0.12781954887218044, 
+            "target": 99
+        }, 
+        {
+            "source": 24, 
+            "strength": 0.12781954887218044, 
+            "target": 33
+        }, 
+        {
+            "source": 24, 
+            "strength": 0.20300751879699247, 
+            "target": 39
+        }, 
+        {
+            "source": 24, 
+            "strength": 0.12781954887218044, 
+            "target": 54
+        }, 
+        {
+            "source": 24, 
+            "strength": 0.12781954887218044, 
+            "target": 66
+        }, 
+        {
+            "source": 24, 
+            "strength": 0.13533834586466165, 
+            "target": 68
+        }, 
+        {
+            "source": 24, 
+            "strength": 0.12781954887218044, 
+            "target": 80
+        }, 
+        {
+            "source": 28, 
+            "strength": 0.22556390977443608, 
+            "target": 29
+        }, 
+        {
+            "source": 28, 
+            "strength": 0.19548872180451127, 
+            "target": 30
+        }, 
+        {
+            "source": 28, 
+            "strength": 0.18045112781954886, 
+            "target": 34
+        }, 
+        {
+            "source": 28, 
+            "strength": 0.15789473684210525, 
+            "target": 36
+        }, 
+        {
+            "source": 28, 
+            "strength": 0.12781954887218044, 
+            "target": 67
+        }, 
+        {
+            "source": 28, 
+            "strength": 0.12781954887218044, 
+            "target": 90
+        }, 
+        {
+            "source": 28, 
+            "strength": 0.12781954887218044, 
+            "target": 91
+        }, 
+        {
+            "source": 28, 
+            "strength": 0.13533834586466165, 
+            "target": 92
+        }, 
+        {
+            "source": 28, 
+            "strength": 0.15789473684210525, 
+            "target": 93
+        }, 
+        {
+            "source": 28, 
+            "strength": 0.15789473684210525, 
+            "target": 104
+        }, 
+        {
+            "source": 28, 
+            "strength": 0.15037593984962405, 
+            "target": 105
+        }, 
+        {
+            "source": 29, 
+            "strength": 0.2556390977443609, 
+            "target": 30
+        }, 
+        {
+            "source": 29, 
+            "strength": 0.13533834586466165, 
+            "target": 34
+        }, 
+        {
+            "source": 29, 
+            "strength": 0.15037593984962405, 
+            "target": 36
+        }, 
+        {
+            "source": 29, 
+            "strength": 0.12781954887218044, 
+            "target": 67
+        }, 
+        {
+            "source": 29, 
+            "strength": 0.12781954887218044, 
+            "target": 90
+        }, 
+        {
+            "source": 29, 
+            "strength": 0.12781954887218044, 
+            "target": 91
+        }, 
+        {
+            "source": 29, 
+            "strength": 0.13533834586466165, 
+            "target": 92
+        }, 
+        {
+            "source": 29, 
+            "strength": 0.15789473684210525, 
+            "target": 93
+        }, 
+        {
+            "source": 29, 
+            "strength": 0.12781954887218044, 
+            "target": 98
+        }, 
+        {
+            "source": 29, 
+            "strength": 0.15789473684210525, 
+            "target": 104
+        }, 
+        {
+            "source": 29, 
+            "strength": 0.15037593984962405, 
+            "target": 105
+        }, 
+        {
+            "source": 30, 
+            "strength": 0.12781954887218044, 
+            "target": 34
+        }, 
+        {
+            "source": 30, 
+            "strength": 0.13533834586466165, 
+            "target": 36
+        }, 
+        {
+            "source": 30, 
+            "strength": 0.11278195488721804, 
+            "target": 67
+        }, 
+        {
+            "source": 30, 
+            "strength": 0.11278195488721804, 
+            "target": 90
+        }, 
+        {
+            "source": 30, 
+            "strength": 0.11278195488721804, 
+            "target": 91
+        }, 
+        {
+            "source": 30, 
+            "strength": 0.12030075187969924, 
+            "target": 92
+        }, 
+        {
+            "source": 30, 
+            "strength": 0.14285714285714285, 
+            "target": 93
+        }, 
+        {
+            "source": 30, 
+            "strength": 0.10526315789473684, 
+            "target": 98
+        }, 
+        {
+            "source": 30, 
+            "strength": 0.14285714285714285, 
+            "target": 104
+        }, 
+        {
+            "source": 30, 
+            "strength": 0.13533834586466165, 
+            "target": 105
+        }, 
+        {
+            "source": 31, 
+            "strength": 0.21052631578947367, 
+            "target": 32
+        }, 
+        {
+            "source": 31, 
+            "strength": 0.11278195488721804, 
+            "target": 43
+        }, 
+        {
+            "source": 31, 
+            "strength": 0.11278195488721804, 
+            "target": 66
+        }, 
+        {
+            "source": 32, 
+            "strength": 0.24060150375939848, 
+            "target": 43
+        }, 
+        {
+            "source": 32, 
+            "strength": 0.22556390977443608, 
+            "target": 56
+        }, 
+        {
+            "source": 32, 
+            "strength": 0.21804511278195488, 
+            "target": 64
+        }, 
+        {
+            "source": 32, 
+            "strength": 0.21804511278195488, 
+            "target": 65
+        }, 
+        {
+            "source": 32, 
+            "strength": 0.10526315789473684, 
+            "target": 66
+        }, 
+        {
+            "source": 32, 
+            "strength": 0.21052631578947367, 
+            "target": 87
+        }, 
+        {
+            "source": 33, 
+            "strength": 0.12030075187969924, 
+            "target": 39
+        }, 
+        {
+            "source": 33, 
+            "strength": 0.15037593984962405, 
+            "target": 54
+        }, 
+        {
+            "source": 33, 
+            "strength": 0.17293233082706766, 
+            "target": 66
+        }, 
+        {
+            "source": 33, 
+            "strength": 0.14285714285714285, 
+            "target": 68
+        }, 
+        {
+            "source": 33, 
+            "strength": 0.21052631578947367, 
+            "target": 80
+        }, 
+        {
+            "source": 34, 
+            "strength": 0.18045112781954886, 
+            "target": 36
+        }, 
+        {
+            "source": 34, 
+            "strength": 0.15037593984962405, 
+            "target": 67
+        }, 
+        {
+            "source": 34, 
+            "strength": 0.10526315789473684, 
+            "target": 71
+        }, 
+        {
+            "source": 34, 
+            "strength": 0.15789473684210525, 
+            "target": 90
+        }, 
+        {
+            "source": 34, 
+            "strength": 0.16541353383458646, 
+            "target": 91
+        }, 
+        {
+            "source": 34, 
+            "strength": 0.15789473684210525, 
+            "target": 92
+        }, 
+        {
+            "source": 34, 
+            "strength": 0.18045112781954886, 
+            "target": 93
+        }, 
+        {
+            "source": 34, 
+            "strength": 0.18045112781954886, 
+            "target": 104
+        }, 
+        {
+            "source": 34, 
+            "strength": 0.17293233082706766, 
+            "target": 105
+        }, 
+        {
+            "source": 35, 
+            "strength": 0.15789473684210525, 
+            "target": 36
+        }, 
+        {
+            "source": 35, 
+            "strength": 0.43609022556390975, 
+            "target": 37
+        }, 
+        {
+            "source": 35, 
+            "strength": 0.39097744360902253, 
+            "target": 38
+        }, 
+        {
+            "source": 36, 
+            "strength": 0.15789473684210525, 
+            "target": 37
+        }, 
+        {
+            "source": 36, 
+            "strength": 0.11278195488721804, 
+            "target": 38
+        }, 
+        {
+            "source": 36, 
+            "strength": 0.3458646616541353, 
+            "target": 67
+        }, 
+        {
+            "source": 36, 
+            "strength": 0.10526315789473684, 
+            "target": 71
+        }, 
+        {
+            "source": 36, 
+            "strength": 0.3458646616541353, 
+            "target": 90
+        }, 
+        {
+            "source": 36, 
+            "strength": 0.3458646616541353, 
+            "target": 91
+        }, 
+        {
+            "source": 36, 
+            "strength": 0.3533834586466165, 
+            "target": 92
+        }, 
+        {
+            "source": 36, 
+            "strength": 0.3684210526315789, 
+            "target": 93
+        }, 
+        {
+            "source": 36, 
+            "strength": 0.3684210526315789, 
+            "target": 104
+        }, 
+        {
+            "source": 36, 
+            "strength": 0.3684210526315789, 
+            "target": 105
+        }, 
+        {
+            "source": 37, 
+            "strength": 0.39849624060150374, 
+            "target": 38
+        }, 
+        {
+            "source": 39, 
+            "strength": 0.12781954887218044, 
+            "target": 54
+        }, 
+        {
+            "source": 39, 
+            "strength": 0.15037593984962405, 
+            "target": 66
+        }, 
+        {
+            "source": 39, 
+            "strength": 0.13533834586466165, 
+            "target": 68
+        }, 
+        {
+            "source": 39, 
+            "strength": 0.12030075187969924, 
+            "target": 80
+        }, 
+        {
+            "source": 39, 
+            "strength": 0.11278195488721804, 
+            "target": 81
+        }, 
+        {
+            "source": 40, 
+            "strength": 0.23308270676691728, 
+            "target": 51
+        }, 
+        {
+            "source": 40, 
+            "strength": 0.15789473684210525, 
+            "target": 89
+        }, 
+        {
+            "source": 41, 
+            "strength": 0.2556390977443609, 
+            "target": 42
+        }, 
+        {
+            "source": 43, 
+            "strength": 0.21804511278195488, 
+            "target": 56
+        }, 
+        {
+            "source": 43, 
+            "strength": 0.21804511278195488, 
+            "target": 64
+        }, 
+        {
+            "source": 43, 
+            "strength": 0.22556390977443608, 
+            "target": 65
+        }, 
+        {
+            "source": 43, 
+            "strength": 0.2556390977443609, 
+            "target": 87
+        }, 
+        {
+            "source": 44, 
+            "strength": 0.23308270676691728, 
+            "target": 45
+        }, 
+        {
+            "source": 44, 
+            "strength": 0.11278195488721804, 
+            "target": 48
+        }, 
+        {
+            "source": 44, 
+            "strength": 0.11278195488721804, 
+            "target": 66
+        }, 
+        {
+            "source": 44, 
+            "strength": 0.10526315789473684, 
+            "target": 91
+        }, 
+        {
+            "source": 45, 
+            "strength": 0.12030075187969924, 
+            "target": 48
+        }, 
+        {
+            "source": 45, 
+            "strength": 0.11278195488721804, 
+            "target": 66
+        }, 
+        {
+            "source": 45, 
+            "strength": 0.10526315789473684, 
+            "target": 69
+        }, 
+        {
+            "source": 45, 
+            "strength": 0.10526315789473684, 
+            "target": 91
+        }, 
+        {
+            "source": 48, 
+            "strength": 0.12030075187969924, 
+            "target": 69
+        }, 
+        {
+            "source": 48, 
+            "strength": 0.10526315789473684, 
+            "target": 90
+        }, 
+        {
+            "source": 48, 
+            "strength": 0.10526315789473684, 
+            "target": 91
+        }, 
+        {
+            "source": 51, 
+            "strength": 0.2706766917293233, 
+            "target": 89
+        }, 
+        {
+            "source": 52, 
+            "strength": 0.10526315789473684, 
+            "target": 104
+        }, 
+        {
+            "source": 54, 
+            "strength": 0.15789473684210525, 
+            "target": 66
+        }, 
+        {
+            "source": 54, 
+            "strength": 0.15037593984962405, 
+            "target": 68
+        }, 
+        {
+            "source": 54, 
+            "strength": 0.15037593984962405, 
+            "target": 80
+        }, 
+        {
+            "source": 56, 
+            "strength": 0.21804511278195488, 
+            "target": 64
+        }, 
+        {
+            "source": 56, 
+            "strength": 0.21804511278195488, 
+            "target": 65
+        }, 
+        {
+            "source": 56, 
+            "strength": 0.22556390977443608, 
+            "target": 87
+        }, 
+        {
+            "source": 60, 
+            "strength": 0.48872180451127817, 
+            "target": 82
+        }, 
+        {
+            "source": 60, 
+            "strength": 0.48120300751879697, 
+            "target": 83
+        }, 
+        {
+            "source": 61, 
+            "strength": 0.15037593984962405, 
+            "target": 86
+        }, 
+        {
+            "source": 62, 
+            "strength": 0.10526315789473684, 
+            "target": 82
+        }, 
+        {
+            "source": 62, 
+            "strength": 0.10526315789473684, 
+            "target": 83
+        }, 
+        {
+            "source": 64, 
+            "strength": 0.21804511278195488, 
+            "target": 65
+        }, 
+        {
+            "source": 64, 
+            "strength": 0.21052631578947367, 
+            "target": 87
+        }, 
+        {
+            "source": 65, 
+            "strength": 0.21804511278195488, 
+            "target": 87
+        }, 
+        {
+            "source": 66, 
+            "strength": 0.15037593984962405, 
+            "target": 68
+        }, 
+        {
+            "source": 66, 
+            "strength": 0.12781954887218044, 
+            "target": 80
+        }, 
+        {
+            "source": 66, 
+            "strength": 0.18796992481203006, 
+            "target": 81
+        }, 
+        {
+            "source": 66, 
+            "strength": 0.18045112781954886, 
+            "target": 99
+        }, 
+        {
+            "source": 67, 
+            "strength": 0.3383458646616541, 
+            "target": 90
+        }, 
+        {
+            "source": 67, 
+            "strength": 0.3308270676691729, 
+            "target": 91
+        }, 
+        {
+            "source": 67, 
+            "strength": 0.3609022556390977, 
+            "target": 92
+        }, 
+        {
+            "source": 67, 
+            "strength": 0.3458646616541353, 
+            "target": 93
+        }, 
+        {
+            "source": 67, 
+            "strength": 0.3458646616541353, 
+            "target": 104
+        }, 
+        {
+            "source": 67, 
+            "strength": 0.3458646616541353, 
+            "target": 105
+        }, 
+        {
+            "source": 68, 
+            "strength": 0.14285714285714285, 
+            "target": 80
+        }, 
+        {
+            "source": 68, 
+            "strength": 0.10526315789473684, 
+            "target": 81
+        }, 
+        {
+            "source": 70, 
+            "strength": 0.14285714285714285, 
+            "target": 71
+        }, 
+        {
+            "source": 70, 
+            "strength": 0.14285714285714285, 
+            "target": 72
+        }, 
+        {
+            "source": 70, 
+            "strength": 0.15037593984962405, 
+            "target": 73
+        }, 
+        {
+            "source": 70, 
+            "strength": 0.14285714285714285, 
+            "target": 74
+        }, 
+        {
+            "source": 71, 
+            "strength": 0.15037593984962405, 
+            "target": 72
+        }, 
+        {
+            "source": 71, 
+            "strength": 0.15037593984962405, 
+            "target": 73
+        }, 
+        {
+            "source": 71, 
+            "strength": 0.17293233082706766, 
+            "target": 74
+        }, 
+        {
+            "source": 71, 
+            "strength": 0.12781954887218044, 
+            "target": 93
+        }, 
+        {
+            "source": 71, 
+            "strength": 0.11278195488721804, 
+            "target": 104
+        }, 
+        {
+            "source": 71, 
+            "strength": 0.10526315789473684, 
+            "target": 105
+        }, 
+        {
+            "source": 72, 
+            "strength": 0.14285714285714285, 
+            "target": 73
+        }, 
+        {
+            "source": 72, 
+            "strength": 0.15789473684210525, 
+            "target": 74
+        }, 
+        {
+            "source": 73, 
+            "strength": 0.15789473684210525, 
+            "target": 74
+        }, 
+        {
+            "source": 75, 
+            "strength": 0.2631578947368421, 
+            "target": 76
+        }, 
+        {
+            "source": 75, 
+            "strength": 0.23308270676691728, 
+            "target": 77
+        }, 
+        {
+            "source": 76, 
+            "strength": 0.24060150375939848, 
+            "target": 77
+        }, 
+        {
+            "source": 78, 
+            "strength": 0.11278195488721804, 
+            "target": 88
+        }, 
+        {
+            "source": 81, 
+            "strength": 0.10526315789473684, 
+            "target": 92
+        }, 
+        {
+            "source": 82, 
+            "strength": 0.924812030075188, 
+            "target": 83
+        }, 
+        {
+            "source": 84, 
+            "strength": 0.10526315789473684, 
+            "target": 90
+        }, 
+        {
+            "source": 90, 
+            "strength": 0.40601503759398494, 
+            "target": 91
+        }, 
+        {
+            "source": 90, 
+            "strength": 0.39849624060150374, 
+            "target": 92
+        }, 
+        {
+            "source": 90, 
+            "strength": 0.3458646616541353, 
+            "target": 93
+        }, 
+        {
+            "source": 90, 
+            "strength": 0.12030075187969924, 
+            "target": 98
+        }, 
+        {
+            "source": 90, 
+            "strength": 0.3458646616541353, 
+            "target": 104
+        }, 
+        {
+            "source": 90, 
+            "strength": 0.3458646616541353, 
+            "target": 105
+        }, 
+        {
+            "source": 91, 
+            "strength": 0.39097744360902253, 
+            "target": 92
+        }, 
+        {
+            "source": 91, 
+            "strength": 0.3458646616541353, 
+            "target": 93
+        }, 
+        {
+            "source": 91, 
+            "strength": 0.12030075187969924, 
+            "target": 98
+        }, 
+        {
+            "source": 91, 
+            "strength": 0.3458646616541353, 
+            "target": 104
+        }, 
+        {
+            "source": 91, 
+            "strength": 0.3458646616541353, 
+            "target": 105
+        }, 
+        {
+            "source": 92, 
+            "strength": 0.3533834586466165, 
+            "target": 93
+        }, 
+        {
+            "source": 92, 
+            "strength": 0.3533834586466165, 
+            "target": 104
+        }, 
+        {
+            "source": 92, 
+            "strength": 0.3533834586466165, 
+            "target": 105
+        }, 
+        {
+            "source": 93, 
+            "strength": 0.37593984962406013, 
+            "target": 104
+        }, 
+        {
+            "source": 93, 
+            "strength": 0.3684210526315789, 
+            "target": 105
+        }, 
+        {
+            "source": 97, 
+            "strength": 0.10526315789473684, 
+            "target": 105
+        }, 
+        {
+            "source": 101, 
+            "strength": 0.20300751879699247, 
+            "target": 102
+        }, 
+        {
+            "source": 101, 
+            "strength": 0.13533834586466165, 
+            "target": 103
+        }, 
+        {
+            "source": 102, 
+            "strength": 0.14285714285714285, 
+            "target": 103
+        }, 
+        {
+            "source": 104, 
+            "strength": 0.45864661654135336, 
+            "target": 105
+        }
+    ]
+}

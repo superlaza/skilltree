@@ -1,0 +1,24 @@
+body {
+  position: relative;
+  width: 2000px;
+  height: 2000px;
+}
+.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.link {
+  stroke: #999;
+  stroke-opacity: .6;
+}
+
+.arrow{
+	stroke-width:1	;
+	stroke:#000;
+}
+
+#arrow{
+	stroke-width:1;
+	stroke-dasharray:0;	
+}
