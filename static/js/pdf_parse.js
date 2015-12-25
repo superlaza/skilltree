@@ -31,9 +31,6 @@ function processPage(page){
 			if(_pdf !== null && currPage <= numPages){
 				_pdf.getPage(currPage).then(processPage);
 			}
-			else{
-				drawGraph(majors);
-			}
 		}
 	);
 }
