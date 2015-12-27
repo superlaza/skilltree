@@ -82,17 +82,22 @@ Plan = React.createClass
 		# drawGraph(this.refs.graph,
 		# 		getGraphData(state.toJS()),
 		# 		dispatch)
-		@graph = new Graph(this.refs.graph, graphData)
-		@graph.addNode('newnode', 0)
+		# console.log 'see', state, graphData
+		@graph = new Graph(this.refs.graph, state, dispatch)
+		# @graph.addNode('newnode', 0)
 		window.an = @graph.addNode
 
 	componentDidUpdate: ->
-		console.log 'thisprops', this.props
 		{dispatch, state, graphData} = this.props
 		
-		drawGraph(this.refs.graph,
-				getGraphData(state.toJS()),
-				dispatch)
+		# console.log 'state', state
+		# @graph.setGraph(state)
+		# new Graph(this.refs.graph, state, dispatch)
+		console.log 'newstate?', state
+		@graph.update(state)
+		# drawGraph(this.refs.graph,
+		# 		getGraphData(state.toJS()),
+		# 		dispatch)
 
 	render: ->
 		<div id='graph' ref='graph'>
@@ -101,7 +106,7 @@ Plan = React.createClass
 
 
 mapStateToProps = (state) ->
-	state: state
+	state: state.toJS()
 
 Plan_ = connect(mapStateToProps)(Plan)
 

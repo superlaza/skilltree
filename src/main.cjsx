@@ -9,12 +9,44 @@ ReactDOM 	= require 'react-dom'
 im 			= require 'immutable'
 
 initialState = {
-	semesters: [
+	nodes:[
+		{index: 0,name:'a',type: 'menu',width:60,height:40},
+		{index: 1,name:'b',width:60,height:40},
+		{index: 2,name:'c',width:60,height:40},
+		{index: 3,name:'d',type: 'menu',width:60,height:40},
+		{index: 4,name:'e',width:60,height:40},
+		{index: 5,name:'h',width:60,height:40, hidden: true}
+	]
+	links:[
+		# {source:1,target:2},
+		# {source:2,target:3},
+		# {source:3,target:4},
+		# {source:0,target:1},
+		# {source:2,target:0},
+		# {source:3,target:5},
+		# {source:0,target:5}
+	]
+	groups:[
+		{id: 0, leaves:[0,1,2]},
+		{id: 1, leaves:[3,4]}
+	]
+	constraints: [
 		{
-			classes: ['a', 'b', 'c']
+			type: 'alignment'
+			axis: 'x'
+			offsets: [
+				{node: 0, offset: 50},
+				{node: 1, offset: 50},
+				{node: 2, offset: 50}
+			]
 		},
 		{
-			classes: ['d', 'e']
+			type: 'alignment'
+			axis: 'x'
+			offsets: [
+				{node: 3, offset: 50},
+				{node: 4, offset: 50}
+			]
 		}
 	]
 }
@@ -23,10 +55,17 @@ initialState = im.fromJS(initialState)
 reducer = (state = initialState, action) ->
 	switch action.type
 		when 'ADD_CLASS'
-			newState = state.updateIn ['semesters', action.semester, 'classes'], 
-				(classList) ->
-					classList.push(action.classCode)
-			newState.set('graph', action.graph)
+			console.log 'graph', action.graph
+			newState = action.graph
+			newNode =
+				index: newState.nodes.length-1
+				name: action.classCode
+				width:60
+				height:40
+
+			newState.nodes.push newNode
+			newState.groups[action.semester].leaves.push newState.nodes.length-1
+			im.fromJS(newState)
 		else state
 
 # initialize devtools
@@ -41,7 +80,7 @@ store = finalCreateStore reducer
 # store = createStore reducer
 
 # store.subscribe ->
-# 	console.log 'state is', JSON.stringify store.getState().toJS(), null, 4
+# 	console.log 'state is', store.getState().toJS()
 
 # store.dispatch {
 # 	type: 'ADD_CLASS'

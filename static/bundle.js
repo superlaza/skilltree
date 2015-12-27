@@ -17,11 +17,80 @@ webpackJsonp([0],[
 	im = __webpack_require__(182);
 
 	initialState = {
-	  semesters: [
+	  nodes: [
 	    {
-	      classes: ['a', 'b', 'c']
+	      index: 0,
+	      name: 'a',
+	      type: 'menu',
+	      width: 60,
+	      height: 40
 	    }, {
-	      classes: ['d', 'e']
+	      index: 1,
+	      name: 'b',
+	      width: 60,
+	      height: 40
+	    }, {
+	      index: 2,
+	      name: 'c',
+	      width: 60,
+	      height: 40
+	    }, {
+	      index: 3,
+	      name: 'd',
+	      type: 'menu',
+	      width: 60,
+	      height: 40
+	    }, {
+	      index: 4,
+	      name: 'e',
+	      width: 60,
+	      height: 40
+	    }, {
+	      index: 5,
+	      name: 'h',
+	      width: 60,
+	      height: 40,
+	      hidden: true
+	    }
+	  ],
+	  links: [],
+	  groups: [
+	    {
+	      id: 0,
+	      leaves: [0, 1, 2]
+	    }, {
+	      id: 1,
+	      leaves: [3, 4]
+	    }
+	  ],
+	  constraints: [
+	    {
+	      type: 'alignment',
+	      axis: 'x',
+	      offsets: [
+	        {
+	          node: 0,
+	          offset: 50
+	        }, {
+	          node: 1,
+	          offset: 50
+	        }, {
+	          node: 2,
+	          offset: 50
+	        }
+	      ]
+	    }, {
+	      type: 'alignment',
+	      axis: 'x',
+	      offsets: [
+	        {
+	          node: 3,
+	          offset: 50
+	        }, {
+	          node: 4,
+	          offset: 50
+	        }
+	      ]
 	    }
 	  ]
 	};
@@ -29,16 +98,23 @@ webpackJsonp([0],[
 	initialState = im.fromJS(initialState);
 
 	reducer = function(state, action) {
-	  var newState;
+	  var newNode, newState;
 	  if (state == null) {
 	    state = initialState;
 	  }
 	  switch (action.type) {
 	    case 'ADD_CLASS':
-	      newState = state.updateIn(['semesters', action.semester, 'classes'], function(classList) {
-	        return classList.push(action.classCode);
-	      });
-	      return newState.set('graph', action.graph);
+	      console.log('graph', action.graph);
+	      newState = action.graph;
+	      newNode = {
+	        index: newState.nodes.length - 1,
+	        name: action.classCode,
+	        width: 60,
+	        height: 40
+	      };
+	      newState.nodes.push(newNode);
+	      newState.groups[action.semester].leaves.push(newState.nodes.length - 1);
+	      return im.fromJS(newState);
 	    default:
 	      return state;
 	  }
@@ -1488,15 +1564,14 @@ webpackJsonp([0],[
 	  componentDidMount: function() {
 	    var dispatch, graphData, ref, state;
 	    ref = this.props, dispatch = ref.dispatch, state = ref.state, graphData = ref.graphData;
-	    this.graph = new Graph(this.refs.graph, graphData);
-	    this.graph.addNode('newnode', 0);
+	    this.graph = new Graph(this.refs.graph, state, dispatch);
 	    return window.an = this.graph.addNode;
 	  },
 	  componentDidUpdate: function() {
 	    var dispatch, graphData, ref, state;
-	    console.log('thisprops', this.props);
 	    ref = this.props, dispatch = ref.dispatch, state = ref.state, graphData = ref.graphData;
-	    return drawGraph(this.refs.graph, getGraphData(state.toJS()), dispatch);
+	    console.log('newstate?', state);
+	    return this.graph.update(state);
 	  },
 	  render: function() {
 	    return React.createElement("div", {
@@ -1508,7 +1583,7 @@ webpackJsonp([0],[
 
 	mapStateToProps = function(state) {
 	  return {
-	    state: state
+	    state: state.toJS()
 	  };
 	};
 
@@ -1524,27 +1599,30 @@ webpackJsonp([0],[
 /* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Graph, d3, drawGraph, webcola,
+	var Graph, actionAddClass, d3, drawGraph, webcola,
 	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 	d3 = __webpack_require__(179);
 
 	webcola = __webpack_require__(180);
 
+	actionAddClass = __webpack_require__(408).actionAddClass;
+
 	Graph = (function() {
-	  function Graph(graphElement1, graph1) {
+	  function Graph(graphElement1, graph1, dispatch) {
 	    var classes, cls, j, len, ref, ref1, sel;
 	    this.graphElement = graphElement1;
 	    this.graph = graph1;
+	    this.dispatch = dispatch;
 	    this.addSemester = bind(this.addSemester, this);
 	    this.addNode = bind(this.addNode, this);
+	    this.getGraph = bind(this.getGraph, this);
 	    this.update = bind(this.update, this);
 	    this.tick = bind(this.tick, this);
 	    this.width = 960;
 	    this.height = 500;
 	    this.pad = 3;
 	    this.color = d3.scale.category20();
-	    this.cola = webcola.d3adaptor().linkDistance(100).avoidOverlaps(true).handleDisconnected(false).size([this.width, this.height]);
 	    this.svg = d3.select(this.graphElement).append('svg').attr('width', this.width).attr('height', this.height);
 	    classes = ['group', 'link', 'node', 'label'];
 	    ref = (function() {
@@ -1572,8 +1650,7 @@ webpackJsonp([0],[
 	      }
 	      return results;
 	    })(), this.group = ref1[0], this.link = ref1[1], this.node = ref1[2], this.label = ref1[3];
-	    this.cola.nodes(this.graph.nodes).links(this.graph.links).groups(this.graph.groups).constraints(this.graph.constraints);
-	    this.cola.on('tick', this.tick);
+	    this.c = 0;
 	    this.update();
 	  }
 
@@ -1613,29 +1690,67 @@ webpackJsonp([0],[
 	  };
 
 	  Graph.prototype.update = function(graph) {
+	    var count, g, onclick;
 	    if (graph == null) {
 	      graph = this.graph;
 	    }
-	    console.log('group', graph, graph.constraints);
-	    console.log('colacontraints', this.cola.constraints());
+	    console.log('update graph', graph);
+	    this.cola = webcola.d3adaptor().linkDistance(100).avoidOverlaps(true).handleDisconnected(false).size([this.width, this.height]);
+	    g = this.stripRefs(graph);
+	    console.log('g is ', g);
+	    console.log('stripped', JSON.stringify(g, null, 4));
+	    this.cola.nodes(graph.nodes).links(graph.links).groups(graph.groups).constraints(graph.constraints);
+	    this.cola.on('tick', this.tick);
+	    console.log('groups', this.cola.groups());
 	    this.group = this.group.data(this.cola.groups(), function(d) {
+	      console.log('ithought..', d);
 	      return d.id;
 	    });
+	    console.log('end', this.group, this.group.enter());
+	    this.group.transition().attr('x', function(d) {
+	      console.log('d', d);
+	      debugger;
+	      console.log('bounds', webcola.vpsc.computeGroupBounds(d));
+	      return d.bounds.x;
+	    }).attr('y', function(d) {
+	      return d.bounds.y;
+	    }).attr('width', function(d) {
+	      return d.bounds.width();
+	    }).attr('height', function(d) {
+	      return d.bounds.height();
+	    });
+	    this.group.call(this.cola.drag);
 	    this.group.enter().append('rect').attr('rx', 8).attr('ry', 8).attr('class', 'cola group').style('fill', (function(_this) {
 	      return function(d, i) {
 	        return _this.color(i);
 	      };
 	    })(this)).call(this.cola.drag);
 	    this.group.exit().remove();
-	    this.link = this.link.data(this.cola.links());
-	    this.link.enter().insert('line', '.link').attr('class', 'cola link');
-	    this.link.exit().remove();
+	    count = 0;
+	    onclick = (function(_this) {
+	      return function() {
+	        var action, datum;
+	        datum = d3.event.target.__data__;
+	        if (datum.type === 'menu') {
+	          action = actionAddClass('class' + count, 0, _this.stripRefs(_this.getGraph()));
+	          _this.dispatch(action);
+	        }
+	        return count += 1;
+	      };
+	    })(this);
 	    this.node = this.node.data(this.cola.nodes(), function(d) {
 	      return d.name;
 	    });
+	    this.node.call(this.cola.drag);
+	    this.node.transition().attr('x', function(d) {
+	      return d.x - (d.width / 2);
+	    }).attr('y', (function(_this) {
+	      return function(d) {
+	        return d.y - (d.height / 2) + _this.pad;
+	      };
+	    })(this));
 	    this.node.enter().insert('rect', '.node').attr('class', 'cola node').attr('width', (function(_this) {
 	      return function(d) {
-	        console.log('d', typeof d.hidden);
 	        if (d.hidden) {
 	          return 0;
 	        } else {
@@ -1654,16 +1769,36 @@ webpackJsonp([0],[
 	      return function(d) {
 	        return _this.color(_this.graph.groups.length);
 	      };
-	    })(this)).call(this.cola.drag).insert('title').text(function(d) {
+	    })(this));
+	    this.node.call(this.cola.drag).on('click', onclick).insert('title').text(function(d) {
 	      return d.name;
 	    }).call(this.cola.drag);
-	    this.link.exit().remove();
-	    this.label = this.label.data(this.graph.nodes);
-	    this.label.enter().insert('text', '.label').attr('class', 'cola label').text(function(d) {
+	    this.node.exit().remove();
+	    this.label = this.label.data(this.cola.nodes(), function(d) {
 	      return d.name;
-	    }).call(this.cola.drag);
+	    });
+	    this.label.call(this.cola.drag);
+	    this.label.transition().attr('x', function(d) {
+	      return d.x;
+	    }).attr('y', function(d) {
+	      var h;
+	      h = this.getBBox().height;
+	      return d.y + h / 2;
+	    });
+	    this.label.enter().insert('text', '.label').attr('class', 'cola label').call(this.cola.drag).on('click', onclick).text(function(d) {
+	      return d.name;
+	    });
 	    this.label.exit().remove();
 	    return this.cola.start();
+	  };
+
+	  Graph.prototype.getGraph = function() {
+	    return {
+	      nodes: this.cola.nodes(),
+	      links: this.cola.links(),
+	      groups: this.cola.groups(),
+	      constraints: this.cola.constraints()
+	    };
 	  };
 
 	  Graph.prototype.addNode = function(name, semester) {
@@ -1686,6 +1821,45 @@ webpackJsonp([0],[
 	      hidden: true
 	    });
 	    return this.update();
+	  };
+
+	  Graph.prototype.stripRefs = function(graph) {
+	    var group, groups, j, k, key, l, leaf, leaves, len, len1, len2, newNode, node, nodes, ref, ref1, ref2, value;
+	    nodes = [];
+	    ref = graph.nodes;
+	    for (j = 0, len = ref.length; j < len; j++) {
+	      node = ref[j];
+	      newNode = {};
+	      for (key in node) {
+	        value = node[key];
+	        if (key !== 'bounds' && key !== 'parent' && key !== 'variable') {
+	          newNode[key] = value;
+	        }
+	      }
+	      nodes.push(newNode);
+	    }
+	    groups = [];
+	    ref1 = graph.groups;
+	    for (k = 0, len1 = ref1.length; k < len1; k++) {
+	      group = ref1[k];
+	      leaves = [];
+	      ref2 = group.leaves;
+	      for (l = 0, len2 = ref2.length; l < len2; l++) {
+	        leaf = ref2[l];
+	        leaves.push(typeof leaf === 'number' ? leaf : leaf.index);
+	      }
+	      groups.push({
+	        id: group.id,
+	        leaves: leaves
+	      });
+	    }
+	    graph.groups = groups;
+	    return {
+	      nodes: nodes,
+	      groups: groups,
+	      links: graph.links,
+	      constraints: graph.constraints
+	    };
 	  };
 
 	  return Graph;
@@ -16063,6 +16237,37 @@ webpackJsonp([0],[
 
 	      , 'space': '\u0000'
 	    }
+	};
+
+
+/***/ },
+/* 408 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var ADD_CLASS, actionAddClass;
+
+	ADD_CLASS = __webpack_require__(409).ADD_CLASS;
+
+	actionAddClass = function(classCode, semester, graph) {
+	  return {
+	    type: ADD_CLASS,
+	    classCode: classCode,
+	    semester: semester,
+	    graph: graph
+	  };
+	};
+
+	module.exports = {
+	  actionAddClass: actionAddClass
+	};
+
+
+/***/ },
+/* 409 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	  ADD_CLASS: 'ADD_CLASS'
 	};
 
 
