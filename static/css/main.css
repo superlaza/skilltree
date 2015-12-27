@@ -22,3 +22,31 @@ body {
 	stroke-width:1;
 	stroke-dasharray:0;	
 }
+
+ /*COLA TEST */
+.cola.node {
+  stroke: #fff;
+  stroke-width: 1.5px;
+    cursor: move;
+}
+
+.cola.group {
+  stroke: #fff;
+  stroke-width: 1.5px;
+  cursor: move;
+  opacity: 0.7;
+}
+
+.cola.link {
+  stroke: #7a4e4e;
+  stroke-width: 3px;
+  stroke-opacity: 1;
+}
+
+.cola.label {
+    fill: white;
+    font-family: Verdana;
+    font-size: 25px;
+    text-anchor: middle;
+    cursor: move;
+}

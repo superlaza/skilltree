@@ -1,8 +1,11 @@
 express 		= require 'express'
 falcorExpress 	= require 'falcor-express'
-Router 			= require('falcor-router')
+Router 			= require 'falcor-router'
 
-graphData 		= require '../data/majorMap.json'
+cola = require 'webcola'
+
+# graphData 		= require '../data/majorMap.json'
+graphData 		= require '../data/colatest.json'
 
 console.log typeof(JSON.stringify(graphData))
 

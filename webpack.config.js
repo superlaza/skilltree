@@ -5,8 +5,8 @@ wp = require('webpack');
 module.exports = {
     context: path.join(__dirname, 'src'),
     entry: {
-        app: "./main.coffee",
-        vendor: ['react', 'd3']
+        app: "./main.cjsx",
+        vendor: ['react', 'd3', 'webcola']
     },
     output: {
         path: path.join(__dirname, 'static'),

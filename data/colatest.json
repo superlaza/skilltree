@@ -1,0 +1,39 @@
+{
+  "nodes":[
+    {"name":"a","width":60,"height":40},
+    {"name":"b","width":60,"height":40},
+    {"name":"c","width":60,"height":40},
+    {"name":"d","width":60,"height":40},
+    {"name":"e","width":60,"height":40},
+    {"name":"f","width":60,"height":40},
+    {"name":"g","width":60,"height":40},
+    {"name":"h","width":60,"height":40, "hidden": true}
+  ],
+  "links":[
+    {"source":1,"target":2},
+    {"source":2,"target":3},
+    {"source":3,"target":4},
+    {"source":0,"target":1},
+    {"source":2,"target":0},
+    {"source":3,"target":5},
+    {"source":0,"target":5}
+  ],
+	"groups":[
+	  {"id": 0, "leaves":[0], "groups":[1]},
+	  {"id": 1, "leaves":[1,2]},
+	  {"id": 2, "leaves":[3,4]},
+    {"id": 3, "leaves": [7]}
+	]
+  ,"constraints": [
+    {
+        "type": "alignment",
+        "axis": "y",
+        "offsets": [
+            {"node": 1,"offset": 0},
+            {"node": 2, "offset": 0},
+            {"node": 3, "offset": 0}
+        ]
+    }
+  ]
+
+}
