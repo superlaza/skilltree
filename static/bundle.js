@@ -20,9 +20,9 @@ webpackJsonp([0],[
 	  nodes: [
 	    {
 	      index: 0,
-	      name: 'a',
+	      name: 'Add Class',
 	      type: 'menu',
-	      width: 60,
+	      width: 137,
 	      height: 40
 	    }, {
 	      index: 1,
@@ -36,9 +36,9 @@ webpackJsonp([0],[
 	      height: 40
 	    }, {
 	      index: 3,
-	      name: 'd',
+	      name: 'Add Class',
 	      type: 'menu',
-	      width: 60,
+	      width: 137,
 	      height: 40
 	    }, {
 	      index: 4,
@@ -53,7 +53,18 @@ webpackJsonp([0],[
 	      hidden: true
 	    }
 	  ],
-	  links: [],
+	  links: [
+	    {
+	      source: 1,
+	      target: 3
+	    }, {
+	      source: 1,
+	      target: 4
+	    }, {
+	      source: 2,
+	      target: 4
+	    }
+	  ],
 	  groups: [
 	    {
 	      id: 0,
@@ -93,6 +104,11 @@ webpackJsonp([0],[
 	        }
 	      ],
 	      group: 1
+	    }, {
+	      axis: 'x',
+	      left: 0,
+	      right: 3,
+	      gap: 200
 	    }
 	  ]
 	};
@@ -100,32 +116,65 @@ webpackJsonp([0],[
 	initialState = im.fromJS(initialState);
 
 	reducer = function(state, action) {
-	  var constraint, i, len, newNode, newState, ref1;
+	  var constraint, group, i, j, k, len, len1, len2, newClassNode, newOptionNode, newState, optionCode, ref1, ref2, ref3;
 	  if (state == null) {
 	    state = initialState;
 	  }
 	  switch (action.type) {
 	    case 'ADD_CLASS':
-	      console.log('graph', action.graph);
 	      newState = action.graph;
-	      newNode = {
-	        index: newState.nodes.length - 1,
+	      console.log('child', newState.nodes, newState.constraints);
+	      newClassNode = {
+	        index: newState.nodes.length,
 	        name: action.classCode,
 	        width: 60,
 	        height: 40,
 	        x: newState.groups[action.semester].bounds.X,
 	        y: newState.groups[action.semester].bounds.Y
 	      };
-	      newState.nodes.push(newNode);
-	      newState.groups[action.semester].leaves.push(newState.nodes.length - 1);
+	      newState.nodes.push(newClassNode);
+	      newState.groups[action.semester].leaves.push(newClassNode.index);
 	      ref1 = newState.constraints;
 	      for (i = 0, len = ref1.length; i < len; i++) {
 	        constraint = ref1[i];
-	        if (constraint.group === action.semester) {
+	        if (constraint.type === 'alignment' && constraint.group === action.semester) {
 	          constraint.offsets.push({
-	            node: newState.nodes.length - 1,
+	            node: newClassNode.index,
 	            offset: 50
 	          });
+	        }
+	      }
+	      ref2 = action.options;
+	      for (j = 0, len1 = ref2.length; j < len1; j++) {
+	        optionCode = ref2[j];
+	        group = newState.groups[action.semester + 1];
+	        if (group != null) {
+	          newOptionNode = {
+	            index: newState.nodes.length,
+	            name: optionCode,
+	            width: 60,
+	            height: 40,
+	            x: group.bounds.X,
+	            y: group.bounds.Y
+	          };
+	          newState.nodes.push(newOptionNode);
+	          group.leaves.push(newOptionNode.index);
+	          newState.links.push({
+	            source: newClassNode.index,
+	            target: newOptionNode.index
+	          });
+	          ref3 = newState.constraints;
+	          for (k = 0, len2 = ref3.length; k < len2; k++) {
+	            constraint = ref3[k];
+	            if (constraint.type === 'alignment' && constraint.group === action.semester + 1) {
+	              constraint.offsets.push({
+	                node: newOptionNode.index,
+	                offset: 50
+	              });
+	            }
+	          }
+	        } else {
+	          console.log('that semester does not exist');
 	        }
 	      }
 	      return im.fromJS(newState);
@@ -1577,8 +1626,9 @@ webpackJsonp([0],[
 	Plan = React.createClass({
 	  componentDidMount: function() {
 	    var dispatch, graphData, ref, state;
+	    console.log('p', this.props);
 	    ref = this.props, dispatch = ref.dispatch, state = ref.state, graphData = ref.graphData;
-	    this.graph = new Graph(this.refs.graph, state, dispatch);
+	    this.graph = new Graph(this.refs.graph, state, dispatch, graphData);
 	    return window.an = this.graph.addNode;
 	  },
 	  componentDidUpdate: function() {
@@ -1623,11 +1673,12 @@ webpackJsonp([0],[
 	actionAddClass = __webpack_require__(408).actionAddClass;
 
 	Graph = (function() {
-	  function Graph(graphElement1, graph1, dispatch) {
+	  function Graph(graphElement1, graph1, dispatch, adjList) {
 	    var classes, cls, j, len, ref, ref1, sel;
 	    this.graphElement = graphElement1;
 	    this.graph = graph1;
 	    this.dispatch = dispatch;
+	    this.adjList = adjList;
 	    this.addSemester = bind(this.addSemester, this);
 	    this.addNode = bind(this.addNode, this);
 	    this.getGraph = bind(this.getGraph, this);
@@ -1725,19 +1776,24 @@ webpackJsonp([0],[
 	      };
 	    })(this)).call(this.cola.drag);
 	    this.group.exit().remove();
+	    this.link = this.link.data(this.cola.links());
+	    this.link.enter().insert('line', '.link').attr('class', 'cola link');
+	    this.link.exit().remove();
 	    onclick = (function(_this) {
 	      return function() {
-	        var action, datum;
+	        var action, className, datum, semester;
 	        datum = d3.event.target.__data__;
 	        if (datum.type === 'menu') {
-	          action = actionAddClass('class' + _this.count, 0, _this.stripRefs(_this.getGraph()));
+	          semester = datum.parent.id;
+	          className = window.prompt('Pick a class');
+	          action = actionAddClass(className, semester, _this.adjList[className], _this.stripRefs(_this.getGraph()));
 	          _this.dispatch(action);
 	        }
 	        return _this.count += 1;
 	      };
 	    })(this);
 	    this.node = this.node.data(this.cola.nodes(), function(d) {
-	      return d.name;
+	      return d.index;
 	    });
 	    this.node.call(this.cola.drag).on('click', onclick);
 	    this.node.enter().insert('rect', '.node').attr('class', 'cola node').attr('width', (function(_this) {
@@ -1766,7 +1822,7 @@ webpackJsonp([0],[
 	    }).call(this.cola.drag);
 	    this.node.exit().remove();
 	    this.label = this.label.data(this.cola.nodes(), function(d) {
-	      return d.name;
+	      return d.index;
 	    });
 	    this.label.call(this.cola.drag).on('click', onclick);
 	    this.label.enter().insert('text', '.label').attr('class', 'cola label').call(this.cola.drag).on('click', onclick).text(function(d) {
@@ -1808,7 +1864,7 @@ webpackJsonp([0],[
 	  };
 
 	  Graph.prototype.stripRefs = function(graph) {
-	    var group, groups, j, k, key, l, leaf, leaves, len, len1, len2, newNode, node, nodes, ref, ref1, ref2, value;
+	    var group, groups, j, k, key, l, leaf, leaves, len, len1, len2, len3, link, links, m, newNode, node, nodes, ref, ref1, ref2, ref3, value;
 	    nodes = [];
 	    ref = graph.nodes;
 	    for (j = 0, len = ref.length; j < len; j++) {
@@ -1845,10 +1901,19 @@ webpackJsonp([0],[
 	      });
 	    }
 	    graph.groups = groups;
+	    links = [];
+	    ref3 = graph.links;
+	    for (m = 0, len3 = ref3.length; m < len3; m++) {
+	      link = ref3[m];
+	      links.push({
+	        source: link.source.index,
+	        target: link.target.index
+	      });
+	    }
 	    return {
 	      nodes: nodes,
 	      groups: groups,
-	      links: graph.links,
+	      links: links,
 	      constraints: graph.constraints
 	    };
 	  };
@@ -16239,11 +16304,12 @@ webpackJsonp([0],[
 
 	ADD_CLASS = __webpack_require__(409).ADD_CLASS;
 
-	actionAddClass = function(classCode, semester, graph) {
+	actionAddClass = function(classCode, semester, options, graph) {
 	  return {
 	    type: ADD_CLASS,
 	    classCode: classCode,
 	    semester: semester,
+	    options: options,
 	    graph: graph
 	  };
 	};

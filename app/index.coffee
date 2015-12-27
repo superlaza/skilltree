@@ -5,7 +5,8 @@ Router 			= require 'falcor-router'
 cola = require 'webcola'
 
 # graphData 		= require '../data/majorMap.json'
-graphData 		= require '../data/colatest.json'
+# graphData 		= require '../data/colatest.json'
+graphData 		= require '../data/courseAdjList.json'
 
 console.log typeof(JSON.stringify(graphData))
 

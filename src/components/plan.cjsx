@@ -75,6 +75,7 @@ getGraphData = (data) ->
 
 Plan = React.createClass
 	componentDidMount: ->
+		console.log 'p', @props
 		{dispatch, state, graphData} = @props
 		# dispatch {type: 'ADD_CLASS', semester: 0, classCode: 'cool'}
 		# this.refs.graph.innerHTML = 'Hoy'
@@ -83,7 +84,7 @@ Plan = React.createClass
 		# 		getGraphData(state.toJS()),
 		# 		dispatch)
 		# console.log 'see', state, graphData
-		@graph = new Graph(this.refs.graph, state, dispatch)
+		@graph = new Graph(this.refs.graph, state, dispatch, graphData)
 		# @graph.addNode('newnode', 0)
 		window.an = @graph.addNode
 

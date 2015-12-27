@@ -46,7 +46,7 @@ body {
 .cola.label {
     fill: white;
     font-family: Verdana;
-    font-size: 25px;
+    font-size: 18px;
     text-anchor: middle;
     cursor: move;
 }

@@ -4,7 +4,7 @@ webcola = require 'webcola'
 {actionAddClass} = require '../../actions/PlanActions.coffee'
 
 class Graph
-	constructor: (@graphElement, @graph, @dispatch) ->
+	constructor: (@graphElement, @graph, @dispatch, @adjList) ->
 		@width = 960
 		@height = 500
 		@pad = 3
@@ -111,23 +111,30 @@ class Graph
 			.call @cola.drag
 		@group.exit().remove()
 
-		# @link = @link.data @cola.links()
-		# @link.enter()
-		# 	.insert 'line', '.link'
-		# 	.attr 'class', 'cola link'
-		# @link.exit().remove()
+		@link = @link.data @cola.links()
+		@link.enter()
+			.insert 'line', '.link'
+			.attr 'class', 'cola link'
+		@link.exit().remove()
 
-		
 		onclick = =>
 			datum = d3.event.target.__data__
+			
 			if datum.type is 'menu'
-				action = actionAddClass 'class'+@count, 0, @stripRefs @getGraph()
+				semester = datum.parent.id # parent group
+				className = window.prompt('Pick a class')
+				action = actionAddClass(
+						className,
+						semester,
+						@adjList[className],
+						@stripRefs @getGraph()
+					)
 				@dispatch action
 			@count += 1
 
 		@node = @node.data @cola.nodes(),
 					(d) ->
-						d.name
+						d.index
 		@node
 			.call @cola.drag
 			.on 'click', onclick
@@ -163,7 +170,7 @@ class Graph
 		# 			console.log 'after', group.bounds
 
 		@label = @label.data @cola.nodes(), (d) ->
-			d.name
+			d.index
 		@label
 			.call @cola.drag
 			.on 'click', onclick
@@ -301,9 +308,15 @@ class Graph
 					Y: group.bounds.Y
 		graph.groups = groups
 
+		links = []
+		for link in graph.links
+			links.push
+				source: link.source.index
+				target: link.target.index
+
 		nodes: nodes
 		groups: groups
-		links: graph.links
+		links: links
 		constraints: graph.constraints
 
 

@@ -10,21 +10,17 @@ im 			= require 'immutable'
 
 initialState = {
 	nodes:[
-		{index: 0,name:'a',type: 'menu',width:60,height:40},
+		{index: 0,name:'Add Class',type: 'menu',width:137,height:40},
 		{index: 1,name:'b',width:60,height:40},
 		{index: 2,name:'c',width:60,height:40},
-		{index: 3,name:'d',type: 'menu',width:60,height:40},
+		{index: 3,name:'Add Class',type: 'menu',width:137,height:40},
 		{index: 4,name:'e',width:60,height:40},
 		{index: 5,name:'h',width:60,height:40, hidden: true}
 	]
 	links:[
-		# {source:1,target:2},
-		# {source:2,target:3},
-		# {source:3,target:4},
-		# {source:0,target:1},
-		# {source:2,target:0},
-		# {source:3,target:5},
-		# {source:0,target:5}
+		{source:1,target:3},
+		{source:1,target:4},
+		{source:2,target:4}
 	]
 	groups:[
 		{id: 0, leaves:[0,1,2]},
@@ -49,6 +45,12 @@ initialState = {
 				{node: 4, offset: 50}
 			]
 			group: 1
+		},
+		{
+			axis: 'x'
+			left: 0
+			right: 3
+			gap: 200
 		}
 	]
 }
@@ -57,23 +59,54 @@ initialState = im.fromJS(initialState)
 reducer = (state = initialState, action) ->
 	switch action.type
 		when 'ADD_CLASS'
-			console.log 'graph', action.graph
+			# console.log 'graph', action.graph
 			newState = action.graph
-			newNode =
-				index: newState.nodes.length-1
+			console.log 'child', newState.nodes, newState.constraints
+			newClassNode =
+				index: newState.nodes.length
 				name: action.classCode
 				width:60
 				height:40
 				x: newState.groups[action.semester].bounds.X
 				y: newState.groups[action.semester].bounds.Y
 
-			newState.nodes.push newNode
-			newState.groups[action.semester].leaves.push newState.nodes.length-1
+			newState.nodes.push newClassNode
+			newState.groups[action.semester].leaves.push newClassNode.index
 			for constraint in newState.constraints
-				if constraint.group is action.semester
+				if constraint.type is 'alignment' and constraint.group is action.semester
 					constraint.offsets.push
-						node: newState.nodes.length-1
+						node: newClassNode.index
 						offset: 50
+
+			# add option nodes
+			for optionCode in action.options
+				group = newState.groups[action.semester+1]
+				if group? # if there's an existing next semester
+					newOptionNode =
+						index: newState.nodes.length
+						name: optionCode
+						width:60
+						height:40
+						x: group.bounds.X
+						y: group.bounds.Y
+
+					newState.nodes.push newOptionNode
+					group.leaves.push newOptionNode.index
+					newState.links.push
+						source: newClassNode.index
+						target: newOptionNode.index
+
+					# add option constraints
+					for constraint in newState.constraints
+						if constraint.type is 'alignment' and constraint.group is action.semester+1
+							constraint.offsets.push
+								node: newOptionNode.index
+								offset: 50
+				else
+					console.log 'that semester does not exist'
+
+						
+
 			im.fromJS(newState)
 		else state
 

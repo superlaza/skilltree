@@ -125,6 +125,15 @@ class Graph:
 	            queue.extend(graph[vertex] - visited)
 	    return visited
 
+	def repr(self):
+		adjList = {}
+		for id, nodeList in self.adjList.items():
+			node, children = nodeList['node'], nodeList['children']
+			adjList[node.prefix+node.number] = [child.prefix+child.number for child in children]
+
+		return adjList
+
+# returns graph object
 def process_courses():
 	# to match stuff like this ZOO 5748C COM-BSBS 5(3,2)
 	regex = re.compile('(\w{3}) ([0-9]{4}[A-Z]?) (.*(?:\s.*)?) (\d\(\d,\d\))\n?')
@@ -210,6 +219,11 @@ def process_courses():
 			else:
 				line = f.readline()
 
+		return g
+
+graph = process_courses()
+json.dump(graph.repr(), open("../courseAdjList.json", 'wb'), indent=4)
+
 def add2neo(courses):
 	authenticate("localhost:7474", 'neo4j', 'admin')
 	graph = Graph()
@@ -223,69 +237,70 @@ def add2neo(courses):
 			except:
 				print 'could not add', name, pre
 
-majors = json.load(open('../majors.json', 'rb'))
+def major_data():
+	majors = json.load(open('../majors.json', 'rb'))
 
-maj_similarity = defaultdict(dict)
-majorList = sorted(majors.keys())
-max_sim = 0
-for i in range(len(majorList)):
-	maj1 = set(majors[majorList[i]])
-	for j in range(i, len(majorList)):
-		maj2 = set(majors[majorList[j]])
+	maj_similarity = defaultdict(dict)
+	majorList = sorted(majors.keys())
+	max_sim = 0
+	for i in range(len(majorList)):
+		maj1 = set(majors[majorList[i]])
+		for j in range(i, len(majorList)):
+			maj2 = set(majors[majorList[j]])
 
-		simil = len(maj1.intersection(maj2))
-		if simil > max_sim:
-			max_sim = simil
-		maj_similarity[majorList[i]][majorList[j]] = simil
-		maj_similarity[majorList[j]][majorList[i]] = simil
+			simil = len(maj1.intersection(maj2))
+			if simil > max_sim:
+				max_sim = simil
+			maj_similarity[majorList[i]][majorList[j]] = simil
+			maj_similarity[majorList[j]][majorList[i]] = simil
 
-for maj1, majs in maj_similarity.items():
-	for maj2 in majs:
-		majs[maj2] = (majs[maj2]+1)/float(max_sim)
+	for maj1, majs in maj_similarity.items():
+		for maj2 in majs:
+			majs[maj2] = (majs[maj2]+1)/float(max_sim)
 
-pprint(dict(maj_similarity), indent=4)
-
-
-majors = {k:majors[k] for k in majors.keys()[:int(len(majors.keys())/1)]}
-
-courseMap = defaultdict(set)
-
-for major, courses in majors.items():
-	for course in courses:
-		courseMap[course].add(major)
-
-# sort course by number of majors it appears in
-# for k in sorted(courseMap, key=lambda k: len(courseMap[k]), reverse=True):
-# 	print k, len(courseMap[k])
-
-nodes = []
-links = []
-nodes += [{'name': major, 'type': 'major'} for major in majorList]
-# nodes += [{'name': course, 'type': 'course', 'size': len(courseMap[course])} for course in courseMap]
-# for major, courses in majors.items():
-# 	for course in courses:
-# 		links.append({
-# 			'source': majorList.index(major),
-# 			'target': courseMap.keys().index(course)+len(majorList),
-# 		})
-
-for i in range(len(majorList)):
-	maj1 = majorList[i]
-	for j in range(i, len(majorList)):
-		maj2 = majorList[j]
-		if not (maj1 == maj2):
-			if maj_similarity[maj1][maj2] > 0.1:
-				links.append({
-					'source': majorList.index(maj1),
-					'target': majorList.index(maj2),
-					'strength': maj_similarity[maj1][maj2]
-				})
-
-json.dump({'nodes': nodes, 'links': links}, open("../majorMap.json", 'wb'), indent=4)
+	pprint(dict(maj_similarity), indent=4)
 
 
-# print [(i, nodes[i]['name']) for i in range(len(nodes))]
-print links
+	majors = {k:majors[k] for k in majors.keys()[:int(len(majors.keys())/1)]}
+
+	courseMap = defaultdict(set)
+
+	for major, courses in majors.items():
+		for course in courses:
+			courseMap[course].add(major)
+
+	# sort course by number of majors it appears in
+	# for k in sorted(courseMap, key=lambda k: len(courseMap[k]), reverse=True):
+	# 	print k, len(courseMap[k])
+
+	nodes = []
+	links = []
+	nodes += [{'name': major, 'type': 'major'} for major in majorList]
+	# nodes += [{'name': course, 'type': 'course', 'size': len(courseMap[course])} for course in courseMap]
+	# for major, courses in majors.items():
+	# 	for course in courses:
+	# 		links.append({
+	# 			'source': majorList.index(major),
+	# 			'target': courseMap.keys().index(course)+len(majorList),
+	# 		})
+
+	for i in range(len(majorList)):
+		maj1 = majorList[i]
+		for j in range(i, len(majorList)):
+			maj2 = majorList[j]
+			if not (maj1 == maj2):
+				if maj_similarity[maj1][maj2] > 0.1:
+					links.append({
+						'source': majorList.index(maj1),
+						'target': majorList.index(maj2),
+						'strength': maj_similarity[maj1][maj2]
+					})
+
+	json.dump({'nodes': nodes, 'links': links}, open("../majorMap.json", 'wb'), indent=4)
+
+
+	# print [(i, nodes[i]['name']) for i in range(len(nodes))]
+	print links
 
 # for course in sorted(math_courses, key=lambda c: c.name):
 # 	check = lambda c: c.prefix+c.number in course.prereqs
