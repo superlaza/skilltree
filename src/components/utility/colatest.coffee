@@ -29,7 +29,7 @@ class Graph
 		# @label = @svg.selectAll '.label'
 
 
-		@c = 0
+		@count = 0 # delete eventually
 		@update()
 
 	tick: =>
@@ -40,13 +40,19 @@ class Graph
 		.attr 		'y2', (d) -> d.target.y
 
 		@node
-		.attr 		'x', (d) -> d.x - (d.width / 2)
-		.attr 		'y', (d) => d.y - (d.height / 2) + @pad
+		.attr 		'x', (d) ->
+			# console.log d.name, d.x
+			d.x - (d.width / 2)
+		.attr 		'y', (d) =>
+			# console.log d.name, d.y
+			d.y - (d.height / 2) + @pad
 
 		@group
 		.attr 		'x', 		(d) ->	d.bounds.x
 		.attr 		'y', 		(d) ->	d.bounds.y
-		.attr 		'width',	(d) ->	d.bounds.width()
+		.attr 		'width',	(d) ->
+			# console.log 'd in tick', d
+			d.bounds.width()
 		.attr 		'height', 	(d) ->	d.bounds.height()
 
 		@label
@@ -56,7 +62,9 @@ class Graph
 			d.y + h / 2
 		return
 
-	update: (graph = @graph) =>
+	update: (graph = @graph, up) =>
+		if up?
+			@cola.stop()
 		console.log 'update graph', graph
 		@cola = webcola.d3adaptor()
 					.linkDistance(100)
@@ -67,9 +75,9 @@ class Graph
 						@height
 					])
 
-		g = @stripRefs graph
-		console.log 'g is ', g
-		console.log 'stripped', JSON.stringify g, null, 4
+		# g = @stripRefs graph
+		# console.log 'g is ', g
+		# console.log 'stripped', JSON.stringify g, null, 4
 		@cola.nodes(graph.nodes)
 			.links(graph.links)
 			.groups(graph.groups)
@@ -77,7 +85,6 @@ class Graph
 
 		@cola.on 'tick', @tick
 		
-		console.log 'groups', @cola.groups()
 		# if @c
 		# 	@cola.groups(graph.groups)
 		# 	@c += 1
@@ -91,19 +98,7 @@ class Graph
 
 		@group = @group.data @cola.groups(),
 					(d) ->
-						console.log 'ithought..', d
 						d.id
-		console.log 'end', @group, @group.enter()
-		@group.transition()
-		.attr 		'x', 		(d) ->
-			console.log 'd', d
-			debugger
-			console.log 'bounds', webcola.vpsc.computeGroupBounds(d)
-			d.bounds.x
-		.attr 		'y', 		(d) ->	d.bounds.y
-		.attr 		'width',	(d) ->	d.bounds.width()
-		.attr 		'height', 	(d) ->	d.bounds.height()
-
 		@group.call @cola.drag
 		@group.enter()
 			# .insert 'rect', '.group'
@@ -122,23 +117,20 @@ class Graph
 		# 	.attr 'class', 'cola link'
 		# @link.exit().remove()
 
-		count = 0
+		
 		onclick = =>
 			datum = d3.event.target.__data__
 			if datum.type is 'menu'
-				action = actionAddClass 'class'+count, 0, @stripRefs @getGraph()
+				action = actionAddClass 'class'+@count, 0, @stripRefs @getGraph()
 				@dispatch action
-			count += 1
+			@count += 1
 
 		@node = @node.data @cola.nodes(),
 					(d) ->
 						d.name
-		@node.call @cola.drag
-
-		@node.transition()
-		.attr 		'x', (d) -> d.x - (d.width / 2)
-		.attr 		'y', (d) => d.y - (d.height / 2) + @pad
-
+		@node
+			.call @cola.drag
+			.on 'click', onclick
 		@node.enter()
 			.insert	'rect', '.node'
 				.attr 	'class', 'cola node'
@@ -172,14 +164,9 @@ class Graph
 
 		@label = @label.data @cola.nodes(), (d) ->
 			d.name
-		@label.call @cola.drag
-
-		@label.transition()
-		.attr 		'x', (d) -> d.x
-		.attr 		'y', (d) ->
-			h = @getBBox().height
-			d.y + h / 2
-
+		@label
+			.call @cola.drag
+			.on 'click', onclick
 		@label.enter()
 			.insert 'text', '.label'
 			.attr 'class', 'cola label'
@@ -188,6 +175,46 @@ class Graph
 			.text (d) ->
 				d.name
 		@label.exit().remove()
+
+
+		# if up?
+		# 	duration = 2000
+		# 	start = =>
+		# 		@cola.start()
+		# 	@group.transition().duration(duration)
+		# 	.attr 		'x', 		(d) ->
+		# 		# console.log 'in first d', d
+		# 		# console.log 'bounds', webcola.vpsc.computeGroupBounds(d)
+		# 		d.bounds.x
+		# 	.attr 		'y', 		(d) ->	d.bounds.y
+		# 	.attr 		'width',	(d) ->
+		# 		# console.log 'd', d.bounds, d.bounds.X-d.bounds.x
+		# 		d.bounds.X-d.bounds.x
+		# 	.attr 		'height', 	(d) ->	d.bounds.Y-d.bounds.y
+
+		# 	@node.transition().duration(duration)
+		# 	.attr 		'x', (d) ->
+		# 		# console.log 'nodedx', d.name, d.x, d.width
+		# 		d.x = if d.x? then d.x else 0
+		# 		d.x - (d.width / 2)
+		# 	.attr 		'y', (d) =>
+		# 		# console.log 'nodedy', d.name, d.y, @pad
+		# 		d.y = if d.y? then d.y else 0
+		# 		d.y - (d.height / 2) + @pad
+
+		# 	@label.transition().duration(duration)
+		# 	.attr 		'x', (d) ->
+		# 		# console.log 'nodedx', d.name, d.x
+		# 		d.x = if d.x? then d.x else 0
+		# 	.attr 		'y', (d) ->
+		# 		h = @getBBox().height
+		# 		# console.log 'labeld', d.name, d.y, h
+		# 		d.y = if d.y? then d.y else 0
+		# 		d.y + h / 2
+		# 	.each 'end', start
+
+		# else
+		# 	@cola.start()
 
 		@cola.start()
 
@@ -262,9 +289,16 @@ class Graph
 			leaves = []
 			for leaf in group.leaves
 				leaves.push(if typeof(leaf) is 'number' then leaf else leaf.index)
+
+			console.log 'my love'
 			groups.push
 				id: group.id
 				leaves: leaves
+				bounds:
+					x: group.bounds.x
+					y: group.bounds.y
+					X: group.bounds.X
+					Y: group.bounds.Y
 		graph.groups = groups
 
 		nodes: nodes

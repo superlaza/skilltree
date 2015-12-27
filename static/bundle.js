@@ -78,7 +78,8 @@ webpackJsonp([0],[
 	          node: 2,
 	          offset: 50
 	        }
-	      ]
+	      ],
+	      group: 0
 	    }, {
 	      type: 'alignment',
 	      axis: 'x',
@@ -90,7 +91,8 @@ webpackJsonp([0],[
 	          node: 4,
 	          offset: 50
 	        }
-	      ]
+	      ],
+	      group: 1
 	    }
 	  ]
 	};
@@ -98,7 +100,7 @@ webpackJsonp([0],[
 	initialState = im.fromJS(initialState);
 
 	reducer = function(state, action) {
-	  var newNode, newState;
+	  var constraint, i, len, newNode, newState, ref1;
 	  if (state == null) {
 	    state = initialState;
 	  }
@@ -110,10 +112,22 @@ webpackJsonp([0],[
 	        index: newState.nodes.length - 1,
 	        name: action.classCode,
 	        width: 60,
-	        height: 40
+	        height: 40,
+	        x: newState.groups[action.semester].bounds.X,
+	        y: newState.groups[action.semester].bounds.Y
 	      };
 	      newState.nodes.push(newNode);
 	      newState.groups[action.semester].leaves.push(newState.nodes.length - 1);
+	      ref1 = newState.constraints;
+	      for (i = 0, len = ref1.length; i < len; i++) {
+	        constraint = ref1[i];
+	        if (constraint.group === action.semester) {
+	          constraint.offsets.push({
+	            node: newState.nodes.length - 1,
+	            offset: 50
+	          });
+	        }
+	      }
 	      return im.fromJS(newState);
 	    default:
 	      return state;
@@ -1571,7 +1585,7 @@ webpackJsonp([0],[
 	    var dispatch, graphData, ref, state;
 	    ref = this.props, dispatch = ref.dispatch, state = ref.state, graphData = ref.graphData;
 	    console.log('newstate?', state);
-	    return this.graph.update(state);
+	    return this.graph.update(state, 'up');
 	  },
 	  render: function() {
 	    return React.createElement("div", {
@@ -1650,7 +1664,7 @@ webpackJsonp([0],[
 	      }
 	      return results;
 	    })(), this.group = ref1[0], this.link = ref1[1], this.node = ref1[2], this.label = ref1[3];
-	    this.c = 0;
+	    this.count = 0;
 	    this.update();
 	  }
 
@@ -1689,35 +1703,20 @@ webpackJsonp([0],[
 	    });
 	  };
 
-	  Graph.prototype.update = function(graph) {
-	    var count, g, onclick;
+	  Graph.prototype.update = function(graph, up) {
+	    var onclick;
 	    if (graph == null) {
 	      graph = this.graph;
 	    }
+	    if (up != null) {
+	      this.cola.stop();
+	    }
 	    console.log('update graph', graph);
 	    this.cola = webcola.d3adaptor().linkDistance(100).avoidOverlaps(true).handleDisconnected(false).size([this.width, this.height]);
-	    g = this.stripRefs(graph);
-	    console.log('g is ', g);
-	    console.log('stripped', JSON.stringify(g, null, 4));
 	    this.cola.nodes(graph.nodes).links(graph.links).groups(graph.groups).constraints(graph.constraints);
 	    this.cola.on('tick', this.tick);
-	    console.log('groups', this.cola.groups());
 	    this.group = this.group.data(this.cola.groups(), function(d) {
-	      console.log('ithought..', d);
 	      return d.id;
-	    });
-	    console.log('end', this.group, this.group.enter());
-	    this.group.transition().attr('x', function(d) {
-	      console.log('d', d);
-	      debugger;
-	      console.log('bounds', webcola.vpsc.computeGroupBounds(d));
-	      return d.bounds.x;
-	    }).attr('y', function(d) {
-	      return d.bounds.y;
-	    }).attr('width', function(d) {
-	      return d.bounds.width();
-	    }).attr('height', function(d) {
-	      return d.bounds.height();
 	    });
 	    this.group.call(this.cola.drag);
 	    this.group.enter().append('rect').attr('rx', 8).attr('ry', 8).attr('class', 'cola group').style('fill', (function(_this) {
@@ -1726,29 +1725,21 @@ webpackJsonp([0],[
 	      };
 	    })(this)).call(this.cola.drag);
 	    this.group.exit().remove();
-	    count = 0;
 	    onclick = (function(_this) {
 	      return function() {
 	        var action, datum;
 	        datum = d3.event.target.__data__;
 	        if (datum.type === 'menu') {
-	          action = actionAddClass('class' + count, 0, _this.stripRefs(_this.getGraph()));
+	          action = actionAddClass('class' + _this.count, 0, _this.stripRefs(_this.getGraph()));
 	          _this.dispatch(action);
 	        }
-	        return count += 1;
+	        return _this.count += 1;
 	      };
 	    })(this);
 	    this.node = this.node.data(this.cola.nodes(), function(d) {
 	      return d.name;
 	    });
-	    this.node.call(this.cola.drag);
-	    this.node.transition().attr('x', function(d) {
-	      return d.x - (d.width / 2);
-	    }).attr('y', (function(_this) {
-	      return function(d) {
-	        return d.y - (d.height / 2) + _this.pad;
-	      };
-	    })(this));
+	    this.node.call(this.cola.drag).on('click', onclick);
 	    this.node.enter().insert('rect', '.node').attr('class', 'cola node').attr('width', (function(_this) {
 	      return function(d) {
 	        if (d.hidden) {
@@ -1777,14 +1768,7 @@ webpackJsonp([0],[
 	    this.label = this.label.data(this.cola.nodes(), function(d) {
 	      return d.name;
 	    });
-	    this.label.call(this.cola.drag);
-	    this.label.transition().attr('x', function(d) {
-	      return d.x;
-	    }).attr('y', function(d) {
-	      var h;
-	      h = this.getBBox().height;
-	      return d.y + h / 2;
-	    });
+	    this.label.call(this.cola.drag).on('click', onclick);
 	    this.label.enter().insert('text', '.label').attr('class', 'cola label').call(this.cola.drag).on('click', onclick).text(function(d) {
 	      return d.name;
 	    });
@@ -1848,9 +1832,16 @@ webpackJsonp([0],[
 	        leaf = ref2[l];
 	        leaves.push(typeof leaf === 'number' ? leaf : leaf.index);
 	      }
+	      console.log('my love');
 	      groups.push({
 	        id: group.id,
-	        leaves: leaves
+	        leaves: leaves,
+	        bounds: {
+	          x: group.bounds.x,
+	          y: group.bounds.y,
+	          X: group.bounds.X,
+	          Y: group.bounds.Y
+	        }
 	      });
 	    }
 	    graph.groups = groups;

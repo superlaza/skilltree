@@ -39,6 +39,7 @@ initialState = {
 				{node: 1, offset: 50},
 				{node: 2, offset: 50}
 			]
+			group: 0
 		},
 		{
 			type: 'alignment'
@@ -47,6 +48,7 @@ initialState = {
 				{node: 3, offset: 50},
 				{node: 4, offset: 50}
 			]
+			group: 1
 		}
 	]
 }
@@ -62,9 +64,16 @@ reducer = (state = initialState, action) ->
 				name: action.classCode
 				width:60
 				height:40
+				x: newState.groups[action.semester].bounds.X
+				y: newState.groups[action.semester].bounds.Y
 
 			newState.nodes.push newNode
 			newState.groups[action.semester].leaves.push newState.nodes.length-1
+			for constraint in newState.constraints
+				if constraint.group is action.semester
+					constraint.offsets.push
+						node: newState.nodes.length-1
+						offset: 50
 			im.fromJS(newState)
 		else state
 

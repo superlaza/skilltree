@@ -94,7 +94,7 @@ Plan = React.createClass
 		# @graph.setGraph(state)
 		# new Graph(this.refs.graph, state, dispatch)
 		console.log 'newstate?', state
-		@graph.update(state)
+		@graph.update(state, 'up')
 		# drawGraph(this.refs.graph,
 		# 		getGraphData(state.toJS()),
 		# 		dispatch)
