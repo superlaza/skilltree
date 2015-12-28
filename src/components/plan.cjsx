@@ -19,6 +19,8 @@ Plan = React.createClass
 		console.log 'newstate?', state
 		@graph.update(state, 'up')
 
+		window.dispatch = dispatch
+
 	render: ->
 		selectorStyle = {position: 'absolute'}
 		<div id='graph' ref='graph'>

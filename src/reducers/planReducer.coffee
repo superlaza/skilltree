@@ -1,11 +1,10 @@
+# CONSTANTS
 {ADD_CLASS, DELETE_CLASS, ADD_SEMESTER} = require '../constants/ActionTypes.coffee'
+{classSpec, addClassSpec, constraintSpec} = require '../constants/Specs.coffee'
 
 im 				= require 'immutable'
 initialState 	= require '../../data/initialState.coffee'
-console.log 'init', initialState
 initialState 	= im.fromJS(initialState)
-
-console.log 'init', initialState
 
 # UTILITY
 # impure
@@ -19,87 +18,145 @@ addPositionData = (newState, data) ->
 			node.x = positions.x
 			node.y = positions.y
 
-	for index, group of newState.groups
-		positions = groupPositions[index]
-		# only update position if group position data exists
-		if positions?
-			group.bounds = 
-				x: positions.bounds.x
-				y: positions.bounds.y
-				X: positions.bounds.X
-				Y: positions.bounds.Y
+	# for index, group of newState.groups
+	# 	positions = groupPositions[index]
+	# 	# only update position if group position data exists
+	# 	if positions?
+	# 		group.bounds = 
+	# 			x: positions.bounds.x
+	# 			y: positions.bounds.y
+	# 			X: positions.bounds.X
+	# 			Y: positions.bounds.Y
+				
+# impure
+createNode = (attrsList...) ->
+	nodeAttrs = {}
+	for attrs in attrsList
+		for key, attr of attrs
+			nodeAttrs[key] = attr	
+
+	newNode = { # all nodes will have a name and id
+		name:		nodeAttrs.className
+		nid:			nodeAttrs.nid
+	}
+
+	newNode.type = nodeAttrs.type if nodeAttrs.type?
+	newNode.semester = nodeAttrs.semester if nodeAttrs.semester?
+	newNode.width  = nodeAttrs.width
+	newNode.height = nodeAttrs.height
+	if nodeAttrs.groupBounds?
+		newNode.x = nodeAttrs.groupBounds.X
+		newNode.y = nodeAttrs.groupBounds.Y
+
+	newNode
+
+addNode = (state, index, node) ->
+	state.nodes.push node
+	state.groups[node.semester].leaves.push index
+	console.log 'node constraints', node
+	for constraint in state.constraints
+		if constraint.type is 'alignment' and constraint.group is node.semester
+			constraint.offsets.push
+				node: index
+				offset: constraintSpec.alignment.OFFSET.x
+	console.log state.constraints
 
 # add node, delete all in group 1, undo add node
 reducer = (state = initialState, action) ->
 	switch action.type
 		when ADD_CLASS
-			console.log 'laksdf'
-			# console.log 'graph', action.graph
 			newState = state.toJS()
 			{nodePositions, groupPositions} = action.positionData
-			{className, semester, nid} = action.nodeData
 
 			addPositionData newState, {
 				nodePositions: nodePositions
 				groupPositions: groupPositions
 			}
 
-			newClassNode =
-				nid: nid
-				name: className
-				width:60
-				height:40
-				x: groupPositions[semester].bounds.X
-				y: groupPositions[semester].bounds.Y
-			nodeIndex = newState.nodes.length
-			newState.nodes.push newClassNode
-			newState.groups[semester].leaves.push nodeIndex
-			for constraint in newState.constraints
-				if constraint.type is 'alignment' and constraint.group is semester
-					constraint.offsets.push
-						node: nodeIndex
-						offset: 50
 
-			# add option nodes
-			for optionData in action.options
-				{className, nid} = optionData
-				group = newState.groups[semester+1]
-				if group? # if there's an existing next semester
-					newOptionNode =
-						nid: nid
-						name: className
-						width:60
-						height:40
-						x: groupPositions[semester+1].bounds.X #here
-						y: groupPositions[semester+1].bounds.Y #here
+			nodeIndex = newState.nodes.length
+			nodeSemester = action.nodeData.semester
+
+			groupBounds = groupPositions[nodeSemester]?.bounds
+			group = newState.groups[nodeSemester+1]
+			newNode = createNode action.nodeData, {
+				groupBounds: groupBounds
+				width: classSpec.WIDTH
+				height: classSpec.HEIGHT
+			}
+			addNode newState, nodeIndex, newNode
+
+			nextGroupBounds = groupPositions[nodeSemester+1]?.bounds
+			nextGroup = newState.groups[nodeSemester+1]
+
+			# add option nodes only if the next semester exists
+			if nextGroup? and nextGroupBounds
+				for optionData in action.options
 					optionIndex = newState.nodes.length
-					newState.nodes.push newOptionNode
-					group.leaves.push optionIndex
+
+					newOption = createNode optionData, {
+						semester: 		nodeSemester+1
+						groupBounds:	nextGroupBounds
+						width: classSpec.WIDTH
+						height: classSpec.HEIGHT
+					}
+					addNode newState, optionIndex, newOption
+
 					newState.links.push
 						source: nodeIndex
 						target: optionIndex
 
-					# add option constraints
-					for constraint in newState.constraints
-						if constraint.type is 'alignment' and constraint.group is semester+1
-							constraint.offsets.push
-								node: optionIndex
-								offset: 50
-				else
-					console.log 'that semester does not exist'
-
-			im.fromJS(newState)
+			im.fromJS newState
 
 		when ADD_SEMESTER
 			newState = state.toJS()
+			{nodePositions, groupPositions} = action.positionData
 
-			addClassNode =
-				nid: -1
-				name:'Add Class'
-				type: 'menu'
-				width:menuWidth
-				height:menuHeight
+			addPositionData newState, {
+				nodePositions: nodePositions
+				groupPositions: groupPositions
+			}
 
+			addClassNodeIndex = newState.nodes.length
+			semesterIndex = newState.groups.length
+			
+			newState.groups.push 
+				gid: semesterIndex # todo: better id generation
+				leaves:[] # add node will push node index
+			
+			addClassNodeData = {
+				name:			addClassSpec.TEXT
+				semester: 		semesterIndex
+				type: 			addClassSpec.TYPE
+				nid: 			"s#{semesterIndex}"
+				width:			addClassSpec.WIDTH
+				height:			addClassSpec.HEIGHT
+			}
+
+			addNode newState, addClassNodeIndex, addClassNodeData
+
+			# new group constraint based on old one
+			# displacements constraints don't have type yet, todo: add them
+			displacementConstraints = newState.constraints.filter( (c) -> !c.type?)
+			lastConstraint = displacementConstraints[displacementConstraints.length-1]
+			newDisplacementConstraint =
+				axis: 'x'
+				gap: constraintSpec.displacement.GAP
+				left: lastConstraint.right
+				right: addClassNodeIndex
+			newState.constraints.push newDisplacementConstraint
+
+			newAlignmentConstraint =
+				axis: 'x'
+				type: 'alignment'
+				group: semesterIndex
+				offsets: [
+					node: addClassNodeIndex
+					offset: constraintSpec.alignment.OFFSET.x
+				]
+			newState.constraints.unshift newAlignmentConstraint
+
+			im.fromJS newState
 
 		when DELETE_CLASS
 			# newState = action.graph
@@ -133,7 +190,7 @@ reducer = (state = initialState, action) ->
 			# maybe later we might want to delte the nodes it points to as well
 			newState.links = ({source:(remap link.source), target:(remap link.target)} for link in newState.links when (link.source isnt delNodeIndex and link.target isnt delNodeIndex))
 
-			im.fromJS(newState)
+			im.fromJS newState
 		else state
 
 module.exports = reducer

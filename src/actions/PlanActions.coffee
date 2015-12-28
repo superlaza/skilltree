@@ -6,7 +6,7 @@ actionAddClass = (nodeData, options, positionData) ->
 	options:		options
 	positionData:	positionData
 
-actionAddSemester = ->
+actionAddSemester = (positionData) ->
 	type: 			ADD_SEMESTER
 	positionData:	positionData
 

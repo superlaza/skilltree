@@ -3,7 +3,7 @@ webcola = require 'webcola'
 $ = require 'jquery'
 require 'jquery-ui'
 
-{addClassConfig} = require '../../constants/NodeConfig.coffee'
+{addClassSpec} = require '../../constants/Specs.coffee'
 
 
 {actionAddClass, actionDeleteClass} = require '../../actions/PlanActions.coffee'
@@ -156,7 +156,6 @@ class Graph
 				.attr 'class', 'cola node'
 				.attr 'width',
 					(d) =>
-						# console.log 'd', typeof d.hidden
 						if d.hidden then 0 else d.width - (2 * @pad)
 				.attr 	'height',
 					(d) => 
@@ -236,16 +235,19 @@ class Graph
 		link
 
 	onNodeClick: =>
+		@dispatch {
+			type: 'ADD_SEMESTER'
+			positionData: @getPositiondata @cola.nodes(), @cola.groups()
+		}
 		return if d3.event.defaultPrevented # default is prevented on drag
 
-		console.log 'hmm'
 		datum = d3.event.target.__data__ 
 		input = @graphElement.children[0]
 
 		input = $('#class-select', @graphElement)
 		input.autocomplete({source: (key for key of @adjList)})
 
-		if datum.type is addClassConfig.type
+		if datum.type is addClassSpec.TYPE
 			console.log datum
 
 			# todo: use a more robust way of selecting this input
@@ -274,6 +276,7 @@ class Graph
 					optionsData,
 					@getPositiondata @cola.nodes(), @cola.groups()
 				)
+			console.log 'not defined my dick', action
 			@dispatch action
 
 	# pure

@@ -1,17 +1,15 @@
-{classConfig, addClassConfig} = require '../src/constants/NodeConfig.coffee'
+{classSpec, addClassSpec, constraintSpec} = require '../src/constants/Specs.coffee'
 
-{width, height} = classConfig
-{btnWidth, btnHeight} = addClassConfig
 
 initialState = {
 	nodes:[
-		{nid: -1,name:addClassConfig.text,type: addClassConfig.type,width:btnWidth,height:btnHeight},
-		{nid: -2,name:'POS3733',width:width,height:height},
-		{nid: -3,name:'COT4500',width:width,height:height},
-		{nid: -4,name:addClassConfig.text,type: addClassConfig.type,width:btnWidth,height:btnHeight},
-		{nid: -5,name:'POS2041',width:width,height:height},
-		{nid: -6,name:'INR2002',width:width,height:height},
-		{nid: -7,name:'COP3223C',width:width,height:height, hidden: false}
+		{nid: -1,name:addClassSpec.TEXT,type: addClassSpec.TYPE,width:addClassSpec.WIDTH,height:addClassSpec.HEIGHT},
+		{nid: -2,name:'POS3733',width:classSpec.WIDTH,height:classSpec.HEIGHT},
+		{nid: -3,name:'COT4500',width:classSpec.WIDTH,height:classSpec.HEIGHT},
+		{nid: -4,name:addClassSpec.TEXT,type: addClassSpec.TYPE,width:addClassSpec.WIDTH,height:addClassSpec.HEIGHT},
+		{nid: -5,name:'POS2041',width:classSpec.WIDTH,height:classSpec.HEIGHT},
+		{nid: -6,name:'INR2002',width:classSpec.WIDTH,height:classSpec.HEIGHT},
+		{nid: -7,name:'COP3223C',width:classSpec.WIDTH,height:classSpec.HEIGHT, hidden: false}
 	]
 	links:[
 		{source:1,target:4},
@@ -47,7 +45,7 @@ initialState = {
 			axis: 'x'
 			left: 0
 			right: 3
-			gap: 200
+			gap: constraintSpec.displacement.GAP
 		}
 	]
 }
