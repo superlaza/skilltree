@@ -16,6 +16,8 @@ class Graph
 					.attr('width', @width)
 					.attr('height', @height)
 
+
+		#========= feature selections
 		# add groups (in appropriate render order) for each element type
 		# this shit is super unreadable
 		classes = ['group', 'link', 'node', 'label']
@@ -27,7 +29,15 @@ class Graph
 		# @link = @svg.selectAll '.link'
 		# @node = @svg.selectAll '.node'
 		# @label = @svg.selectAll '.label'
+		#==========
 
+		# map node id to its index in node list
+		@indexMap = {}
+		for index, node of @graph.nodes
+			@indexMap[node.nid] = parseInt index
+
+		# node count, serves as idea for new node creation
+		@nodeCount = 0
 
 		@count = 0 # delete eventually
 		@update()
@@ -64,6 +74,7 @@ class Graph
 		.attr 		'y', (d) ->
 			h = @getBBox().height
 			d.y + h / 2
+		.text (d)->d.nid  # only for testing
 		return
 
 	update: (graph = @graph, up) =>
@@ -89,20 +100,9 @@ class Graph
 
 		@cola.on 'tick', @tick
 		
-		# if @c
-		# 	@cola.groups(graph.groups)
-		# 	@c += 1
-		# console.log 'e',@cola.nodes().length, e.length, n.length
-		# for group in @cola.groups()
-		# 	for leaf in group.leaves
-		# 		for node in e
-		# 			if leaf.name is node.name
-		# 				console.log 'fuck me'
-		# 				group.leaves = (_leaf for _leaf in group.leaves when leaf isnt _leaf)
-
 		@group = @group.data @cola.groups(),
 					(d) ->
-						d.id
+						d.gid
 		@group.call @cola.drag
 		@group.enter()
 			# .insert 'rect', '.group'
@@ -125,12 +125,24 @@ class Graph
 			datum = d3.event.target.__data__
 			
 			if datum.type is 'menu'
-				semester = datum.parent.id # parent group
 				className = window.prompt('Pick a class')
+				nodeData =
+					className: className
+					semester: datum.parent.gid # parent group
+					nid: @nodeCount
+
+				@nodeCount += 1
+
+				optionsData = []
+				for optionName in @adjList[className]
+					optionsData.push
+						className: optionName
+						nid: @nodeCount
+					@nodeCount += 1
+
 				action = actionAddClass(
-						className,
-						semester,
-						@adjList[className],
+						nodeData,
+						optionsData,
 						@stripRefs @getGraph()
 					)
 				@dispatch action
@@ -138,7 +150,7 @@ class Graph
 
 		@node = @node.data @cola.nodes(),
 					(d) ->
-						d.index
+						d.nid
 		@node
 			.call @cola.drag
 			.on 'click', onclick
@@ -165,7 +177,10 @@ class Graph
 				.attr 'cy', 0
 				.on 'click', =>
 					datum = d3.event.target.__data__
-					@dispatch actionDeleteClass(1)
+					@dispatch actionDeleteClass(
+							datum.nid,
+							@stripRefs @getGraph()
+					)
 		enter.append 'title' # todo: inserts title multiple times
 				.text (d) ->
 					d.name
@@ -183,7 +198,7 @@ class Graph
 		# 			console.log 'after', group.bounds
 
 		@label = @label.data @cola.nodes(), (d) ->
-			d.index
+			d.nid
 		@label
 			.call @cola.drag
 			.on 'click', onclick
@@ -246,13 +261,13 @@ class Graph
 			constraints: @cola.constraints()
 		}
 	
-	stripRefs: (graph) ->
+	stripRefs: (graph) =>
 		# for node in graph.nodes
 		nodes = []
 		for node in graph.nodes
 			newNode = {}
 			for key,value of node
-				unless key in ['bounds','parent', 'variable']
+				unless key in ['bounds','parent','variable']
 					newNode[key] = value
 			nodes.push newNode
 
@@ -262,9 +277,8 @@ class Graph
 			for leaf in group.leaves
 				leaves.push(if typeof(leaf) is 'number' then leaf else leaf.index)
 
-			console.log 'my love'
 			groups.push
-				id: group.id
+				gid: group.gid
 				leaves: leaves
 				bounds:
 					x: group.bounds.x

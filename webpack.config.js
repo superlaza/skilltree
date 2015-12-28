@@ -6,7 +6,7 @@ module.exports = {
     context: path.join(__dirname, 'src'),
     entry: {
         app: "./main.cjsx",
-        vendor: ['react', 'd3', 'webcola']
+        vendor: ['react', 'd3', 'webcola', 'immutable', 'redux', 'react-redux']
     },
     output: {
         path: path.join(__dirname, 'static'),

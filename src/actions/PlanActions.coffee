@@ -1,15 +1,14 @@
 {ADD_CLASS, DELETE_CLASS} = require '../constants/ActionTypes.coffee'
 
-actionAddClass = (classCode, semester, options, graph) ->
+actionAddClass = (nodeData, options, graph) ->
 	type: 		ADD_CLASS
-	classCode: 	classCode
-	semester:	semester
+	nodeData:	nodeData
 	options:	options
 	graph:		graph
 
-actionDeleteClass = (nodeIndex) ->
+actionDeleteClass = (nodeID, graph) ->
 	type: 		DELETE_CLASS 
-	nodeIndex:	nodeIndex
+	nodeID:		nodeID
 	graph:		graph
 
 module.exports =

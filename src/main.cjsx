@@ -11,13 +11,13 @@ im 			= require 'immutable'
 
 initialState = {
 	nodes:[
-		{index: 0,name:'Add Class',type: 'menu',width:137,height:40},
-		{index: 1,name:'b',width:60,height:40},
-		{index: 2,name:'c',width:60,height:40},
-		{index: 3,name:'Add Class',type: 'menu',width:137,height:40},
-		{index: 4,name:'d',width:60,height:40},
-		{index: 5,name:'e',width:60,height:40},
-		{index: 6,name:'h',width:60,height:40, hidden: true}
+		{nid: -1,name:'Add Class',type: 'menu',width:137,height:40},
+		{nid: -2,name:'b',width:60,height:40},
+		{nid: -3,name:'c',width:60,height:40},
+		{nid: -4,name:'Add Class',type: 'menu',width:137,height:40},
+		{nid: -5,name:'d',width:60,height:40},
+		{nid: -6,name:'e',width:60,height:40},
+		{nid: -7,name:'h',width:60,height:40, hidden: false}
 	]
 	links:[
 		{source:1,target:4},
@@ -25,8 +25,8 @@ initialState = {
 		{source:2,target:5}
 	]
 	groups:[
-		{id: 0, leaves:[0,1,2]},
-		{id: 1, leaves:[3,4,5]}
+		{gid: 0, leaves:[0,1,2]},
+		{gid: 1, leaves:[3,4,5]}
 	]
 	constraints: [
 		{
@@ -64,53 +64,83 @@ reducer = (state = initialState, action) ->
 		when ADD_CLASS
 			# console.log 'graph', action.graph
 			newState = action.graph
-			console.log 'child', newState.nodes, newState.constraints
+
+			{className, semester, nid} = action.nodeData
+			console.log 'sem', newState.groups[semester]
+
+			console.log 'child', newState.groups
 			newClassNode =
-				index: newState.nodes.length
-				name: action.classCode
+				nid: nid
+				name: className
 				width:60
 				height:40
-				x: newState.groups[action.semester].bounds.X
-				y: newState.groups[action.semester].bounds.Y
-
+				x: newState.groups[semester].bounds.X
+				y: newState.groups[semester].bounds.Y
+			nodeIndex = newState.nodes.length
 			newState.nodes.push newClassNode
-			newState.groups[action.semester].leaves.push newClassNode.index
+			newState.groups[semester].leaves.push nodeIndex
 			for constraint in newState.constraints
-				if constraint.type is 'alignment' and constraint.group is action.semester
+				if constraint.type is 'alignment' and constraint.group is semester
 					constraint.offsets.push
-						node: newClassNode.index
+						node: nodeIndex
 						offset: 50
 
 			# add option nodes
-			for optionCode in action.options
-				group = newState.groups[action.semester+1]
+			for optionData in action.options
+				{className, nid} = optionData
+				group = newState.groups[semester+1]
 				if group? # if there's an existing next semester
 					newOptionNode =
-						index: newState.nodes.length
-						name: optionCode
+						nid: nid
+						name: className
 						width:60
 						height:40
 						x: group.bounds.X
 						y: group.bounds.Y
-
+					optionIndex = newState.nodes.length
 					newState.nodes.push newOptionNode
-					group.leaves.push newOptionNode.index
+					group.leaves.push optionIndex
 					newState.links.push
-						source: newClassNode.index
-						target: newOptionNode.index
+						source: nodeIndex
+						target: optionIndex
 
 					# add option constraints
 					for constraint in newState.constraints
-						if constraint.type is 'alignment' and constraint.group is action.semester+1
+						if constraint.type is 'alignment' and constraint.group is semester+1
 							constraint.offsets.push
-								node: newOptionNode.index
+								node: optionIndex
 								offset: 50
 				else
 					console.log 'that semester does not exist'
 			im.fromJS(newState)
 
 		when DELETE_CLASS
-			console.log 'deleting'
+			newState = action.graph
+
+			# get index by node id
+			for index, node of newState.nodes
+				delNodeIndex = parseInt index
+				if node.nid is action.nodeID
+					break
+
+			# the deletion
+			newState.nodes.splice(delNodeIndex, 1)
+
+			# remap index refs
+			# these lines are too long, this is not Disney.
+			remap = (i) -> if i>delNodeIndex then i-1 else i
+			for group in newState.groups
+				group.leaves = (remap leaf for leaf in group.leaves when leaf isnt delNodeIndex)
+			for constraint in newState.constraints
+				if constraint.type is 'alignment'					# yo dawg...
+					constraint.offsets = ({node:(remap offset.node), offset:offset.offset} for offset in constraint.offsets when offset.node isnt delNodeIndex)
+			
+			# delete all links attached to node
+			# maybe later we might want to delte the nodes it points to as well
+			newState.links = ({source:(remap link.source), target:(remap link.target)} for link in newState.links when (link.source isnt delNodeIndex and link.target isnt delNodeIndex))
+
+			console.log 'deletion', newState
+			im.fromJS(newState)
 		else state
 
 # initialize devtools
