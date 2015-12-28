@@ -142,11 +142,11 @@ reducer = (state = initialState, action) ->
 				positions = groupPositions[index]
 				# only update position if group position data exists
 				if positions?
-				group.bounds = 
-					x: positions.bounds.x
-					y: positions.bounds.y
-					X: positions.bounds.X
-					Y: positions.bounds.Y
+					group.bounds = 
+						x: positions.bounds.x
+						y: positions.bounds.y
+						X: positions.bounds.X
+						Y: positions.bounds.Y
 
 			# get index by node id
 			for index, node of newState.nodes
