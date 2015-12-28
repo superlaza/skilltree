@@ -126,30 +126,45 @@ webpackJsonp([0],[
 	initialState = im.fromJS(initialState);
 
 	reducer = function(state, action) {
-	  var className, constraint, delNodeIndex, group, index, j, k, l, leaf, len, len1, len2, len3, len4, link, m, n, newClassNode, newOptionNode, newState, nid, node, nodeIndex, offset, optionData, optionIndex, ref2, ref3, ref4, ref5, ref6, ref7, ref8, remap, semester;
+	  var className, constraint, delNodeIndex, group, groupPositions, index, j, k, l, leaf, len, len1, len2, len3, len4, link, m, n, newClassNode, newOptionNode, newState, nid, node, nodeIndex, nodePositions, offset, optionData, optionIndex, ref10, ref11, ref12, ref13, ref14, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, remap, semester;
 	  if (state == null) {
 	    state = initialState;
 	  }
 	  switch (action.type) {
 	    case ADD_CLASS:
-	      newState = action.graph;
-	      ref2 = action.nodeData, className = ref2.className, semester = ref2.semester, nid = ref2.nid;
-	      console.log('sem', newState.groups[semester]);
-	      console.log('child', newState.groups);
+	      newState = state.toJS();
+	      ref2 = action.positionData, nodePositions = ref2.nodePositions, groupPositions = ref2.groupPositions;
+	      ref3 = action.nodeData, className = ref3.className, semester = ref3.semester, nid = ref3.nid;
+	      ref4 = newState.nodes;
+	      for (index in ref4) {
+	        node = ref4[index];
+	        node.x = nodePositions[index].x;
+	        node.y = nodePositions[index].y;
+	      }
+	      ref5 = newState.groups;
+	      for (index in ref5) {
+	        group = ref5[index];
+	        group.bounds = {
+	          x: groupPositions[index].bounds.x,
+	          y: groupPositions[index].bounds.y,
+	          X: groupPositions[index].bounds.X,
+	          Y: groupPositions[index].bounds.Y
+	        };
+	      }
 	      newClassNode = {
 	        nid: nid,
 	        name: className,
 	        width: 60,
 	        height: 40,
-	        x: newState.groups[semester].bounds.X,
-	        y: newState.groups[semester].bounds.Y
+	        x: groupPositions[semester].bounds.X,
+	        y: groupPositions[semester].bounds.Y
 	      };
 	      nodeIndex = newState.nodes.length;
 	      newState.nodes.push(newClassNode);
 	      newState.groups[semester].leaves.push(nodeIndex);
-	      ref3 = newState.constraints;
-	      for (j = 0, len = ref3.length; j < len; j++) {
-	        constraint = ref3[j];
+	      ref6 = newState.constraints;
+	      for (j = 0, len = ref6.length; j < len; j++) {
+	        constraint = ref6[j];
 	        if (constraint.type === 'alignment' && constraint.group === semester) {
 	          constraint.offsets.push({
 	            node: nodeIndex,
@@ -157,9 +172,9 @@ webpackJsonp([0],[
 	          });
 	        }
 	      }
-	      ref4 = action.options;
-	      for (k = 0, len1 = ref4.length; k < len1; k++) {
-	        optionData = ref4[k];
+	      ref7 = action.options;
+	      for (k = 0, len1 = ref7.length; k < len1; k++) {
+	        optionData = ref7[k];
 	        className = optionData.className, nid = optionData.nid;
 	        group = newState.groups[semester + 1];
 	        if (group != null) {
@@ -168,8 +183,8 @@ webpackJsonp([0],[
 	            name: className,
 	            width: 60,
 	            height: 40,
-	            x: group.bounds.X,
-	            y: group.bounds.Y
+	            x: groupPositions[semester + 1].bounds.X,
+	            y: groupPositions[semester + 1].bounds.Y
 	          };
 	          optionIndex = newState.nodes.length;
 	          newState.nodes.push(newOptionNode);
@@ -178,9 +193,9 @@ webpackJsonp([0],[
 	            source: nodeIndex,
 	            target: optionIndex
 	          });
-	          ref5 = newState.constraints;
-	          for (l = 0, len2 = ref5.length; l < len2; l++) {
-	            constraint = ref5[l];
+	          ref8 = newState.constraints;
+	          for (l = 0, len2 = ref8.length; l < len2; l++) {
+	            constraint = ref8[l];
 	            if (constraint.type === 'alignment' && constraint.group === semester + 1) {
 	              constraint.offsets.push({
 	                node: optionIndex,
@@ -194,10 +209,32 @@ webpackJsonp([0],[
 	      }
 	      return im.fromJS(newState);
 	    case DELETE_CLASS:
-	      newState = action.graph;
-	      ref6 = newState.nodes;
-	      for (index in ref6) {
-	        node = ref6[index];
+	      newState = state.toJS();
+	      ref9 = action.positionData, nodePositions = ref9.nodePositions, groupPositions = ref9.groupPositions;
+	      console.log('before', node, nodePositions);
+	      ref10 = newState.nodes;
+	      for (index in ref10) {
+	        node = ref10[index];
+	        console.log('broken index', index);
+	        if ((node != null) && (nodePositions[index] != null)) {
+	          node.x = nodePositions[index].x;
+	          node.y = nodePositions[index].y;
+	        }
+	      }
+	      console.log('after');
+	      ref11 = newState.groups;
+	      for (index in ref11) {
+	        group = ref11[index];
+	        group.bounds = {
+	          x: groupPositions[index].bounds.x,
+	          y: groupPositions[index].bounds.y,
+	          X: groupPositions[index].bounds.X,
+	          Y: groupPositions[index].bounds.Y
+	        };
+	      }
+	      ref12 = newState.nodes;
+	      for (index in ref12) {
+	        node = ref12[index];
 	        delNodeIndex = parseInt(index);
 	        if (node.nid === action.nodeID) {
 	          break;
@@ -211,15 +248,15 @@ webpackJsonp([0],[
 	          return i;
 	        }
 	      };
-	      ref7 = newState.groups;
-	      for (m = 0, len3 = ref7.length; m < len3; m++) {
-	        group = ref7[m];
+	      ref13 = newState.groups;
+	      for (m = 0, len3 = ref13.length; m < len3; m++) {
+	        group = ref13[m];
 	        group.leaves = (function() {
-	          var len4, n, ref8, results;
-	          ref8 = group.leaves;
+	          var len4, n, ref14, results;
+	          ref14 = group.leaves;
 	          results = [];
-	          for (n = 0, len4 = ref8.length; n < len4; n++) {
-	            leaf = ref8[n];
+	          for (n = 0, len4 = ref14.length; n < len4; n++) {
+	            leaf = ref14[n];
 	            if (leaf !== delNodeIndex) {
 	              results.push(remap(leaf));
 	            }
@@ -227,16 +264,16 @@ webpackJsonp([0],[
 	          return results;
 	        })();
 	      }
-	      ref8 = newState.constraints;
-	      for (n = 0, len4 = ref8.length; n < len4; n++) {
-	        constraint = ref8[n];
+	      ref14 = newState.constraints;
+	      for (n = 0, len4 = ref14.length; n < len4; n++) {
+	        constraint = ref14[n];
 	        if (constraint.type === 'alignment') {
 	          constraint.offsets = (function() {
-	            var len5, o, ref9, results;
-	            ref9 = constraint.offsets;
+	            var len5, o, ref15, results;
+	            ref15 = constraint.offsets;
 	            results = [];
-	            for (o = 0, len5 = ref9.length; o < len5; o++) {
-	              offset = ref9[o];
+	            for (o = 0, len5 = ref15.length; o < len5; o++) {
+	              offset = ref15[o];
 	              if (offset.node !== delNodeIndex) {
 	                results.push({
 	                  node: remap(offset.node),
@@ -249,11 +286,11 @@ webpackJsonp([0],[
 	        }
 	      }
 	      newState.links = (function() {
-	        var len5, o, ref9, results;
-	        ref9 = newState.links;
+	        var len5, o, ref15, results;
+	        ref15 = newState.links;
 	        results = [];
-	        for (o = 0, len5 = ref9.length; o < len5; o++) {
-	          link = ref9[o];
+	        for (o = 0, len5 = ref15.length; o < len5; o++) {
+	          link = ref15[o];
 	          if (link.source !== delNodeIndex && link.target !== delNodeIndex) {
 	            results.push({
 	              source: remap(link.source),
@@ -263,7 +300,6 @@ webpackJsonp([0],[
 	        }
 	        return results;
 	      })();
-	      console.log('deletion', newState);
 	      return im.fromJS(newState);
 	    default:
 	      return state;
@@ -622,8 +658,7 @@ webpackJsonp([0],[
 	    this.graph = graph1;
 	    this.dispatch = dispatch;
 	    this.adjList = adjList;
-	    this.stripRefs = bind(this.stripRefs, this);
-	    this.getGraph = bind(this.getGraph, this);
+	    this.getPositiondata = bind(this.getPositiondata, this);
 	    this.update = bind(this.update, this);
 	    this.tick = bind(this.tick, this);
 	    this.width = 960;
@@ -753,7 +788,7 @@ webpackJsonp([0],[
 	            });
 	            _this.nodeCount += 1;
 	          }
-	          action = actionAddClass(nodeData, optionsData, _this.stripRefs(_this.getGraph()));
+	          action = actionAddClass(nodeData, optionsData, _this.getPositiondata(_this.cola.nodes(), _this.cola.groups()));
 	          _this.dispatch(action);
 	        }
 	        return _this.count += 1;
@@ -789,7 +824,7 @@ webpackJsonp([0],[
 	      return function() {
 	        var datum;
 	        datum = d3.event.target.__data__;
-	        return _this.dispatch(actionDeleteClass(datum.nid, _this.stripRefs(_this.getGraph())));
+	        return _this.dispatch(actionDeleteClass(datum.nid, _this.getPositiondata(_this.cola.nodes(), _this.cola.groups())));
 	      };
 	    })(this));
 	    enter.append('title').text(function(d) {
@@ -807,43 +842,28 @@ webpackJsonp([0],[
 	    return this.cola.start();
 	  };
 
-	  Graph.prototype.getGraph = function() {
-	    return {
-	      nodes: this.cola.nodes(),
-	      links: this.cola.links(),
-	      groups: this.cola.groups(),
-	      constraints: this.cola.constraints()
-	    };
-	  };
-
-	  Graph.prototype.stripRefs = function(graph) {
-	    var group, groups, j, k, key, l, leaf, leaves, len, len1, len2, len3, link, links, m, newNode, node, nodes, ref1, ref2, ref3, ref4, value;
+	  Graph.prototype.getPositiondata = function(_nodes, _groups) {
+	    var group, groups, j, k, len, len1, node, nodes;
 	    nodes = [];
-	    ref1 = graph.nodes;
-	    for (j = 0, len = ref1.length; j < len; j++) {
-	      node = ref1[j];
-	      newNode = {};
-	      for (key in node) {
-	        value = node[key];
-	        if (key !== 'bounds' && key !== 'parent' && key !== 'variable') {
-	          newNode[key] = value;
-	        }
-	      }
-	      nodes.push(newNode);
-	    }
 	    groups = [];
-	    ref2 = graph.groups;
-	    for (k = 0, len1 = ref2.length; k < len1; k++) {
-	      group = ref2[k];
-	      leaves = [];
-	      ref3 = group.leaves;
-	      for (l = 0, len2 = ref3.length; l < len2; l++) {
-	        leaf = ref3[l];
-	        leaves.push(typeof leaf === 'number' ? leaf : leaf.index);
-	      }
+	    for (j = 0, len = _nodes.length; j < len; j++) {
+	      node = _nodes[j];
+	      nodes.push({
+	        nid: node.nid,
+	        bounds: {
+	          x: node.bounds.x,
+	          X: node.bounds.X,
+	          y: node.bounds.y,
+	          Y: node.bounds.Y
+	        },
+	        x: node.x,
+	        y: node.y
+	      });
+	    }
+	    for (k = 0, len1 = _groups.length; k < len1; k++) {
+	      group = _groups[k];
 	      groups.push({
 	        gid: group.gid,
-	        leaves: leaves,
 	        bounds: {
 	          x: group.bounds.x,
 	          y: group.bounds.y,
@@ -852,21 +872,9 @@ webpackJsonp([0],[
 	        }
 	      });
 	    }
-	    graph.groups = groups;
-	    links = [];
-	    ref4 = graph.links;
-	    for (m = 0, len3 = ref4.length; m < len3; m++) {
-	      link = ref4[m];
-	      links.push({
-	        source: link.source.index,
-	        target: link.target.index
-	      });
-	    }
 	    return {
-	      nodes: nodes,
-	      groups: groups,
-	      links: links,
-	      constraints: graph.constraints
+	      nodePositions: nodes,
+	      groupPositions: groups
 	    };
 	  };
 
@@ -889,20 +897,20 @@ webpackJsonp([0],[
 
 	ref = __webpack_require__(11), ADD_CLASS = ref.ADD_CLASS, DELETE_CLASS = ref.DELETE_CLASS;
 
-	actionAddClass = function(nodeData, options, graph) {
+	actionAddClass = function(nodeData, options, positionData) {
 	  return {
 	    type: ADD_CLASS,
 	    nodeData: nodeData,
 	    options: options,
-	    graph: graph
+	    positionData: positionData
 	  };
 	};
 
-	actionDeleteClass = function(nodeID, graph) {
+	actionDeleteClass = function(nodeID, positionData) {
 	  return {
 	    type: DELETE_CLASS,
 	    nodeID: nodeID,
-	    graph: graph
+	    positionData: positionData
 	  };
 	};
 

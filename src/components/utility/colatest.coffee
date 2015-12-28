@@ -90,9 +90,6 @@ class Graph
 						@height
 					])
 
-		# g = @stripRefs graph
-		# console.log 'g is ', g
-		# console.log 'stripped', JSON.stringify g, null, 4
 		@cola.nodes(graph.nodes)
 			.links(graph.links)
 			.groups(graph.groups)
@@ -143,7 +140,7 @@ class Graph
 				action = actionAddClass(
 						nodeData,
 						optionsData,
-						@stripRefs @getGraph()
+						@getPositiondata @cola.nodes(), @cola.groups()
 					)
 				@dispatch action
 			@count += 1
@@ -179,7 +176,7 @@ class Graph
 					datum = d3.event.target.__data__
 					@dispatch actionDeleteClass(
 							datum.nid,
-							@stripRefs @getGraph()
+							@getPositiondata @cola.nodes(), @cola.groups()
 					)
 		enter.append 'title' # todo: inserts title multiple times
 				.text (d) ->
@@ -253,50 +250,32 @@ class Graph
 
 		@cola.start()
 
-	getGraph: =>
-		return {
-			nodes: @cola.nodes()
-			links: @cola.links()
-			groups: @cola.groups()
-			constraints: @cola.constraints()
-		}
-	
-	stripRefs: (graph) =>
-		# for node in graph.nodes
+	# pure
+	getPositiondata: (_nodes, _groups) =>
 		nodes = []
-		for node in graph.nodes
-			newNode = {}
-			for key,value of node
-				unless key in ['bounds','parent','variable']
-					newNode[key] = value
-			nodes.push newNode
-
 		groups = []
-		for group in graph.groups
-			leaves = []
-			for leaf in group.leaves
-				leaves.push(if typeof(leaf) is 'number' then leaf else leaf.index)
+		for node in _nodes
+			nodes.push
+				nid: node.nid
+				bounds:
+					x: node.bounds.x
+					X: node.bounds.X
+					y: node.bounds.y
+					Y: node.bounds.Y
+				x: node.x
+				y: node.y
 
+		for group in _groups
 			groups.push
 				gid: group.gid
-				leaves: leaves
 				bounds:
 					x: group.bounds.x
 					y: group.bounds.y
 					X: group.bounds.X
 					Y: group.bounds.Y
-		graph.groups = groups
 
-		links = []
-		for link in graph.links
-			links.push
-				source: link.source.index
-				target: link.target.index
-
-		nodes: nodes
-		groups: groups
-		links: links
-		constraints: graph.constraints
+		nodePositions: 	nodes
+		groupPositions: groups
 
 module.exports = 
 	Graph: Graph

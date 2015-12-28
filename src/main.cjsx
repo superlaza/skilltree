@@ -63,19 +63,29 @@ reducer = (state = initialState, action) ->
 	switch action.type
 		when ADD_CLASS
 			# console.log 'graph', action.graph
-			newState = action.graph
-
+			newState = state.toJS()
+			{nodePositions, groupPositions} = action.positionData
 			{className, semester, nid} = action.nodeData
-			console.log 'sem', newState.groups[semester]
 
-			console.log 'child', newState.groups
+			# infuse position data
+			for index, node of newState.nodes
+				node.x = nodePositions[index].x
+				node.y = nodePositions[index].y
+
+			for index, group of newState.groups
+				group.bounds = 
+					x: groupPositions[index].bounds.x
+					y: groupPositions[index].bounds.y
+					X: groupPositions[index].bounds.X
+					Y: groupPositions[index].bounds.Y
+
 			newClassNode =
 				nid: nid
 				name: className
 				width:60
 				height:40
-				x: newState.groups[semester].bounds.X
-				y: newState.groups[semester].bounds.Y
+				x: groupPositions[semester].bounds.X
+				y: groupPositions[semester].bounds.Y
 			nodeIndex = newState.nodes.length
 			newState.nodes.push newClassNode
 			newState.groups[semester].leaves.push nodeIndex
@@ -95,8 +105,8 @@ reducer = (state = initialState, action) ->
 						name: className
 						width:60
 						height:40
-						x: group.bounds.X
-						y: group.bounds.Y
+						x: groupPositions[semester+1].bounds.X #here
+						y: groupPositions[semester+1].bounds.Y #here
 					optionIndex = newState.nodes.length
 					newState.nodes.push newOptionNode
 					group.leaves.push optionIndex
@@ -112,10 +122,31 @@ reducer = (state = initialState, action) ->
 								offset: 50
 				else
 					console.log 'that semester does not exist'
+
 			im.fromJS(newState)
 
 		when DELETE_CLASS
-			newState = action.graph
+			# newState = action.graph
+			newState = state.toJS() # todo: shouldn't need to convert to js, fix later
+			{nodePositions, groupPositions} = action.positionData
+
+			# infuse location data			
+			for index, node of newState.nodes
+				positions = nodePositions[index]
+				# only update position if node exists
+				if node? and positions?
+					node.x = positions.x
+					node.y = positions.y
+
+			for index, group of newState.groups
+				positions = groupPositions[index]
+				# only update position if group position data exists
+				if positions?
+				group.bounds = 
+					x: positions.bounds.x
+					y: positions.bounds.y
+					X: positions.bounds.X
+					Y: positions.bounds.Y
 
 			# get index by node id
 			for index, node of newState.nodes
@@ -139,7 +170,6 @@ reducer = (state = initialState, action) ->
 			# maybe later we might want to delte the nodes it points to as well
 			newState.links = ({source:(remap link.source), target:(remap link.target)} for link in newState.links when (link.source isnt delNodeIndex and link.target isnt delNodeIndex))
 
-			console.log 'deletion', newState
 			im.fromJS(newState)
 		else state
 
