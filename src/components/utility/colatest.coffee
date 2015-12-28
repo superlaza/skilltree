@@ -68,12 +68,12 @@ class Graph
 			d.bounds.width()
 		.attr 		'height', 	(d) ->	d.bounds.height()
 
-		@label
-		.attr 		'x', (d) -> d.x
-		.attr 		'y', (d) ->
-			h = @getBBox().height
-			d.y + h / 2
-		.text (d)->d.nid  # only for testing
+		# @label
+		# .attr 		'x', (d) -> d.x
+		# .attr 		'y', (d) ->
+		# 	h = @getBBox().height
+		# 	d.y + h / 2
+		# .text (d)->d.nid  # only for testing
 		return
 
 	update: (graph = @graph, up) =>
@@ -186,36 +186,19 @@ class Graph
 							@getPositiondata @cola.nodes(), @cola.groups()
 					)
 
+		enter.insert 'text', '.label'
+				.attr 'class', 'cola label'
+				.attr 'x', (d) -> d.width/2
+				.attr 'y', (d) -> d.height/2
+			.call @cola.drag
+			.text (d) ->
+				d.name
+
 		enter.append 'title' # todo: inserts title multiple times
 				.text (d) ->
 					d.name
 
 		@node.exit().remove()
-
-		# console.log 'lencheck', n.length, @cola.nodes().length
-		# if n.length isnt @cola.nodes().length
-		# 	console.log 'pass1'
-		# 	if @cola.groups()[0].bounds?
-		# 		console.log 'pass2'
-		# 		for group in @cola.groups()
-		# 			console.log 'before', group.bounds
-		# 			group.bounds = webcola.vpsc.computeGroupBounds(group)
-		# 			console.log 'after', group.bounds
-
-		@label = @label.data @cola.nodes(), (d) ->
-			d.nid
-		@label
-			.call @cola.drag
-			.on 'click', onclick
-		@label.enter()
-			.insert 'text', '.label'
-			.attr 'class', 'cola label'
-			.call @cola.drag
-			.on('click', onclick)
-			.text (d) ->
-				d.name
-		@label.exit().remove()
-
 
 		# if up?
 		# 	duration = 2000
