@@ -1,5 +1,8 @@
 d3 = require 'd3'
 webcola = require 'webcola'
+$ = require 'jquery'
+require 'jquery-ui'
+
 
 {actionAddClass, actionDeleteClass} = require '../../actions/PlanActions.coffee'
 
@@ -53,27 +56,13 @@ class Graph
 			x = d.x - (d.width/2)
 			y = d.y - (d.height / 2) + @pad
 			"translate(#{x}, #{y})"
-		# .attr 		'x', (d) ->
-		# 	# console.log d.name, d.x
-		# 	d.x - (d.width / 2)
-		# .attr 		'y', (d) =>
-		# 	# console.log d.name, d.y
-		# 	d.y - (d.height / 2) + @pad
 
 		@group
 		.attr 		'x', 		(d) ->	d.bounds.x
 		.attr 		'y', 		(d) ->	d.bounds.y
-		.attr 		'width',	(d) ->
-			# console.log 'd in tick', d
-			d.bounds.width()
+		.attr 		'width',	(d) ->	d.bounds.width()
 		.attr 		'height', 	(d) ->	d.bounds.height()
 
-		# @label
-		# .attr 		'x', (d) -> d.x
-		# .attr 		'y', (d) ->
-		# 	h = @getBBox().height
-		# 	d.y + h / 2
-		# .text (d)->d.nid  # only for testing
 		return
 
 	update: (graph = @graph, up) =>
@@ -177,7 +166,7 @@ class Graph
 		# this whole button is just me being lazy
 		# listen, it was late, didn't want to learn anything new
 		deleteButton = enter.append 'g'
-				.attr 'transform', 'scale(0.1) translate(-80, -80)'
+				.attr 'transform', 'scale(0.13) translate(-150, -80)'
 				.attr 'class', 'delete-button'
 				.attr 'visibility', 'hidden'
 				.on 'click', =>
@@ -245,9 +234,21 @@ class Graph
 		link
 
 	onNodeClick: =>
-		datum = d3.event.target.__data__
-		
+		datum = d3.event.target.__data__ 
+		input = @graphElement.children[0]
+
+		input = $('#class-select', @graphElement)
+		input.autocomplete({source: (key for key of @adjList)})
+
 		if datum.type is 'menu'
+			console.log datum
+
+			# todo: use a more robust way of selecting this input
+			input = @graphElement.children[0]
+
+			input.style.left = "#{datum.x-85}px"
+			input.style.top = "#{datum.y+10}px"
+			
 			className = window.prompt('Pick a class')
 			nodeData =
 				className: className

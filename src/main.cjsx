@@ -9,15 +9,20 @@ ReactDOM 	= require 'react-dom'
 
 im 			= require 'immutable'
 
+width = 100
+height = 40
+menuWidth = 160
+menuHeight = 40
+
 initialState = {
 	nodes:[
-		{nid: -1,name:'Add Class',type: 'menu',width:137,height:40},
-		{nid: -2,name:'b',width:60,height:40},
-		{nid: -3,name:'c',width:60,height:40},
-		{nid: -4,name:'Add Class',type: 'menu',width:137,height:40},
-		{nid: -5,name:'d',width:60,height:40},
-		{nid: -6,name:'e',width:60,height:40},
-		{nid: -7,name:'h',width:60,height:40, hidden: false}
+		{nid: -1,name:'Add Class',type: 'menu',width:menuWidth,height:menuHeight},
+		{nid: -2,name:'POS3733',width:width,height:height},
+		{nid: -3,name:'COT4500',width:width,height:height},
+		{nid: -4,name:'Add Class',type: 'menu',width:menuWidth,height:menuHeight},
+		{nid: -5,name:'POS2041',width:width,height:height},
+		{nid: -6,name:'INR2002',width:width,height:height},
+		{nid: -7,name:'COP3223C',width:width,height:height, hidden: false}
 	]
 	links:[
 		{source:1,target:4},
