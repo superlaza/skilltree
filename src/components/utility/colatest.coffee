@@ -173,10 +173,12 @@ class Graph
 				.attr 'rx', 5
 				.attr 'ry', 5
 				.style 'fill',   (d) => @color @graph.groups.length
-		enter.append 'circle'
-				.attr 'r', 10
-				.attr 'cx', 0
-				.attr 'cy', 0
+		
+		# this whole button is just me being lazy
+		# listen, it was late, didn't want to learn anything new
+		deleteButton = enter.append 'g'
+				.attr 'transform', 'scale(0.1) translate(-80, -80)'
+				.attr 'class', 'delete-button'
 				.attr 'visibility', 'hidden'
 				.on 'click', =>
 					datum = d3.event.target.__data__
@@ -184,6 +186,21 @@ class Graph
 							datum.nid,
 							@getPositiondata @cola.nodes(), @cola.groups()
 					)
+
+		appendButton = (path) ->
+			deleteButton.append 'path'
+							.attr 'd', path
+							.style 'fill', '#e00'
+							.style 'fill-opacity', 1
+							.style 'fill-rule', 'evenodd'
+							.style 'stroke', 'none'
+							.style 'stroke-width', '0.25pt'
+							.style 'stroke-linecap', 'butt'
+							.style 'stroke-linejoin', 'miter'
+							.style 'stroke-opacity', 1
+		appendButton path for path in ['M 100,60 L 60,100 L 230,270 L 270,230 L 100,60 z', 'M 60,230 L 230,60 L 270,100 L 100,270 L 60,230 z']
+
+
 		enter.insert 'text', '.label'
 				.attr 'class', 'cola label'
 				.attr 'x', (d) -> d.width/2
