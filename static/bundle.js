@@ -2,9 +2,11 @@ webpackJsonp([0],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var DevTools, Plan_, Provider, React, ReactDOM, compose, createStore, finalCreateStore, im, initialState, model, reducer, ref, store;
+	var ADD_CLASS, DELETE_CLASS, DevTools, Plan_, Provider, React, ReactDOM, compose, createStore, finalCreateStore, im, initialState, model, reducer, ref, ref1, store;
 
 	ref = __webpack_require__(1), createStore = ref.createStore, compose = ref.compose;
+
+	ref1 = __webpack_require__(409), ADD_CLASS = ref1.ADD_CLASS, DELETE_CLASS = ref1.DELETE_CLASS;
 
 	React = __webpack_require__(11);
 
@@ -42,11 +44,16 @@ webpackJsonp([0],[
 	      height: 40
 	    }, {
 	      index: 4,
-	      name: 'e',
+	      name: 'd',
 	      width: 60,
 	      height: 40
 	    }, {
 	      index: 5,
+	      name: 'e',
+	      width: 60,
+	      height: 40
+	    }, {
+	      index: 6,
 	      name: 'h',
 	      width: 60,
 	      height: 40,
@@ -56,13 +63,13 @@ webpackJsonp([0],[
 	  links: [
 	    {
 	      source: 1,
-	      target: 3
+	      target: 4
 	    }, {
 	      source: 1,
-	      target: 4
+	      target: 5
 	    }, {
 	      source: 2,
-	      target: 4
+	      target: 5
 	    }
 	  ],
 	  groups: [
@@ -71,7 +78,7 @@ webpackJsonp([0],[
 	      leaves: [0, 1, 2]
 	    }, {
 	      id: 1,
-	      leaves: [3, 4]
+	      leaves: [3, 4, 5]
 	    }
 	  ],
 	  constraints: [
@@ -101,6 +108,9 @@ webpackJsonp([0],[
 	        }, {
 	          node: 4,
 	          offset: 50
+	        }, {
+	          node: 5,
+	          offset: 50
 	        }
 	      ],
 	      group: 1
@@ -116,12 +126,12 @@ webpackJsonp([0],[
 	initialState = im.fromJS(initialState);
 
 	reducer = function(state, action) {
-	  var constraint, group, i, j, k, len, len1, len2, newClassNode, newOptionNode, newState, optionCode, ref1, ref2, ref3;
+	  var constraint, group, i, j, k, len, len1, len2, newClassNode, newOptionNode, newState, optionCode, ref2, ref3, ref4;
 	  if (state == null) {
 	    state = initialState;
 	  }
 	  switch (action.type) {
-	    case 'ADD_CLASS':
+	    case ADD_CLASS:
 	      newState = action.graph;
 	      console.log('child', newState.nodes, newState.constraints);
 	      newClassNode = {
@@ -134,9 +144,9 @@ webpackJsonp([0],[
 	      };
 	      newState.nodes.push(newClassNode);
 	      newState.groups[action.semester].leaves.push(newClassNode.index);
-	      ref1 = newState.constraints;
-	      for (i = 0, len = ref1.length; i < len; i++) {
-	        constraint = ref1[i];
+	      ref2 = newState.constraints;
+	      for (i = 0, len = ref2.length; i < len; i++) {
+	        constraint = ref2[i];
 	        if (constraint.type === 'alignment' && constraint.group === action.semester) {
 	          constraint.offsets.push({
 	            node: newClassNode.index,
@@ -144,9 +154,9 @@ webpackJsonp([0],[
 	          });
 	        }
 	      }
-	      ref2 = action.options;
-	      for (j = 0, len1 = ref2.length; j < len1; j++) {
-	        optionCode = ref2[j];
+	      ref3 = action.options;
+	      for (j = 0, len1 = ref3.length; j < len1; j++) {
+	        optionCode = ref3[j];
 	        group = newState.groups[action.semester + 1];
 	        if (group != null) {
 	          newOptionNode = {
@@ -163,9 +173,9 @@ webpackJsonp([0],[
 	            source: newClassNode.index,
 	            target: newOptionNode.index
 	          });
-	          ref3 = newState.constraints;
-	          for (k = 0, len2 = ref3.length; k < len2; k++) {
-	            constraint = ref3[k];
+	          ref4 = newState.constraints;
+	          for (k = 0, len2 = ref4.length; k < len2; k++) {
+	            constraint = ref4[k];
 	            if (constraint.type === 'alignment' && constraint.group === action.semester + 1) {
 	              constraint.offsets.push({
 	                node: newOptionNode.index,
@@ -178,6 +188,8 @@ webpackJsonp([0],[
 	        }
 	      }
 	      return im.fromJS(newState);
+	    case DELETE_CLASS:
+	      return console.log('deleting');
 	    default:
 	      return state;
 	  }
@@ -1663,24 +1675,22 @@ webpackJsonp([0],[
 /* 178 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Graph, actionAddClass, d3, drawGraph, webcola,
+	var Graph, actionAddClass, actionDeleteClass, d3, ref, webcola,
 	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 	d3 = __webpack_require__(179);
 
 	webcola = __webpack_require__(180);
 
-	actionAddClass = __webpack_require__(408).actionAddClass;
+	ref = __webpack_require__(408), actionAddClass = ref.actionAddClass, actionDeleteClass = ref.actionDeleteClass;
 
 	Graph = (function() {
-	  function Graph(graphElement1, graph1, dispatch, adjList) {
-	    var classes, cls, j, len, ref, ref1, sel;
-	    this.graphElement = graphElement1;
+	  function Graph(graphElement, graph1, dispatch, adjList) {
+	    var classes, cls, j, len, ref1, ref2, sel;
+	    this.graphElement = graphElement;
 	    this.graph = graph1;
 	    this.dispatch = dispatch;
 	    this.adjList = adjList;
-	    this.addSemester = bind(this.addSemester, this);
-	    this.addNode = bind(this.addNode, this);
 	    this.getGraph = bind(this.getGraph, this);
 	    this.update = bind(this.update, this);
 	    this.tick = bind(this.tick, this);
@@ -1690,7 +1700,7 @@ webpackJsonp([0],[
 	    this.color = d3.scale.category20();
 	    this.svg = d3.select(this.graphElement).append('svg').attr('width', this.width).attr('height', this.height);
 	    classes = ['group', 'link', 'node', 'label'];
-	    ref = (function() {
+	    ref1 = (function() {
 	      var k, len, results;
 	      results = [];
 	      for (k = 0, len = classes.length; k < len; k++) {
@@ -1699,14 +1709,14 @@ webpackJsonp([0],[
 	      }
 	      return results;
 	    })();
-	    for (j = 0, len = ref.length; j < len; j++) {
-	      cls = ref[j];
+	    for (j = 0, len = ref1.length; j < len; j++) {
+	      cls = ref1[j];
 	      this.svg.append('g').attr('class', cls);
 	    }
 	    sel = function(className) {
 	      return d3.select("g." + className + "-group").selectAll("." + className);
 	    };
-	    ref1 = (function() {
+	    ref2 = (function() {
 	      var k, len1, results;
 	      results = [];
 	      for (k = 0, len1 = classes.length; k < len1; k++) {
@@ -1714,7 +1724,7 @@ webpackJsonp([0],[
 	        results.push(sel(cls));
 	      }
 	      return results;
-	    })(), this.group = ref1[0], this.link = ref1[1], this.node = ref1[2], this.label = ref1[3];
+	    })(), this.group = ref2[0], this.link = ref2[1], this.node = ref2[2], this.label = ref2[3];
 	    this.count = 0;
 	    this.update();
 	  }
@@ -1729,11 +1739,12 @@ webpackJsonp([0],[
 	    }).attr('y2', function(d) {
 	      return d.target.y;
 	    });
-	    this.node.attr('x', function(d) {
-	      return d.x - (d.width / 2);
-	    }).attr('y', (function(_this) {
+	    this.node.attr('transform', (function(_this) {
 	      return function(d) {
-	        return d.y - (d.height / 2) + _this.pad;
+	        var x, y;
+	        x = d.x - (d.width / 2);
+	        y = d.y - (d.height / 2) + _this.pad;
+	        return "translate(" + x + ", " + y + ")";
 	      };
 	    })(this));
 	    this.group.attr('x', function(d) {
@@ -1755,7 +1766,7 @@ webpackJsonp([0],[
 	  };
 
 	  Graph.prototype.update = function(graph, up) {
-	    var onclick;
+	    var enter, onclick;
 	    if (graph == null) {
 	      graph = this.graph;
 	    }
@@ -1796,7 +1807,8 @@ webpackJsonp([0],[
 	      return d.index;
 	    });
 	    this.node.call(this.cola.drag).on('click', onclick);
-	    this.node.enter().insert('rect', '.node').attr('class', 'cola node').attr('width', (function(_this) {
+	    enter = this.node.enter().insert('g', '.node-cont').call(this.cola.drag).on('click', onclick);
+	    enter.append('rect').attr('class', 'cola node').attr('width', (function(_this) {
 	      return function(d) {
 	        if (d.hidden) {
 	          return 0;
@@ -1817,9 +1829,16 @@ webpackJsonp([0],[
 	        return _this.color(_this.graph.groups.length);
 	      };
 	    })(this));
-	    this.node.call(this.cola.drag).on('click', onclick).insert('title').text(function(d) {
+	    enter.append('circle').attr('r', 10).attr('cx', 0).attr('cy', 0).on('click', (function(_this) {
+	      return function() {
+	        var datum;
+	        datum = d3.event.target.__data__;
+	        return _this.dispatch(actionDeleteClass(1));
+	      };
+	    })(this));
+	    enter.append('title').text(function(d) {
 	      return d.name;
-	    }).call(this.cola.drag);
+	    });
 	    this.node.exit().remove();
 	    this.label = this.label.data(this.cola.nodes(), function(d) {
 	      return d.index;
@@ -1841,34 +1860,12 @@ webpackJsonp([0],[
 	    };
 	  };
 
-	  Graph.prototype.addNode = function(name, semester) {
-	    var newNode;
-	    newNode = {
-	      name: name,
-	      width: 60,
-	      height: 40
-	    };
-	    this.graph.nodes.push(newNode);
-	    this.graph.groups[semester].leaves.push(newNode);
-	    return this.update();
-	  };
-
-	  Graph.prototype.addSemester = function() {
-	    this.graph.nodes.push({
-	      name: 'dummy',
-	      width: 40,
-	      height: 40,
-	      hidden: true
-	    });
-	    return this.update();
-	  };
-
 	  Graph.prototype.stripRefs = function(graph) {
-	    var group, groups, j, k, key, l, leaf, leaves, len, len1, len2, len3, link, links, m, newNode, node, nodes, ref, ref1, ref2, ref3, value;
+	    var group, groups, j, k, key, l, leaf, leaves, len, len1, len2, len3, link, links, m, newNode, node, nodes, ref1, ref2, ref3, ref4, value;
 	    nodes = [];
-	    ref = graph.nodes;
-	    for (j = 0, len = ref.length; j < len; j++) {
-	      node = ref[j];
+	    ref1 = graph.nodes;
+	    for (j = 0, len = ref1.length; j < len; j++) {
+	      node = ref1[j];
 	      newNode = {};
 	      for (key in node) {
 	        value = node[key];
@@ -1879,13 +1876,13 @@ webpackJsonp([0],[
 	      nodes.push(newNode);
 	    }
 	    groups = [];
-	    ref1 = graph.groups;
-	    for (k = 0, len1 = ref1.length; k < len1; k++) {
-	      group = ref1[k];
+	    ref2 = graph.groups;
+	    for (k = 0, len1 = ref2.length; k < len1; k++) {
+	      group = ref2[k];
 	      leaves = [];
-	      ref2 = group.leaves;
-	      for (l = 0, len2 = ref2.length; l < len2; l++) {
-	        leaf = ref2[l];
+	      ref3 = group.leaves;
+	      for (l = 0, len2 = ref3.length; l < len2; l++) {
+	        leaf = ref3[l];
 	        leaves.push(typeof leaf === 'number' ? leaf : leaf.index);
 	      }
 	      console.log('my love');
@@ -1902,9 +1899,9 @@ webpackJsonp([0],[
 	    }
 	    graph.groups = groups;
 	    links = [];
-	    ref3 = graph.links;
-	    for (m = 0, len3 = ref3.length; m < len3; m++) {
-	      link = ref3[m];
+	    ref4 = graph.links;
+	    for (m = 0, len3 = ref4.length; m < len3; m++) {
+	      link = ref4[m];
 	      links.push({
 	        source: link.source.index,
 	        target: link.target.index
@@ -1921,107 +1918,6 @@ webpackJsonp([0],[
 	  return Graph;
 
 	})();
-
-	drawGraph = function(graphElement, graph) {
-	  var classes, cls, cola, color, group, height, j, label, len, link, node, pad, ref, ref1, sel, svg, tick, update, width;
-	  width = 960;
-	  height = 500;
-	  pad = 3;
-	  color = d3.scale.category20();
-	  cola = webcola.d3adaptor().linkDistance(100).avoidOverlaps(true).handleDisconnected(false).size([width, height]);
-	  svg = d3.select(graphElement).append('svg').attr('width', width).attr('height', height);
-	  classes = ['group', 'link', 'node', 'label'];
-	  ref = (function() {
-	    var k, len, results;
-	    results = [];
-	    for (k = 0, len = classes.length; k < len; k++) {
-	      cls = classes[k];
-	      results.push(cls + "-group");
-	    }
-	    return results;
-	  })();
-	  for (j = 0, len = ref.length; j < len; j++) {
-	    cls = ref[j];
-	    svg.append('g').attr('class', cls);
-	  }
-	  sel = function(className) {
-	    return d3.select("g." + className + "-group").selectAll("." + className);
-	  };
-	  ref1 = (function() {
-	    var k, len1, results;
-	    results = [];
-	    for (k = 0, len1 = classes.length; k < len1; k++) {
-	      cls = classes[k];
-	      results.push(sel(cls));
-	    }
-	    return results;
-	  })(), group = ref1[0], link = ref1[1], node = ref1[2], label = ref1[3];
-	  cola.nodes(graph.nodes).links(graph.links).groups(graph.groups);
-	  update = function(graph) {
-	    group = group.data(graph.groups);
-	    group.enter().insert('rect').attr('rx', 8).attr('ry', 8).attr('class', 'group').style('fill', function(d, i) {
-	      console.log('group el', d, i);
-	      return color(i);
-	    }).call(cola.drag);
-	    group.exit().remove();
-	    link = link.data(cola.links());
-	    link.enter().insert('line').attr('class', 'cola link');
-	    link.exit().remove();
-	    node = node.data(cola.nodes(), function(d) {
-	      return d.name;
-	    });
-	    node.enter().insert('rect').attr('class', 'cola node').attr('width', function(d) {
-	      return d.width - (2 * pad);
-	    }).attr('height', function(d) {
-	      return d.height - (2 * pad);
-	    }).attr('rx', 5).attr('ry', 5).style('fill', function(d) {
-	      return color(graph.groups.length);
-	    }).call(cola.drag).insert('title').text(function(d) {
-	      return d.name;
-	    }).call(cola.drag);
-	    link.exit().remove();
-	    label = label.data(graph.nodes);
-	    label.enter().insert('text').attr('class', 'label').text(function(d) {
-	      return d.name;
-	    }).call(cola.drag);
-	    label.exit().remove();
-	    return cola.start();
-	  };
-	  update(graph);
-	  tick = function() {
-	    link.attr('x1', function(d) {
-	      return d.source.x;
-	    }).attr('y1', function(d) {
-	      return d.source.y;
-	    }).attr('x2', function(d) {
-	      return d.target.x;
-	    }).attr('y2', function(d) {
-	      return d.target.y;
-	    });
-	    node.attr('x', function(d) {
-	      return d.x - (d.width / 2);
-	    }).attr('y', function(d) {
-	      return d.y - (d.height / 2) + pad;
-	    });
-	    group.attr('x', function(d) {
-	      return d.bounds.x;
-	    }).attr('y', function(d) {
-	      return d.bounds.y;
-	    }).attr('width', function(d) {
-	      return d.bounds.width();
-	    }).attr('height', function(d) {
-	      return d.bounds.height();
-	    });
-	    label.attr('x', function(d) {
-	      return d.x;
-	    }).attr('y', function(d) {
-	      var h;
-	      h = this.getBBox().height;
-	      return d.y + h / 2;
-	    });
-	  };
-	  cola.on('tick', tick);
-	};
 
 	module.exports = {
 	  Graph: Graph
@@ -16300,9 +16196,9 @@ webpackJsonp([0],[
 /* 408 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ADD_CLASS, actionAddClass;
+	var ADD_CLASS, DELETE_CLASS, actionAddClass, actionDeleteClass, ref;
 
-	ADD_CLASS = __webpack_require__(409).ADD_CLASS;
+	ref = __webpack_require__(409), ADD_CLASS = ref.ADD_CLASS, DELETE_CLASS = ref.DELETE_CLASS;
 
 	actionAddClass = function(classCode, semester, options, graph) {
 	  return {
@@ -16314,8 +16210,17 @@ webpackJsonp([0],[
 	  };
 	};
 
+	actionDeleteClass = function(nodeIndex) {
+	  return {
+	    type: DELETE_CLASS,
+	    nodeIndex: nodeIndex,
+	    graph: graph
+	  };
+	};
+
 	module.exports = {
-	  actionAddClass: actionAddClass
+	  actionAddClass: actionAddClass,
+	  actionDeleteClass: actionDeleteClass
 	};
 
 
@@ -16324,7 +16229,8 @@ webpackJsonp([0],[
 /***/ function(module, exports) {
 
 	module.exports = {
-	  ADD_CLASS: 'ADD_CLASS'
+	  ADD_CLASS: 'ADD_CLASS',
+	  DELETE_CLASS: 'DELETE_CLASS'
 	};
 
 

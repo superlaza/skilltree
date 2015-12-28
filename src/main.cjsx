@@ -1,4 +1,5 @@
 {createStore, compose} = require 'redux'
+{ADD_CLASS, DELETE_CLASS} = require './constants/ActionTypes.coffee'
 
 React 		= require 'react'
 ReactDOM 	= require 'react-dom'
@@ -14,17 +15,18 @@ initialState = {
 		{index: 1,name:'b',width:60,height:40},
 		{index: 2,name:'c',width:60,height:40},
 		{index: 3,name:'Add Class',type: 'menu',width:137,height:40},
-		{index: 4,name:'e',width:60,height:40},
-		{index: 5,name:'h',width:60,height:40, hidden: true}
+		{index: 4,name:'d',width:60,height:40},
+		{index: 5,name:'e',width:60,height:40},
+		{index: 6,name:'h',width:60,height:40, hidden: true}
 	]
 	links:[
-		{source:1,target:3},
 		{source:1,target:4},
-		{source:2,target:4}
+		{source:1,target:5},
+		{source:2,target:5}
 	]
 	groups:[
 		{id: 0, leaves:[0,1,2]},
-		{id: 1, leaves:[3,4]}
+		{id: 1, leaves:[3,4,5]}
 	]
 	constraints: [
 		{
@@ -42,7 +44,8 @@ initialState = {
 			axis: 'x'
 			offsets: [
 				{node: 3, offset: 50},
-				{node: 4, offset: 50}
+				{node: 4, offset: 50},
+				{node: 5, offset: 50}
 			]
 			group: 1
 		},
@@ -58,7 +61,7 @@ initialState = im.fromJS(initialState)
 
 reducer = (state = initialState, action) ->
 	switch action.type
-		when 'ADD_CLASS'
+		when ADD_CLASS
 			# console.log 'graph', action.graph
 			newState = action.graph
 			console.log 'child', newState.nodes, newState.constraints
@@ -104,10 +107,10 @@ reducer = (state = initialState, action) ->
 								offset: 50
 				else
 					console.log 'that semester does not exist'
-
-						
-
 			im.fromJS(newState)
+
+		when DELETE_CLASS
+			console.log 'deleting'
 		else state
 
 # initialize devtools
