@@ -2,3 +2,5 @@ data/Majors/
 node_modules/
 skilltree.sublime-workspace
 skilltree.sublime-project
+
+*.bundle.js

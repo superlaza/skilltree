@@ -1,7 +1,7 @@
 React 					= require 'react'
 # drawGraph 			= require './utility/drawGraph.coffee'
 # {drawGraph} 			= require './utility/colatest.coffee'
-{Graph} 			= require './utility/colatest.coffee'
+{Graph} 			= require './utility/Graph.coffee'
 
 {connect} 				= require 'react-redux'
 
