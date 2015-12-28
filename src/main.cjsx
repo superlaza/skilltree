@@ -59,6 +59,7 @@ initialState = {
 }
 initialState = im.fromJS(initialState)
 
+# add node, delete all in group 1, undo add node
 reducer = (state = initialState, action) ->
 	switch action.type
 		when ADD_CLASS
@@ -67,17 +68,23 @@ reducer = (state = initialState, action) ->
 			{nodePositions, groupPositions} = action.positionData
 			{className, semester, nid} = action.nodeData
 
-			# infuse position data
+			# infuse location data			
 			for index, node of newState.nodes
-				node.x = nodePositions[index].x
-				node.y = nodePositions[index].y
+				positions = nodePositions[index]
+				# only update position if node exists
+				if node? and positions?
+					node.x = positions.x
+					node.y = positions.y
 
 			for index, group of newState.groups
-				group.bounds = 
-					x: groupPositions[index].bounds.x
-					y: groupPositions[index].bounds.y
-					X: groupPositions[index].bounds.X
-					Y: groupPositions[index].bounds.Y
+				positions = groupPositions[index]
+				# only update position if group position data exists
+				if positions?
+					group.bounds = 
+						x: positions.bounds.x
+						y: positions.bounds.y
+						X: positions.bounds.X
+						Y: positions.bounds.Y
 
 			newClassNode =
 				nid: nid

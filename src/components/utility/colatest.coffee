@@ -77,8 +77,8 @@ class Graph
 		return
 
 	update: (graph = @graph, up) =>
-		if up?
-			@cola.stop()
+		# if up?
+		# 	@cola.stop()
 		console.log 'update graph', graph
 		@cola = webcola.d3adaptor()
 					.linkDistance(100)
@@ -96,109 +96,10 @@ class Graph
 
 		@cola.on 'tick', @tick
 		
-		@group = @group.data @cola.groups(),
-					(d) ->
-						d.gid
-		@group.call @cola.drag
-		@group.enter()
-			# .insert 'rect', '.group'
-			.append 'rect'
-			.attr 'rx', 8
-			.attr 'ry', 8
-			.attr 'class', 'cola group'
-			.style 'fill', (d, i) =>
-					@color i
-			.call @cola.drag
-		@group.exit().remove()
-
-		@link = @link.data @cola.links()
-		@link.enter()
-			.insert 'line', '.link'
-			.attr 'class', 'cola link'
-		@link.exit().remove()
-
-		onclick = =>
-			datum = d3.event.target.__data__
-			
-			if datum.type is 'menu'
-				className = window.prompt('Pick a class')
-				nodeData =
-					className: className
-					semester: datum.parent.gid # parent group
-					nid: @nodeCount
-
-				@nodeCount += 1
-
-				optionsData = []
-				for optionName in @adjList[className]
-					optionsData.push
-						className: optionName
-						nid: @nodeCount
-					@nodeCount += 1
-
-				action = actionAddClass(
-						nodeData,
-						optionsData,
-						@getPositiondata @cola.nodes(), @cola.groups()
-					)
-				@dispatch action
-
-		@node = @node.data @cola.nodes(),
-					(d) ->
-						d.nid
-		@node
-			.call @cola.drag
-			.on 'click', onclick
-		enter = @node.enter()
-			# .insert	'rect', '.node'
-			.insert 'g', '.node-cont'
-				.call @cola.drag
-				.on 'click', onclick
-				.on 'mouseenter', ->
-					# assumes target is always class rect element
-					# and that the circle will always be at position 1
-					cir = d3.event.target.children[1]
-					cir.setAttribute('visibility', 'visible')
-				.on 'mouseleave', ->
-					cir = d3.event.target.children[1]
-					cir.setAttribute('visibility', 'hidden')
-		enter.append 'rect'
-				.attr 'class', 'cola node'
-				.attr 'width',
-					(d) =>
-						# console.log 'd', typeof d.hidden
-						if d.hidden then 0 else d.width - (2 * @pad)
-				.attr 	'height',
-					(d) => 
-						if d.hidden then 0 else d.height - (2 * @pad)
-				.attr 'rx', 5
-				.attr 'ry', 5
-				.style 'fill',   (d) => @color @graph.groups.length
-		enter.append 'circle'
-				.attr 'r', 10
-				.attr 'cx', 0
-				.attr 'cy', 0
-				.attr 'visibility', 'hidden'
-				.on 'click', =>
-					datum = d3.event.target.__data__
-					@dispatch actionDeleteClass(
-							datum.nid,
-							@getPositiondata @cola.nodes(), @cola.groups()
-					)
-
-		enter.insert 'text', '.label'
-				.attr 'class', 'cola label'
-				.attr 'x', (d) -> d.width/2
-				.attr 'y', (d) -> d.height/2
-			.call @cola.drag
-			.text (d) ->
-				d.name
-
-		enter.append 'title' # todo: inserts title multiple times
-				.text (d) ->
-					d.name
-
-		@node.exit().remove()
+		@group = @updateGroups @group, @cola.groups()
+		@link = @updateLinks @link, @cola.links()
+		@node = @updateNodes @node, @cola.nodes()
+		
 
 		# if up?
 		# 	duration = 2000
@@ -240,6 +141,117 @@ class Graph
 		# 	@cola.start()
 
 		@cola.start()
+		
+	updateNodes: (selection, data) =>
+		node = selection.data data,
+					(d) ->
+						d.nid
+		node
+			.call @cola.drag
+			.on 'click', @onNodeClick
+		enter = node.enter()
+			.insert 'g', '.node-cont'
+				.call @cola.drag
+				.on 'click', @onNodeClick
+				.on 'mouseenter', ->
+					# assumes target is always class rect element
+					# and that the circle will always be at position 1
+					cir = d3.event.target.children[1]
+					cir.setAttribute('visibility', 'visible')
+				.on 'mouseleave', ->
+					cir = d3.event.target.children[1]
+					cir.setAttribute('visibility', 'hidden')
+		enter.append 'rect'
+				.attr 'class', 'cola node'
+				.attr 'width',
+					(d) =>
+						# console.log 'd', typeof d.hidden
+						if d.hidden then 0 else d.width - (2 * @pad)
+				.attr 	'height',
+					(d) => 
+						if d.hidden then 0 else d.height - (2 * @pad)
+				.attr 'rx', 5
+				.attr 'ry', 5
+				.style 'fill',   (d) => @color @graph.groups.length
+		enter.append 'circle'
+				.attr 'r', 10
+				.attr 'cx', 0
+				.attr 'cy', 0
+				.attr 'visibility', 'hidden'
+				.on 'click', =>
+					datum = d3.event.target.__data__
+					@dispatch actionDeleteClass(
+							datum.nid,
+							@getPositiondata @cola.nodes(), @cola.groups()
+					)
+		enter.insert 'text', '.label'
+				.attr 'class', 'cola label'
+				.attr 'x', (d) -> d.width/2
+				.attr 'y', (d) -> d.height/2
+			.call @cola.drag
+			.text (d) ->
+				d.name
+
+		enter.append 'title' # todo: inserts title multiple times
+				.text (d) ->
+					d.name
+
+		node.exit().remove()
+
+		node
+
+	updateGroups: (selection, data) =>
+		group = selection.data data,
+					(d) ->
+						d.gid
+		group.call @cola.drag
+		group.enter()
+			# .insert 'rect', '.group'
+			.append 'rect'
+			.attr 'rx', 8
+			.attr 'ry', 8
+			.attr 'class', 'cola group'
+			.style 'fill', (d, i) =>
+					@color i
+			.call @cola.drag
+		group.exit().remove()
+
+		group
+
+	updateLinks: (selection, data) =>
+		link = selection.data data
+		link.enter()
+			.insert 'line', '.link'
+			.attr 'class', 'cola link'
+		link.exit().remove()
+
+		link
+
+	onNodeClick: =>
+		datum = d3.event.target.__data__
+		
+		if datum.type is 'menu'
+			className = window.prompt('Pick a class')
+			nodeData =
+				className: className
+				semester: datum.parent.gid # parent group
+				nid: @nodeCount
+
+			@nodeCount += 1
+
+			optionsData = []
+			for optionName in @adjList[className]
+				optionsData.push
+					className: optionName
+					nid: @nodeCount
+				@nodeCount += 1
+
+			action = actionAddClass(
+					nodeData,
+					optionsData,
+					@getPositiondata @cola.nodes(), @cola.groups()
+				)
+			@dispatch action
 
 	# pure
 	getPositiondata: (_nodes, _groups) =>
