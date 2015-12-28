@@ -39,7 +39,6 @@ class Graph
 		# node count, serves as idea for new node creation
 		@nodeCount = 0
 
-		@count = 0 # delete eventually
 		@update()
 
 	tick: =>
@@ -143,7 +142,6 @@ class Graph
 						@getPositiondata @cola.nodes(), @cola.groups()
 					)
 				@dispatch action
-			@count += 1
 
 		@node = @node.data @cola.nodes(),
 					(d) ->
@@ -156,6 +154,14 @@ class Graph
 			.insert 'g', '.node-cont'
 				.call @cola.drag
 				.on 'click', onclick
+				.on 'mouseenter', ->
+					# assumes target is always class rect element
+					# and that the circle will always be at position 1
+					cir = d3.event.target.children[1]
+					cir.setAttribute('visibility', 'visible')
+				.on 'mouseleave', ->
+					cir = d3.event.target.children[1]
+					cir.setAttribute('visibility', 'hidden')
 		enter.append 'rect'
 				.attr 'class', 'cola node'
 				.attr 'width',
@@ -172,12 +178,14 @@ class Graph
 				.attr 'r', 10
 				.attr 'cx', 0
 				.attr 'cy', 0
+				.attr 'visibility', 'hidden'
 				.on 'click', =>
 					datum = d3.event.target.__data__
 					@dispatch actionDeleteClass(
 							datum.nid,
 							@getPositiondata @cola.nodes(), @cola.groups()
 					)
+
 		enter.append 'title' # todo: inserts title multiple times
 				.text (d) ->
 					d.name
