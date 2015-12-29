@@ -1,16 +1,16 @@
 body {
-  position: relative;
-  width: 2000px;
-  height: 2000px;
+	position: relative;
+	width: 2000px;
+	height: 2000px;
 }
 .node {
-  stroke: #fff;
-  stroke-width: 1.5px;
+	stroke: #fff;
+	stroke-width: 1.5px;
 }
 
 .link {
-  stroke: #999;
-  stroke-opacity: .6;
+	stroke: #999;
+	stroke-opacity: .6;
 }
 
 .arrow{
@@ -25,28 +25,38 @@ body {
 
  /*COLA TEST */
 .cola.node {
-  stroke: #fff;
-  stroke-width: 1.5px;
-    cursor: move;
+	stroke: #fff;
+	stroke-width: 1.5px;
+	cursor: move;
 }
 
 .cola.group {
-  stroke: #fff;
-  stroke-width: 1.5px;
-  cursor: move;
-  opacity: 0.7;
+	stroke: #fff;
+	stroke-width: 1.5px;
+	cursor: move;
+	opacity: 0.7;
 }
 
 .cola.link {
-  stroke: #7a4e4e;
-  stroke-width: 3px;
-  stroke-opacity: 1;
+	stroke: #7a4e4e;
+	stroke-width: 3px;
+	stroke-opacity: 1;
 }
 
 .cola.label {
-    fill: white;
-    font-family: Verdana;
-    font-size: 14px;
-    text-anchor: middle;
-    cursor: move;
+	fill: white;
+	font-family: Verdana;
+	font-size: 14px;
+	text-anchor: middle;
+	cursor: move;
+}
+
+.btn-add-class {
+	fill: rgb(32, 101, 243) !important; /* don't style this way*/
+}
+
+/*for jquery autocomplete*/
+ul
+{
+    list-style-type: none;
 }

@@ -171,7 +171,13 @@ class Graph
 				.on 'mouseenter', setVisibility('visible')
 				.on 'mouseleave', setVisibility('hidden')
 		enter.append 'rect'
-				.attr 'class', 'cola node'
+				.attr 'class', (d) ->
+					switch d.type
+						when addClassSpec.TYPE
+							"cola node #{addClassSpec.CLASS}"
+						when classSpec.TYPE
+							"cola node #{classSpec.CLASS}"
+					
 				.attr 'width',
 					(d) =>
 						if d.hidden then 0 else d.width - (2 * @pad)
@@ -276,44 +282,49 @@ class Graph
 				@clickedNode = targetNode
 				
 
-
 			when addClassSpec.TYPE
 				input = @graphElement.children[0]
 				input = $('#class-select', @graphElement)
-				input.autocomplete({source: (key for key of @adjList)})
-				# todo: use a more robust way of selecting this input
-				input = @graphElement.children[0]
+				input.autocomplete {
+					source: (key for key of @adjList)
+					autoFocus: true
+				}
 
-				input.style.left = "#{datum.x-85}px"
-				input.style.top = "#{datum.y+10}px"
+				# input.css 'left', "#{datum.x-13}px"
+				# input.css 'top', "#{datum.y+10}px"
 				
-				className = window.prompt('Pick a class')
-				nodeData =
-					className: className
-					semester: datum.parent.gid # parent group
-					nid: @nodeCount
-					type: classSpec.TYPE
-					width: classSpec.WIDTH
-					height: classSpec.HEIGHT
+				# className = window.prompt('Pick a class')
+				className = 'dymm'
+				input.keypress (e) =>
+					if e.keyCode is 13
+						
+						className = e.target.value
+						nodeData =
+							className: className
+							semester: datum.parent.gid # parent group
+							nid: @nodeCount
+							type: classSpec.TYPE
+							width: classSpec.WIDTH
+							height: classSpec.HEIGHT
 
-				@nodeCount += 1
+						@nodeCount += 1
 
-				optionsData = []
-				for optionName in @adjList[className]
-					optionsData.push
-						className: optionName
-						nid: @nodeCount
-						type: classSpec.TYPE
-						width: classSpec.WIDTH
-						height: classSpec.HEIGHT
-					@nodeCount += 1
+						optionsData = []
+						for optionName in @adjList[className]
+							optionsData.push
+								className: optionName
+								nid: @nodeCount
+								type: classSpec.TYPE
+								width: classSpec.WIDTH
+								height: classSpec.HEIGHT
+							@nodeCount += 1
 
-				action = actionAddClass(
-						nodeData,
-						optionsData,
-						@getPositiondata @cola.nodes(), @cola.groups()
-					)
-				@dispatch action
+						action = actionAddClass(
+								nodeData,
+								optionsData,
+								@getPositiondata @cola.nodes(), @cola.groups()
+							)
+						@dispatch action
 
 	moveNode: =>
 		return if !@clickedNode?
