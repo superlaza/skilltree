@@ -1,1 +1,1 @@
-web: node app/index.coffee
+web: node app/build/index.js

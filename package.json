@@ -4,6 +4,9 @@
   "description": "Visualizing your college degree!",
   "main": "index.js",
   "scripts": {
+    "start-dev": "nodemon app/src/index.coffee --watch app/src",
+    "watch-frontend": "webpack --watch",
+    "watch-backend": "cake build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "David Perlaza",

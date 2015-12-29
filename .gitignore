@@ -1,3 +1,5 @@
+app/build/
+
 data/Majors/
 node_modules/
 skilltree.sublime-workspace
