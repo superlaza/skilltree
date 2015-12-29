@@ -10,6 +10,89 @@ require 'jquery-ui'
 
 class Graph
 	constructor: (@graphElement, @graph, @dispatch, @adjList) ->
+		# event result persistence
+		@clickedNode = null
+
+		d3.select 'body'
+			.on 'keydown', =>
+				d3.event.preventDefault()
+				console.log 'clicked', @clickedNode
+				console.log 'capturing', d3.event.keyCode
+				clickedNode = @clickedNode
+
+				# for node in @cola.nodes()
+				# 	if node.nid is clickedNoded.nid
+				# 		console.log 'node', node
+				# 		if d3.event.keyCode is 40
+				# 			node.y +=20
+				# 		if d3.event.keyCode is 38
+				# 			node.y -=20
+				# @tick()
+
+				map = {}
+				for constraint in @cola.constraints()
+					if constraint.type? and constraint.group is clickedNode.parent.gid
+						console.log 'con', constraint
+						for index, offset of constraint.offsets
+							map[index] = offset
+							if clickedNode.index is offset.node
+								saveIndex = parseInt(index)
+				
+				if d3.event.keyCode is 40
+					offset = 1
+				if d3.event.keyCode is 38
+					offset = -1
+
+				temp = map[saveIndex+offset]
+				map[saveIndex+offset] = map[saveIndex]
+				map[saveIndex] = temp
+
+				for node in @cola.nodes()
+					if node.index is clickedNode.index
+						node1 = node
+					if node.index is map[saveIndex].node # since i switched them
+						node2 = node
+				
+				tempx = node1.x
+				tempy = node1.y
+
+				node1.x = node2.x
+				node1.y = node2.y
+
+				node2.x = tempx
+				node2.y = tempy
+				console.log 'node', node1, node2
+
+
+
+				# newConstraints = []
+				# for constraint in @cola.constraints()
+				# 	if constraint.type?
+				# 		newConstraint = 
+				# 			axis: constraint.axis
+				# 			group: constraint.group
+				# 			type: constraint.type
+
+				# 		if constraint.group is clickedNode.parent.gid
+				# 			newConstraint.offsets = (offset for _, offset of map)
+				# 		else
+				# 			newConstraint.offsets = constraint.offsets
+				# 	else
+				# 		newConstraint =
+				# 			axis: constraint.axis
+				# 			left: constraint.left
+				# 			right: constraint.right
+				# 			gap: constraint.gap
+
+				# 	newConstraints.push newConstraint
+
+				# console.log newConstraints, @cola.constraints()
+
+				# @cola.constraints(newConstraints)
+				@cola.start()
+
+
+		# init graph
 		@width = 960
 		@height = 500
 		@pad = 3
@@ -245,13 +328,15 @@ class Graph
 		link
 
 	onNodeClick: =>
+
 		# @dispatch {
 		# 	type: 'ADD_SEMESTER'
 		# 	positionData: @getPositiondata @cola.nodes(), @cola.groups()
 		# }
 		return if d3.event.defaultPrevented # default is prevented on drag
-
+		d3.event.target.setAttribute('style', 'fill: rgb(31, 119, 180);')
 		datum = d3.event.target.__data__ 
+		@clickedNode = datum
 		input = @graphElement.children[0]
 
 		input = $('#class-select', @graphElement)
