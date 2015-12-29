@@ -31,7 +31,7 @@ app.use express.static('static')
 app.use express.static('data')
 
 
-server = app.listen(3000, ->
+server = app.listen(process.env.PORT || 3000, ->
 	host = server.address().address
 	port = server.address().port
 	console.log 'Example app listening at http://%s:%s', host, port

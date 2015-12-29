@@ -34,7 +34,7 @@
 
   app.use(express["static"]('data'));
 
-  server = app.listen(3000, function() {
+  server = app.listen(process.env.PORT || 3000, function() {
     var host, port;
     host = server.address().address;
     port = server.address().port;
