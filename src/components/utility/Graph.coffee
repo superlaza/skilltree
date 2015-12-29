@@ -3,7 +3,7 @@ webcola = require 'webcola'
 $ = require 'jquery'
 require 'jquery-ui'
 
-{addClassSpec} = require '../../constants/Specs.coffee'
+{classSpec, addClassSpec} = require '../../constants/Specs.coffee'
 
 
 {actionAddClass, actionDeleteClass} = require '../../actions/PlanActions.coffee'
@@ -14,83 +14,7 @@ class Graph
 		@clickedNode = null
 
 		d3.select 'body'
-			.on 'keydown', =>
-				d3.event.preventDefault()
-				console.log 'clicked', @clickedNode
-				console.log 'capturing', d3.event.keyCode
-				clickedNode = @clickedNode
-
-				# for node in @cola.nodes()
-				# 	if node.nid is clickedNoded.nid
-				# 		console.log 'node', node
-				# 		if d3.event.keyCode is 40
-				# 			node.y +=20
-				# 		if d3.event.keyCode is 38
-				# 			node.y -=20
-				# @tick()
-
-				map = {}
-				for constraint in @cola.constraints()
-					if constraint.type? and constraint.group is clickedNode.parent.gid
-						console.log 'con', constraint
-						for index, offset of constraint.offsets
-							map[index] = offset
-							if clickedNode.index is offset.node
-								saveIndex = parseInt(index)
-				
-				if d3.event.keyCode is 40
-					offset = 1
-				if d3.event.keyCode is 38
-					offset = -1
-
-				temp = map[saveIndex+offset]
-				map[saveIndex+offset] = map[saveIndex]
-				map[saveIndex] = temp
-
-				for node in @cola.nodes()
-					if node.index is clickedNode.index
-						node1 = node
-					if node.index is map[saveIndex].node # since i switched them
-						node2 = node
-				
-				tempx = node1.x
-				tempy = node1.y
-
-				node1.x = node2.x
-				node1.y = node2.y
-
-				node2.x = tempx
-				node2.y = tempy
-				console.log 'node', node1, node2
-
-
-
-				# newConstraints = []
-				# for constraint in @cola.constraints()
-				# 	if constraint.type?
-				# 		newConstraint = 
-				# 			axis: constraint.axis
-				# 			group: constraint.group
-				# 			type: constraint.type
-
-				# 		if constraint.group is clickedNode.parent.gid
-				# 			newConstraint.offsets = (offset for _, offset of map)
-				# 		else
-				# 			newConstraint.offsets = constraint.offsets
-				# 	else
-				# 		newConstraint =
-				# 			axis: constraint.axis
-				# 			left: constraint.left
-				# 			right: constraint.right
-				# 			gap: constraint.gap
-
-				# 	newConstraints.push newConstraint
-
-				# console.log newConstraints, @cola.constraints()
-
-				# @cola.constraints(newConstraints)
-				@cola.start()
-
+			.on 'keydown', @moveNode
 
 		# init graph
 		@width = 960
@@ -99,16 +23,29 @@ class Graph
 		@color = d3.scale.category20()
 
 
-		@svg = d3.select(@graphElement)
+		# === SETUP CONTAINING SVG ELEMENT === #
+		# by the way, a double click zooms...
+		zoomed = => # there's a zoom pan bug when you drag graph, event picks up from point where drag started
+			if d3.event.sourceEvent?.type is 'wheel'
+				@svg.attr 'transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')'
+			else
+				targetNode = d3.event.sourceEvent?.target.nodeName
+				if (targetNode isnt node for node in ['rect','text','g','link','path']).every((e)->e)
+					@svg.attr 'transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')'
+			return
+		zoom = d3.behavior.zoom().on('zoom', zoomed)
+		@_svg = d3.select(@graphElement)
 				.append('svg')
 					.attr('width', @width)
 					.attr('height', @height)
-
+				.call zoom
+		@svg = @_svg.append('g')
+		# ==== #
 
 		#========= feature selections
 		# add groups (in appropriate render order) for each element type
 		# this shit is super unreadable
-		classes = ['group', 'link', 'node', 'label']
+		classes = ['group', 'link', 'node']
 		@svg.append('g').attr('class', cls) for cls in ("#{cls}-group" for cls in classes)
 		sel = (className) -> d3.select("g.#{className}-group").selectAll ".#{className}"
 		[@group, @link, @node, @label] = (sel cls for cls in classes)
@@ -119,12 +56,7 @@ class Graph
 		# @label = @svg.selectAll '.label'
 		#==========
 
-		# map node id to its index in node list
-		@indexMap = {}
-		for index, node of @graph.nodes
-			@indexMap[node.nid] = parseInt index
-
-		# node count, serves as idea for new node creation
+		# node count, serves as id for new node creation
 		@nodeCount = 0
 
 		@update()
@@ -145,16 +77,8 @@ class Graph
 		@group
 		.attr 		'x', 		(d) ->	d.bounds.x
 		.attr 		'y', 		(d) ->	d.bounds.y
-		.attr 		'width',	(d) ->	
-			# if d.gid is 0 or d.gid is 2
-			# 	d.bounds.X+=50
-			# 	d.bounds.x-=50
-			# 	d.bounds.Y+=50
-			# 	d.bounds.y-=50
-			# console.log 'group d',d
-			d.bounds.width()
-		.attr 		'height', 	(d) ->	
-			d.bounds.height()
+		.attr 		'width',	(d) ->	d.bounds.width()
+		.attr 		'height', 	(d) ->	d.bounds.height()
 
 		return
 
@@ -328,49 +252,129 @@ class Graph
 		link
 
 	onNodeClick: =>
-
-		# @dispatch {
-		# 	type: 'ADD_SEMESTER'
-		# 	positionData: @getPositiondata @cola.nodes(), @cola.groups()
-		# }
 		return if d3.event.defaultPrevented # default is prevented on drag
-		d3.event.target.setAttribute('style', 'fill: rgb(31, 119, 180);')
-		datum = d3.event.target.__data__ 
-		@clickedNode = datum
-		input = @graphElement.children[0]
+		
+		targetNode = d3.event.target
+		datum = targetNode.__data__ 
 
-		input = $('#class-select', @graphElement)
-		input.autocomplete({source: (key for key of @adjList)})
+		console.log 'd', datum.type
+		switch datum.type
+			when classSpec.TYPE
+		
+				if targetNode.nodeName is 'text'
+					targetNode = targetNode.parentNode.children[0] # switch to rect
 
-		if datum.type is addClassSpec.TYPE
+				# set previously clicked node back to default color
+				if @clickedNode?
+					@clickedNode.setAttribute('style', "fill: #{classSpec.COLOR.DEFAULT}")
+				# set newly clicked node's color, and store it
+				targetNode.setAttribute('style', "fill: #{classSpec.COLOR.SELECTED}")
+				@clickedNode = targetNode
+				
 
-			# todo: use a more robust way of selecting this input
-			input = @graphElement.children[0]
 
-			input.style.left = "#{datum.x-85}px"
-			input.style.top = "#{datum.y+10}px"
-			
-			className = window.prompt('Pick a class')
-			nodeData =
-				className: className
-				semester: datum.parent.gid # parent group
-				nid: @nodeCount
+			when addClassSpec.TYPE
+				input = @graphElement.children[0]
+				input = $('#class-select', @graphElement)
+				input.autocomplete({source: (key for key of @adjList)})
+				# todo: use a more robust way of selecting this input
+				input = @graphElement.children[0]
 
-			@nodeCount += 1
-
-			optionsData = []
-			for optionName in @adjList[className]
-				optionsData.push
-					className: optionName
+				input.style.left = "#{datum.x-85}px"
+				input.style.top = "#{datum.y+10}px"
+				
+				className = window.prompt('Pick a class')
+				nodeData =
+					className: className
+					semester: datum.parent.gid # parent group
 					nid: @nodeCount
+					type: classSpec.TYPE
+					width: classSpec.WIDTH
+					height: classSpec.HEIGHT
+
 				@nodeCount += 1
 
-			action = actionAddClass(
-					nodeData,
-					optionsData,
-					@getPositiondata @cola.nodes(), @cola.groups()
-				)
-			@dispatch action
+				optionsData = []
+				for optionName in @adjList[className]
+					optionsData.push
+						className: optionName
+						nid: @nodeCount
+						type: classSpec.TYPE
+						width: classSpec.WIDTH
+						height: classSpec.HEIGHT
+					@nodeCount += 1
+
+				action = actionAddClass(
+						nodeData,
+						optionsData,
+						@getPositiondata @cola.nodes(), @cola.groups()
+					)
+				@dispatch action
+
+	moveNode: =>
+		return if !@clickedNode?
+		clickedNode = @clickedNode.__data__ # clicked node is stored as DOM element
+
+		map = {}
+		# make a map of index -> offset, get index of clickedNode's offset spec
+		for constraint in @cola.constraints()
+			if constraint.type? and constraint.group is clickedNode.parent.gid
+				for index, offset of constraint.offsets
+					map[index] = offset
+					if clickedNode.index is offset.node
+						saveIndex = parseInt(index)
+		
+		# move up or down
+		if d3.event.keyCode is 40
+			d3.event.preventDefault()
+			offset = 1
+		if d3.event.keyCode is 38
+			d3.event.preventDefault()
+			offset = -1
+
+		swapIndex = saveIndex+offset
+		maxIndex = (_ for _ of map).length
+		# so long as the index of the swapping node is in bounds...
+		if 0<swapIndex and swapIndex<maxIndex
+			# perform swap
+			[map[saveIndex],map[saveIndex+offset]] = [map[saveIndex+offset],map[saveIndex]]
+
+			# graph the relevant live node objects for updating their positions
+			for node in @cola.nodes()
+				if node.index is clickedNode.index
+					node1 = node
+				if node.index is map[saveIndex].node # since i switched them
+					node2 = node
+			
+			# swap their positions
+			[node1.x, node2.x] = [node2.x, node2.x]
+			[node1.y, node2.y] = [node2.y, node2.y]
+
+			# update the constraints with the switch
+			newConstraints = []
+			for constraint in @cola.constraints()
+				if constraint.type?
+					newConstraint = 
+						axis: constraint.axis
+						group: constraint.group
+						type: constraint.type
+
+					if constraint.group is clickedNode.parent.gid
+						newConstraint.offsets = (offset for _, offset of map)
+					else
+						newConstraint.offsets = constraint.offsets
+				else
+					newConstraint =
+						axis: constraint.axis
+						left: constraint.left
+						right: constraint.right
+						gap: constraint.gap
+
+				newConstraints.push newConstraint
+
+			# add to simulation and restart
+			@cola.constraints(newConstraints)
+			@cola.start()
 
 	# pure
 	getPositiondata: (_nodes, _groups) =>

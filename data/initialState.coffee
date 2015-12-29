@@ -4,12 +4,12 @@
 initialState = {
 	nodes:[
 		{nid: -1,name:addClassSpec.TEXT,type: addClassSpec.TYPE,width:addClassSpec.WIDTH,height:addClassSpec.HEIGHT},
-		{nid: -2,name:'POS3733',width:classSpec.WIDTH,height:classSpec.HEIGHT},
-		{nid: -3,name:'COT4500',width:classSpec.WIDTH,height:classSpec.HEIGHT},
+		{nid: -2,name:'POS3733',type: classSpec.TYPE, width:classSpec.WIDTH,height:classSpec.HEIGHT},
+		{nid: -3,name:'COT4500',type: classSpec.TYPE, width:classSpec.WIDTH,height:classSpec.HEIGHT},
 		{nid: -4,name:addClassSpec.TEXT,type: addClassSpec.TYPE,width:addClassSpec.WIDTH,height:addClassSpec.HEIGHT},
-		{nid: -5,name:'POS2041',width:classSpec.WIDTH,height:classSpec.HEIGHT},
-		{nid: -6,name:'INR2002',width:classSpec.WIDTH,height:classSpec.HEIGHT},
-		{nid: -7,name:'COP3223C',width:classSpec.WIDTH,height:classSpec.HEIGHT, hidden: false}
+		{nid: -5,name:'POS2041',type: classSpec.TYPE, width:classSpec.WIDTH,height:classSpec.HEIGHT},
+		{nid: -6,name:'INR2002',type: classSpec.TYPE, width:classSpec.WIDTH,height:classSpec.HEIGHT},
+		{nid: -7,name:'COP3223C',type: classSpec.TYPE, width:classSpec.WIDTH,height:classSpec.HEIGHT, hidden: false}
 	]
 	links:[
 		{source:1,target:4},
