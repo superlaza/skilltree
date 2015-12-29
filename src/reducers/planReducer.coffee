@@ -9,7 +9,7 @@ initialState 	= im.fromJS(initialState)
 # UTILITY
 # impure
 addPositionData = (newState, data) ->
-	{nodePositions, groupPositions} = data
+	{nodePositions} = data
 	# infuse location data			
 	for index, node of newState.nodes
 		positions = nodePositions[index]
@@ -17,16 +17,6 @@ addPositionData = (newState, data) ->
 		if node? and positions?
 			node.x = positions.x
 			node.y = positions.y
-
-	# for index, group of newState.groups
-	# 	positions = groupPositions[index]
-	# 	# only update position if group position data exists
-	# 	if positions?
-	# 		group.bounds = 
-	# 			x: positions.bounds.x
-	# 			y: positions.bounds.y
-	# 			X: positions.bounds.X
-	# 			Y: positions.bounds.Y
 				
 # impure
 createNode = (attrsList...) ->

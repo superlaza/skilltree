@@ -18,3 +18,4 @@ actionDeleteClass = (nodeID, positionData) ->
 module.exports =
 	actionAddClass		: actionAddClass
 	actionDeleteClass	: actionDeleteClass
+	actionAddSemester 	: actionAddSemester

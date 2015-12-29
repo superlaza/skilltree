@@ -3,4 +3,5 @@ node_modules/
 skilltree.sublime-workspace
 skilltree.sublime-project
 
-*.bundle.js
+vendor.bundle.js
+main.bundle.js

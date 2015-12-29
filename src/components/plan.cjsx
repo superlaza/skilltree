@@ -5,7 +5,9 @@ React 					= require 'react'
 
 {connect} 				= require 'react-redux'
 
-require './sub.cjsx'
+{actionAddSemester} = require '../actions/PlanActions.coffee'
+
+
 
 Plan = React.createClass
 	componentDidMount: ->
@@ -14,7 +16,7 @@ Plan = React.createClass
 		@graph = new Graph(this.refs.graph, state, dispatch, graphData)
 
 	componentDidUpdate: ->
-		{dispatch, state, graphData} = this.props
+		{dispatch, state, graphData} = @props
 		
 		console.log 'newstate?', state
 		@graph.update(state, 'up')
@@ -22,11 +24,17 @@ Plan = React.createClass
 		window.dispatch = dispatch
 
 	render: ->
+		{dispatch} = @props
+		addSemester = =>
+			{nodes, groups, links} = @graph.getGraph()
+			dispatch actionAddSemester(@graph.getPositiondata nodes, groups)
+
 		selectorStyle = {position: 'absolute'}
 		<div id='graph' ref='graph'>
 			<input 	id='class-select'
 					style={selectorStyle}
 				/>
+			<button onClick={addSemester}> add semester</button>
 		</div>
 
 

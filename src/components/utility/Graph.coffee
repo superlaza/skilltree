@@ -62,8 +62,16 @@ class Graph
 		@group
 		.attr 		'x', 		(d) ->	d.bounds.x
 		.attr 		'y', 		(d) ->	d.bounds.y
-		.attr 		'width',	(d) ->	d.bounds.width()
-		.attr 		'height', 	(d) ->	d.bounds.height()
+		.attr 		'width',	(d) ->	
+			# if d.gid is 0 or d.gid is 2
+			# 	d.bounds.X+=50
+			# 	d.bounds.x-=50
+			# 	d.bounds.Y+=50
+			# 	d.bounds.y-=50
+			# console.log 'group d',d
+			d.bounds.width()
+		.attr 		'height', 	(d) ->	
+			d.bounds.height()
 
 		return
 
@@ -72,7 +80,9 @@ class Graph
 		# 	@cola.stop()
 		console.log 'update graph', graph
 		@cola = webcola.d3adaptor()
-					.linkDistance(100)
+					# .linkDistance(100)
+					# .jaccardLinkLengths(20,5)
+					.symmetricDiffLinkLengths(40)
 					.avoidOverlaps(true)
 					.handleDisconnected(false)
 					.size([
@@ -235,10 +245,10 @@ class Graph
 		link
 
 	onNodeClick: =>
-		@dispatch {
-			type: 'ADD_SEMESTER'
-			positionData: @getPositiondata @cola.nodes(), @cola.groups()
-		}
+		# @dispatch {
+		# 	type: 'ADD_SEMESTER'
+		# 	positionData: @getPositiondata @cola.nodes(), @cola.groups()
+		# }
 		return if d3.event.defaultPrevented # default is prevented on drag
 
 		datum = d3.event.target.__data__ 
@@ -248,7 +258,6 @@ class Graph
 		input.autocomplete({source: (key for key of @adjList)})
 
 		if datum.type is addClassSpec.TYPE
-			console.log datum
 
 			# todo: use a more robust way of selecting this input
 			input = @graphElement.children[0]
@@ -276,7 +285,6 @@ class Graph
 					optionsData,
 					@getPositiondata @cola.nodes(), @cola.groups()
 				)
-			console.log 'not defined my dick', action
 			@dispatch action
 
 	# pure
@@ -305,6 +313,11 @@ class Graph
 
 		nodePositions: 	nodes
 		groupPositions: groups
+
+	getGraph: =>
+		nodes: @cola.nodes()
+		groups: @cola.groups()
+		links: @cola.links()
 
 module.exports = 
 	Graph: Graph
