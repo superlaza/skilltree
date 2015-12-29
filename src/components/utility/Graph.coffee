@@ -289,12 +289,13 @@ class Graph
 					source: (key for key of @adjList)
 					autoFocus: true
 				}
+				input.focus()
 
 				# input.css 'left', "#{datum.x-13}px"
 				# input.css 'top', "#{datum.y+10}px"
 				
 				# className = window.prompt('Pick a class')
-				className = 'dymm'
+				className = null
 				input.keypress (e) =>
 					if e.keyCode is 13
 						

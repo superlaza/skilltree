@@ -8,6 +8,9 @@
   },
   "author": "David Perlaza",
   "license": "ISC",
+  "engines": {
+    "node": "4.2.3"
+  },
   "dependencies": {
     "babel-preset-react": "^6.3.13",
     "babelify": "^7.2.0",
