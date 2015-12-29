@@ -3,7 +3,7 @@ webcola = require 'webcola'
 $ = require 'jquery'
 require 'jquery-ui'
 
-{classSpec, addClassSpec} = require '../../constants/Specs.coffee'
+{classSpec, addClassSpec, btnDeleteClassSpec} = require '../../constants/Specs.coffee'
 
 
 {actionAddClass, actionDeleteClass} = require '../../actions/PlanActions.coffee'
@@ -157,18 +157,19 @@ class Graph
 		node
 			.call @cola.drag
 			.on 'click', @onNodeClick
+
+		setVisibility = (vis) -> # decorator
+			->
+				for child in d3.event.target.children
+					if child.className.animVal is btnDeleteClassSpec.CLASS
+						child.setAttribute('visibility', vis)
+						break
 		enter = node.enter()
 			.insert 'g', '.node-cont'
 				.call @cola.drag
 				.on 'click', @onNodeClick
-				.on 'mouseenter', ->
-					# assumes target is always class rect element
-					# and that the circle will always be at position 1
-					cir = d3.event.target.children[1]
-					cir.setAttribute('visibility', 'visible')
-				.on 'mouseleave', ->
-					cir = d3.event.target.children[1]
-					cir.setAttribute('visibility', 'hidden')
+				.on 'mouseenter', setVisibility('visible')
+				.on 'mouseleave', setVisibility('hidden')
 		enter.append 'rect'
 				.attr 'class', 'cola node'
 				.attr 'width',
@@ -180,12 +181,25 @@ class Graph
 				.attr 'rx', 5
 				.attr 'ry', 5
 				.style 'fill',   (d) => @color @graph.groups.length
-		
+		enter.append 'text'
+				.attr 'class', 'cola label'
+				.attr 'x', (d) -> d.width/2
+				.attr 'y', (d) -> d.height/2
+			.call @cola.drag
+			.text (d) ->
+				d.name
+		enter.append 'title' # todo: inserts title multiple times
+				.text (d) ->
+					d.name
+
+		# only add delete button to class types
+		enter = enter.filter (d) -> d.type is 'class'
+
 		# this whole button is just me being lazy
 		# listen, it was late, didn't want to learn anything new
 		deleteButton = enter.append 'g'
 				.attr 'transform', 'scale(0.13) translate(-150, -80)'
-				.attr 'class', 'delete-button'
+				.attr 'class', btnDeleteClassSpec.CLASS
 				.attr 'visibility', 'hidden'
 				.on 'click', =>
 					datum = d3.event.target.__data__
@@ -208,17 +222,7 @@ class Graph
 		appendButton path for path in ['M 100,60 L 60,100 L 230,270 L 270,230 L 100,60 z', 'M 60,230 L 230,60 L 270,100 L 100,270 L 60,230 z']
 
 
-		enter.insert 'text', '.label'
-				.attr 'class', 'cola label'
-				.attr 'x', (d) -> d.width/2
-				.attr 'y', (d) -> d.height/2
-			.call @cola.drag
-			.text (d) ->
-				d.name
 
-		enter.append 'title' # todo: inserts title multiple times
-				.text (d) ->
-					d.name
 
 		node.exit().remove()
 

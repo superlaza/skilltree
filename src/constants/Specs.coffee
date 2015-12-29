@@ -11,6 +11,9 @@ module.exports =
 		TYPE: 'btnAddClass'
 		WIDTH: 160
 		HEIGHT: 40
+	btnDeleteClassSpec:
+		CLASS: 'btn-delete-class'
+		COLOR: '#e00'
 	constraintSpec:
 		displacement:
 			GAP: 200
