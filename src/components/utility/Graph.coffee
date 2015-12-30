@@ -63,16 +63,20 @@ class Graph
 
 	tick: =>
 		@link
-		.attr 		'x1', (d) -> d.source.x
-		.attr 		'y1', (d) -> d.source.y
-		.attr 		'x2', (d) -> d.target.x
-		.attr 		'y2', (d) -> d.target.y
+		.attr 'x1', (d) -> d.source.x
+		.attr 'y1', (d) -> d.source.y
+		.attr 'x2', (d) -> d.target.x
+		.attr 'y2', (d) -> d.target.y
+		.attr 'visibility', (d) ->
+			if d.visible then 'visible' else 'hidden'
 
 		@node
 		.attr 'transform', (d) =>
 			x = d.x - (d.width/2)
 			y = d.y - (d.height / 2) + @pad
 			"translate(#{x}, #{y})"
+		.style 'opacity', (d) ->
+			if d.opaque then 1 else classSpec.OPACITY
 
 		@group
 		.attr 		'x', 		(d) ->	d.bounds.x
@@ -158,18 +162,41 @@ class Graph
 			.call @cola.drag
 			.on 'click', @onNodeClick
 
-		setVisibility = (vis) -> # decorator
-			->
-				for child in d3.event.target.children
-					if child.className.animVal is btnDeleteClassSpec.CLASS
-						child.setAttribute('visibility', vis)
-						break
+		setVisibility = =>
+			eventType = d3.event.type
+			datum = d3.event.target.__data__
+
+			# hide/show links on class nodes
+			if datum.type is classSpec.TYPE
+				neighbors = [datum.index]
+				for index, link of @cola.links()
+					{source, target} = link
+					if source.index is datum.index or target.index is datum.index
+						link.visible = if eventType is 'mouseenter' then true else false
+						if source.index is datum.index
+							neighbors.push target.index
+						else
+							neighbors.push source.index
+				# fade classes that aren't connected
+				for node in @cola.nodes()
+					if node.type is classSpec.TYPE and node.index not in neighbors
+						node.opaque = if eventType is 'mouseenter' then false else true
+				@tick() # draw changes
+
+			# set visibility of delete button
+			for child in d3.event.target.children
+				if child.className.animVal is btnDeleteClassSpec.CLASS
+					child.setAttribute('visibility', if eventType is 'mouseenter' then 'visible' else 'hidden')
+					break
+
 		enter = node.enter()
 			.insert 'g', '.node-cont'
+				.style 'opacity', (d) ->
+					 if d.opaque then 1 else addClassSpec.OPACITY
 				.call @cola.drag
 				.on 'click', @onNodeClick
-				.on 'mouseenter', setVisibility('visible')
-				.on 'mouseleave', setVisibility('hidden')
+				.on 'mouseenter', setVisibility
+				.on 'mouseleave', setVisibility
 		enter.append 'rect'
 				.attr 'class', (d) ->
 					switch d.type
@@ -256,7 +283,9 @@ class Graph
 		link = selection.data data
 		link.enter()
 			.insert 'line', '.link'
-			.attr 'class', 'cola link'
+				.attr 'class', 'cola link'
+				.attr 'visibility', (d) ->
+					if d.visible then 'visible' else 'hidden'
 		link.exit().remove()
 
 		link
@@ -298,7 +327,8 @@ class Graph
 				className = null
 				input.keypress (e) =>
 					if e.keyCode is 13
-						
+						# todo: users will press enter multiple times to enter 
+						# a class, so it gets added multiple times
 						className = e.target.value
 						nodeData =
 							className: className

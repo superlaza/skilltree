@@ -7,6 +7,7 @@ module.exports =
 		COLOR:
 			DEFAULT: 'rgb(255, 127, 14)'
 			SELECTED: 'rgb(0, 153, 0)'
+		OPACITY: 0.3
 	addClassSpec:
 		TEXT: "Add Class"
 		TYPE: 'btnAddClass'

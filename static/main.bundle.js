@@ -283,6 +283,7 @@ webpackJsonp([0],[
 	    newNode.x = nodeAttrs.groupBounds.X;
 	    newNode.y = nodeAttrs.groupBounds.Y;
 	  }
+	  newNode.opaque = true;
 	  return newNode;
 	};
 
@@ -322,9 +323,7 @@ webpackJsonp([0],[
 	      groupBounds = (ref3 = groupPositions[nodeSemester]) != null ? ref3.bounds : void 0;
 	      group = newState.groups[nodeSemester + 1];
 	      newNode = createNode(action.nodeData, {
-	        groupBounds: groupBounds,
-	        width: classSpec.WIDTH,
-	        height: classSpec.HEIGHT
+	        groupBounds: groupBounds
 	      });
 	      addNode(newState, nodeIndex, newNode);
 	      nextGroupBounds = (ref4 = groupPositions[nodeSemester + 1]) != null ? ref4.bounds : void 0;
@@ -336,14 +335,13 @@ webpackJsonp([0],[
 	          optionIndex = newState.nodes.length;
 	          newOption = createNode(optionData, {
 	            semester: nodeSemester + 1,
-	            groupBounds: nextGroupBounds,
-	            width: classSpec.WIDTH,
-	            height: classSpec.HEIGHT
+	            groupBounds: nextGroupBounds
 	          });
 	          addNode(newState, optionIndex, newOption);
 	          newState.links.push({
 	            source: nodeIndex,
-	            target: optionIndex
+	            target: optionIndex,
+	            visible: false
 	          });
 	        }
 	      }
@@ -367,7 +365,8 @@ webpackJsonp([0],[
 	        type: addClassSpec.TYPE,
 	        nid: "s" + semesterIndex,
 	        width: addClassSpec.WIDTH,
-	        height: addClassSpec.HEIGHT
+	        height: addClassSpec.HEIGHT,
+	        opaque: true
 	      };
 	      addNode(newState, addClassNodeIndex, addClassNodeData);
 	      displacementConstraints = newState.constraints.filter(function(c) {
@@ -502,7 +501,8 @@ webpackJsonp([0],[
 	    COLOR: {
 	      DEFAULT: 'rgb(255, 127, 14)',
 	      SELECTED: 'rgb(0, 153, 0)'
-	    }
+	    },
+	    OPACITY: 0.3
 	  },
 	  addClassSpec: {
 	    TEXT: "Add Class",
@@ -542,42 +542,49 @@ webpackJsonp([0],[
 	    {
 	      nid: -1,
 	      name: addClassSpec.TEXT,
+	      opaque: true,
 	      type: addClassSpec.TYPE,
 	      width: addClassSpec.WIDTH,
 	      height: addClassSpec.HEIGHT
 	    }, {
 	      nid: -2,
 	      name: 'POS3733',
+	      opaque: true,
 	      type: classSpec.TYPE,
 	      width: classSpec.WIDTH,
 	      height: classSpec.HEIGHT
 	    }, {
 	      nid: -3,
 	      name: 'COT4500',
+	      opaque: true,
 	      type: classSpec.TYPE,
 	      width: classSpec.WIDTH,
 	      height: classSpec.HEIGHT
 	    }, {
 	      nid: -4,
 	      name: addClassSpec.TEXT,
+	      opaque: true,
 	      type: addClassSpec.TYPE,
 	      width: addClassSpec.WIDTH,
 	      height: addClassSpec.HEIGHT
 	    }, {
 	      nid: -5,
 	      name: 'POS2041',
+	      opaque: true,
 	      type: classSpec.TYPE,
 	      width: classSpec.WIDTH,
 	      height: classSpec.HEIGHT
 	    }, {
 	      nid: -6,
 	      name: 'INR2002',
+	      opaque: true,
 	      type: classSpec.TYPE,
 	      width: classSpec.WIDTH,
 	      height: classSpec.HEIGHT
 	    }, {
 	      nid: -7,
 	      name: 'COP3223C',
+	      opaque: true,
 	      type: classSpec.TYPE,
 	      width: classSpec.WIDTH,
 	      height: classSpec.HEIGHT,
@@ -587,13 +594,16 @@ webpackJsonp([0],[
 	  links: [
 	    {
 	      source: 1,
-	      target: 4
+	      target: 4,
+	      visible: false
 	    }, {
 	      source: 1,
-	      target: 5
+	      target: 5,
+	      visible: false
 	    }, {
 	      source: 2,
-	      target: 5
+	      target: 5,
+	      visible: false
 	    }
 	  ],
 	  groups: [
@@ -721,7 +731,8 @@ webpackJsonp([0],[
 /***/ function(module, exports, __webpack_require__) {
 
 	var $, Graph, actionAddClass, actionDeleteClass, addClassSpec, btnDeleteClassSpec, classSpec, d3, ref, ref1, webcola,
-	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 	d3 = __webpack_require__(184);
 
@@ -823,6 +834,12 @@ webpackJsonp([0],[
 	      return d.target.x;
 	    }).attr('y2', function(d) {
 	      return d.target.y;
+	    }).attr('visibility', function(d) {
+	      if (d.visible) {
+	        return 'visible';
+	      } else {
+	        return 'hidden';
+	      }
 	    });
 	    this.node.attr('transform', (function(_this) {
 	      return function(d) {
@@ -831,7 +848,13 @@ webpackJsonp([0],[
 	        y = d.y - (d.height / 2) + _this.pad;
 	        return "translate(" + x + ", " + y + ")";
 	      };
-	    })(this));
+	    })(this)).style('opacity', function(d) {
+	      if (d.opaque) {
+	        return 1;
+	      } else {
+	        return classSpec.OPACITY;
+	      }
+	    });
 	    this.group.attr('x', function(d) {
 	      return d.bounds.x;
 	    }).attr('y', function(d) {
@@ -863,15 +886,41 @@ webpackJsonp([0],[
 	      return d.nid;
 	    });
 	    node.call(this.cola.drag).on('click', this.onNodeClick);
-	    setVisibility = function(vis) {
+	    setVisibility = (function(_this) {
 	      return function() {
-	        var child, j, len, ref2, results;
-	        ref2 = d3.event.target.children;
+	        var child, datum, eventType, index, j, k, len, len1, link, neighbors, ref2, ref3, ref4, ref5, results, source, target;
+	        eventType = d3.event.type;
+	        datum = d3.event.target.__data__;
+	        if (datum.type === classSpec.TYPE) {
+	          neighbors = [datum.index];
+	          ref2 = _this.cola.links();
+	          for (index in ref2) {
+	            link = ref2[index];
+	            source = link.source, target = link.target;
+	            if (source.index === datum.index || target.index === datum.index) {
+	              link.visible = eventType === 'mouseenter' ? true : false;
+	              if (source.index === datum.index) {
+	                neighbors.push(target.index);
+	              } else {
+	                neighbors.push(source.index);
+	              }
+	            }
+	          }
+	          ref3 = _this.cola.nodes();
+	          for (j = 0, len = ref3.length; j < len; j++) {
+	            node = ref3[j];
+	            if (node.type === classSpec.TYPE && (ref4 = node.index, indexOf.call(neighbors, ref4) < 0)) {
+	              node.opaque = eventType === 'mouseenter' ? false : true;
+	            }
+	          }
+	          _this.tick();
+	        }
+	        ref5 = d3.event.target.children;
 	        results = [];
-	        for (j = 0, len = ref2.length; j < len; j++) {
-	          child = ref2[j];
+	        for (k = 0, len1 = ref5.length; k < len1; k++) {
+	          child = ref5[k];
 	          if (child.className.animVal === btnDeleteClassSpec.CLASS) {
-	            child.setAttribute('visibility', vis);
+	            child.setAttribute('visibility', eventType === 'mouseenter' ? 'visible' : 'hidden');
 	            break;
 	          } else {
 	            results.push(void 0);
@@ -879,8 +928,14 @@ webpackJsonp([0],[
 	        }
 	        return results;
 	      };
-	    };
-	    enter = node.enter().insert('g', '.node-cont').call(this.cola.drag).on('click', this.onNodeClick).on('mouseenter', setVisibility('visible')).on('mouseleave', setVisibility('hidden'));
+	    })(this);
+	    enter = node.enter().insert('g', '.node-cont').style('opacity', function(d) {
+	      if (d.opaque) {
+	        return 1;
+	      } else {
+	        return addClassSpec.OPACITY;
+	      }
+	    }).call(this.cola.drag).on('click', this.onNodeClick).on('mouseenter', setVisibility).on('mouseleave', setVisibility);
 	    enter.append('rect').attr('class', function(d) {
 	      switch (d.type) {
 	        case addClassSpec.TYPE:
@@ -959,7 +1014,13 @@ webpackJsonp([0],[
 	  Graph.prototype.updateLinks = function(selection, data) {
 	    var link;
 	    link = selection.data(data);
-	    link.enter().insert('line', '.link').attr('class', 'cola link');
+	    link.enter().insert('line', '.link').attr('class', 'cola link').attr('visibility', function(d) {
+	      if (d.visible) {
+	        return 'visible';
+	      } else {
+	        return 'hidden';
+	      }
+	    });
 	    link.exit().remove();
 	    return link;
 	  };

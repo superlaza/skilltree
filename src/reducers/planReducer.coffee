@@ -25,6 +25,8 @@ createNode = (attrsList...) ->
 		for key, attr of attrs
 			nodeAttrs[key] = attr	
 
+	# DATA
+	# ====
 	newNode = { # all nodes will have a name and id
 		name:		nodeAttrs.className
 		nid:			nodeAttrs.nid
@@ -32,11 +34,15 @@ createNode = (attrsList...) ->
 
 	newNode.type = nodeAttrs.type if nodeAttrs.type?
 	newNode.semester = nodeAttrs.semester if nodeAttrs.semester?
+	
+	# STYLE
+	# ====
 	newNode.width  = nodeAttrs.width
 	newNode.height = nodeAttrs.height
 	if nodeAttrs.groupBounds?
 		newNode.x = nodeAttrs.groupBounds.X
 		newNode.y = nodeAttrs.groupBounds.Y
+	newNode.opaque	= true
 
 	newNode
 
@@ -71,8 +77,6 @@ reducer = (state = initialState, action) ->
 			group = newState.groups[nodeSemester+1]
 			newNode = createNode action.nodeData, {
 				groupBounds: groupBounds
-				width: classSpec.WIDTH
-				height: classSpec.HEIGHT
 			}
 			addNode newState, nodeIndex, newNode
 
@@ -87,14 +91,14 @@ reducer = (state = initialState, action) ->
 					newOption = createNode optionData, {
 						semester: 		nodeSemester+1
 						groupBounds:	nextGroupBounds
-						width: classSpec.WIDTH
-						height: classSpec.HEIGHT
 					}
 					addNode newState, optionIndex, newOption
 
+					# add new links
 					newState.links.push
 						source: nodeIndex
 						target: optionIndex
+						visible: false
 
 			im.fromJS newState
 
@@ -121,6 +125,7 @@ reducer = (state = initialState, action) ->
 				nid: 			"s#{semesterIndex}"
 				width:			addClassSpec.WIDTH
 				height:			addClassSpec.HEIGHT
+				opaque:			true
 			}
 
 			addNode newState, addClassNodeIndex, addClassNodeData
