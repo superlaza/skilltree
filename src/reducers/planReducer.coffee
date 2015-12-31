@@ -40,6 +40,7 @@ createNode = (attrsList...) ->
 	}
 
 	newNode.type = nodeAttrs.type if nodeAttrs.type?
+	newNode.status = if nodeAttrs.status? then nodeAttrs.status else classSpec.status.ENROLLED
 	newNode.semester = nodeAttrs.semester if nodeAttrs.semester?
 	
 	# STYLE
@@ -81,7 +82,6 @@ reducer = (state = initialState, action) ->
 				groupPositions: groupPositions
 			}
 
-
 			nodeIndex = newState.nodes.length
 			nodeSemester = action.nodeData.semester
 
@@ -95,6 +95,7 @@ reducer = (state = initialState, action) ->
 			nextGroupBounds = groupPositions[nodeSemester+1]?.bounds
 			nextGroup = newState.groups[nodeSemester+1]
 
+			# === ADD OPTIONS COURSES
 			# add option nodes only if the next semester exists
 			if nextGroup? and nextGroupBounds
 				for optionData in action.options
@@ -103,6 +104,7 @@ reducer = (state = initialState, action) ->
 					newOption = createNode optionData, {
 						semester: 		nodeSemester+1
 						groupBounds:	nextGroupBounds
+						status:			classSpec.status.ENROLLED
 					}
 					addNode newState, optionIndex, newOption
 

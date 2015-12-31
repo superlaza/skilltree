@@ -99,7 +99,8 @@ webpackJsonp([0],[
 	            opaque: true,
 	            type: classSpec.TYPE,
 	            width: classSpec.WIDTH,
-	            height: classSpec.HEIGHT
+	            height: classSpec.HEIGHT,
+	            status: classSpec.status.ENROLLED
 	          };
 	          newNode.name = placeholder;
 	          newNode.nid = nodeCount;
@@ -117,7 +118,8 @@ webpackJsonp([0],[
 	          opaque: true,
 	          type: classSpec.TYPE,
 	          width: classSpec.WIDTH,
-	          height: classSpec.HEIGHT
+	          height: classSpec.HEIGHT,
+	          status: classSpec.status.ENROLLED
 	        };
 	        newNode.name = course;
 	        newNode.nid = nodeCount;
@@ -394,6 +396,7 @@ webpackJsonp([0],[
 	  if (nodeAttrs.type != null) {
 	    newNode.type = nodeAttrs.type;
 	  }
+	  newNode.status = nodeAttrs.status != null ? nodeAttrs.status : classSpec.status.ENROLLED;
 	  if (nodeAttrs.semester != null) {
 	    newNode.semester = nodeAttrs.semester;
 	  }
@@ -458,7 +461,8 @@ webpackJsonp([0],[
 	          optionIndex = newState.nodes.length;
 	          newOption = createNode(optionData, {
 	            semester: nodeSemester + 1,
-	            groupBounds: nextGroupBounds
+	            groupBounds: nextGroupBounds,
+	            status: classSpec.status.ENROLLED
 	          });
 	          addNode(newState, optionIndex, newOption);
 	          newState.links.push({
@@ -624,6 +628,11 @@ webpackJsonp([0],[
 	    WIDTH: 100,
 	    HEIGHT: 40,
 	    TYPE: 'class',
+	    status: {
+	      ENROLLED: 'enrolled',
+	      OPTION: 'option',
+	      PREREQ: 'prereq'
+	    },
 	    CLASS: 'classNode',
 	    COLOR: {
 	      DEFAULT: 'rgb(255, 127, 14)',
@@ -918,11 +927,21 @@ webpackJsonp([0],[
 	      }
 	    }).call(this.cola.drag).on('click', this.onNodeClick).on('mouseenter', setVisibility).on('mouseleave', setVisibility);
 	    enter.append('rect').attr('class', function(d) {
+	      var classStem;
+	      classStem = 'cola node';
 	      switch (d.type) {
 	        case addClassSpec.TYPE:
-	          return "cola node " + addClassSpec.CLASS;
+	          return classStem += " " + addClassSpec.CLASS;
 	        case classSpec.TYPE:
-	          return "cola node " + classSpec.CLASS;
+	          classStem += " " + classSpec.CLASS;
+	          switch (d.status) {
+	            case classSpec.status.ENROLLED:
+	              return classStem += " " + classSpec.status.ENROLLED;
+	            case classSpec.status.OPTION:
+	              return classStem += " " + classSpec.status.OPTION;
+	            case classSpec.status.PREREQ:
+	              return classStem += " " + classSpec.status.PREREQ;
+	          }
 	      }
 	    }).attr('width', (function(_this) {
 	      return function(d) {

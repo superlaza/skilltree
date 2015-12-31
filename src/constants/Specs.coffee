@@ -3,6 +3,10 @@ module.exports =
 		WIDTH: 100
 		HEIGHT: 40
 		TYPE: 'class'
+		status:
+			ENROLLED: 'enrolled'
+			OPTION: 'option'
+			PREREQ: 'prereq'
 		CLASS: 'classNode'
 		COLOR:
 			DEFAULT: 'rgb(255, 127, 14)'

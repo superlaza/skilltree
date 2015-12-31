@@ -135,6 +135,7 @@ Promise.all([graphProm, majorProm]).then (res) ->
 						type: classSpec.TYPE
 						width: classSpec.WIDTH
 						height: classSpec.HEIGHT
+						status: classSpec.status.ENROLLED
 					newNode.name = placeholder
 					newNode.nid = nodeCount
 					nodeCount -= 1
@@ -154,6 +155,7 @@ Promise.all([graphProm, majorProm]).then (res) ->
 					type: classSpec.TYPE
 					width: classSpec.WIDTH
 					height: classSpec.HEIGHT
+					status: classSpec.status.ENROLLED
 				newNode.name = course
 				newNode.nid = nodeCount
 				nodeCount -= 1

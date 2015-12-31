@@ -202,11 +202,19 @@ class Graph
 				.on 'mouseleave', setVisibility
 		enter.append 'rect'
 				.attr 'class', (d) ->
+					classStem = 'cola node'
 					switch d.type
 						when addClassSpec.TYPE
-							"cola node #{addClassSpec.CLASS}"
+							classStem+=" #{addClassSpec.CLASS}"
 						when classSpec.TYPE
-							"cola node #{classSpec.CLASS}"
+							classStem+=" #{classSpec.CLASS}"
+							switch d.status
+								when classSpec.status.ENROLLED
+									classStem+=" #{classSpec.status.ENROLLED}"
+								when classSpec.status.OPTION
+									classStem+=" #{classSpec.status.OPTION}"
+								when classSpec.status.PREREQ
+									classStem+=" #{classSpec.status.PREREQ}"
 					
 				.attr 'width',
 					(d) =>
