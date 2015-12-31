@@ -29,6 +29,9 @@ body {
 	stroke-width: 1.5px;
 	cursor: move;
 }
+.cola.node.option{
+	fill: rgb(188,188,188) !important;
+}
 
 .cola.group {
 	stroke: #fff;

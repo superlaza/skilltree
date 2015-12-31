@@ -104,7 +104,7 @@ reducer = (state = initialState, action) ->
 					newOption = createNode optionData, {
 						semester: 		nodeSemester+1
 						groupBounds:	nextGroupBounds
-						status:			classSpec.status.ENROLLED
+						status:			classSpec.status.OPTION
 					}
 					addNode newState, optionIndex, newOption
 
