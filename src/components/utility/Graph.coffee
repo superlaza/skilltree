@@ -17,8 +17,8 @@ class Graph
 			.on 'keydown', @moveNode
 
 		# init graph
-		@width = 960
-		@height = 500
+		@width = 1800
+		@height = 1000
 		@pad = 3
 		@color = d3.scale.category20()
 
@@ -28,10 +28,10 @@ class Graph
 		zoomed = => # there's a zoom pan bug when you drag graph, event picks up from point where drag started
 			if d3.event.sourceEvent?.type is 'wheel'
 				@svg.attr 'transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')'
-			else
-				targetNode = d3.event.sourceEvent?.target.nodeName
-				if (targetNode isnt node for node in ['rect','text','g','link','path']).every((e)->e)
-					@svg.attr 'transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')'
+			# else
+			# 	targetNode = d3.event.sourceEvent?.target.nodeName
+			# 	if (targetNode isnt node for node in ['rect','text','g','link','path']).every((e)->e)
+			# 		@svg.attr 'transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')'
 			return
 		zoom = d3.behavior.zoom().on('zoom', zoomed)
 		@_svg = d3.select(@graphElement)
@@ -106,6 +106,9 @@ class Graph
 			.groups(graph.groups)
 			.constraints(graph.constraints)
 
+		# console.log 'wtf cola'
+		# for cons in @cola.nodes()
+		# 	console.log cons.name
 		@cola.on 'tick', @tick
 		
 		@group = @updateGroups @group, @cola.groups()
@@ -192,7 +195,7 @@ class Graph
 		enter = node.enter()
 			.insert 'g', '.node-cont'
 				.style 'opacity', (d) ->
-					 if d.opaque then 1 else addClassSpec.OPACITY
+					if d.opaque then 1 else addClassSpec.OPACITY
 				.call @cola.drag
 				.on 'click', @onNodeClick
 				.on 'mouseenter', setVisibility
@@ -296,7 +299,6 @@ class Graph
 		targetNode = d3.event.target
 		datum = targetNode.__data__ 
 
-		console.log 'd', datum.type
 		switch datum.type
 			when classSpec.TYPE
 		

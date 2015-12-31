@@ -1,0 +1,216 @@
+{
+	"name": "Anthropology",
+	"year": 2015,
+	"type": "Bachelor of Arts",
+	"requirements": {
+		"GEP": {
+			"hour": 36,
+			"subgroups": {
+				"Communication Foundations": {
+					"hours": 9
+				},
+				"Cultural & Historical Foundations": {
+					"hours": 9
+				},
+				"Mathematical Foundations": {
+					"hours": 6,
+					"suggested": [
+						[
+							"MGF1106",
+							"MGF1107"
+						],
+						"STA2014C"
+					]
+				},
+				"Social Foundations": {
+					"hours": 6,
+					"suggested": [
+						"ANT2000", ["GEP D.1"]
+					]
+				},
+				"Science Foundations": {
+					"hours": 6,
+					"required": [
+						"ANT2511", ["GEP E.1"]
+					]
+				}
+			}
+		},
+		"Core Requirements: Basic Level": {
+			"hours": 6,
+			"required": [
+				"ANT2140",
+				"ANT2410"
+			]
+		},
+		"Core Requirements: Advanced Level": {
+			"hours": 12,
+			"required": [
+				"ANT3610",
+				"ANT4034", ["ANT3145", "ANT3115"],
+				["ANT4516", "ANT4586C"]
+			]
+		},
+		"Restricted Electives": {
+			"hours": 24,
+			"subgroups": {
+				"Area Study": {
+					"hours": 3,
+					"required": [
+						[
+							"ANT3148",
+							"ANT3152",
+							"ANT3158",
+							"ANT3160",
+							"ANT3161",
+							"ANT3163",
+							"ANT3164",
+							"ANT3165",
+							"ANT3168",
+							"ANT3177",
+							"ANT3311",
+							"ANT3312",
+							"ANT3313",
+							"ANT3319",
+							"ANT3362",
+							"ANT4153",
+							"ANT4332",
+							"ANT4340",
+							"ANT4352"
+						]
+					]
+				},
+				"Electives": {
+					"hours": 21,
+					"required": [
+						["ANT3115", "ANT3145"],
+						["ANT4516", "ANT4586C"],
+						[
+							"ANT3905",
+							"ANT3955",
+							"ANT3943",
+							"ANT4180C",
+							"ANT4824",
+							"ANT4906",
+							"ANT4912",
+							"ANT4955",
+							"ANG5822",
+							"ANG5907",
+							"ANG5917"
+						]
+					],
+					"restricted": [
+						"ANT4903H",
+						"ANT4904H",
+						"ANT4970H"
+					],
+					"optional": [
+						"ANT2511L",
+						"ANT3026",
+						"ANT3106",
+						"ANT3142",
+						"ANT3173",
+						"ANT3173",
+						"ANT3212",
+						"ANT3241",
+						"ANT3245",
+						"ANT3262",
+						"ANT3273",
+						"ANT3302",
+						"ANT3330",
+						"ANT3393",
+						"ANT3398",
+						"ANT3541",
+						"ANT3550C",
+						"ANT3701",
+						"ANT4027",
+						"ANT4013",
+						"ANT4183",
+						"ANT4184",
+						"ANT4266",
+						"ANT4303",
+						"ANT4408",
+						"ANT4462",
+						"ANT4467",
+						"ANT4521",
+						"ANT4525C",
+						"ANT4560",
+						"ANT4702",
+						"ANT4802",
+						"ANG5166",
+						"ANG5167",
+						"ANG5228",
+						"ANG5742"
+					]
+				}
+			}
+		}
+	},
+	"POS": [{
+		"semester": "Freshman Year - Fall",
+		"courses": [
+			"ANT2000",
+			"ENC1101",
+			"COM1000", ["GEP-MATH", "GEP"]
+		]
+	}, {
+		"semester": "Freshman Year - Spring",
+		"courses": [
+			"ANT2511",
+			"ENC1102", ["GEP", "GEP", "GEP"]
+		]
+	}, {
+		"semester": "Sophomore Year - Fall",
+		"courses": [
+			"ANT2140",
+			"ANT2410", [
+				"Restricted Elective",
+				"GEP",
+				"Free Elective"
+			]
+		]
+	}, {
+		"semester": "Junior Year - Fall",
+		"courses": [
+			"ANT3115",
+			"ANT3145", [
+				"Restricted Elective",
+				"Restricted Elective",
+				"Foreign Language",
+				"Elective / Minor"
+			]
+		]
+	}, {
+		"semester": "Junior Year - Spring",
+		"courses": [
+			"ANT4034", [
+				"Restricted Elective",
+				"Foreign Language",
+				"Elective / Minor",
+				"Elective / Minor"
+			]
+		]
+	}, {
+		"semester": "Senior Year - Fall",
+		"courses": [
+			"ANT4516",
+			"ANT4586", [
+				"Restricted Elective",
+				"Elective / Minor",
+				"Elective / Minor",
+				"Free Elective"
+			]
+		]
+	}, {
+		"semester": "Senior Year - Spring",
+		"courses": [
+			[
+				"Restricted Elective",
+				"Area Study Elective",
+				"Free Elective",
+				"Elective / Minor",
+				"Elective / Minor"
+			]
+		]
+	}]
+}

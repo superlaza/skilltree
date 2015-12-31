@@ -6,7 +6,8 @@ cola = require 'webcola'
 
 # graphData 		= require '../../data/majorMap.json'
 # graphData 		= require '../../data/colatest.json'
-graphData 		= require '../../data/courseAdjList.json'
+graphData     = require '../../data/courseAdjList.json'
+majorData 		= require '../../data/majors/json/anthropology.json'
 
 console.log typeof(JSON.stringify(graphData))
 
@@ -23,6 +24,15 @@ app.use '/model.json', falcorExpress.dataSourceRoute (req, res) ->
         # return {path:["greeting"], value: "Hello World"}
         path: ['graph']
         value: JSON.stringify(graphData)
+    },
+    {
+      # match a request for the key "greeting"    
+      route: "major",
+      # respond with a PathValue with the value of "Hello World."
+      get: ->
+        # return {path:["greeting"], value: "Hello World"}
+        path: ['major']
+        value: JSON.stringify(majorData)
     }
   ]
 

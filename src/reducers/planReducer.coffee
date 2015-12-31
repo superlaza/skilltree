@@ -3,8 +3,15 @@
 {classSpec, addClassSpec, constraintSpec} = require '../constants/Specs.coffee'
 
 im 				= require 'immutable'
-initialState 	= require '../../data/initialState.coffee'
-initialState 	= im.fromJS(initialState)
+# initialState 	= require '../../data/initialState.coffee'
+# initialState 	= im.fromJS(initialState)
+
+initialState = im.fromJS {
+	nodes:[]
+	links:[]
+	groups:[]
+	constraints: []
+}
 
 # UTILITY
 # impure
@@ -60,6 +67,11 @@ addNode = (state, index, node) ->
 # add node, delete all in group 1, undo add node
 reducer = (state = initialState, action) ->
 	switch action.type
+		when 'INIT'
+			newState = state.toJS()
+
+			im.fromJS action.initialState
+
 		when ADD_CLASS
 			newState = state.toJS()
 			{nodePositions, groupPositions} = action.positionData
@@ -187,5 +199,8 @@ reducer = (state = initialState, action) ->
 
 			im.fromJS newState
 		else state
+
+init = (init) ->
+	initialState = im.fromJS(init)	
 
 module.exports = reducer

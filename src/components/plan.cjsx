@@ -11,7 +11,7 @@ React 					= require 'react'
 
 Plan = React.createClass
 	componentDidMount: ->
-		{dispatch, state, graphData} = @props
+		{dispatch, state, graphData, majorData} = @props
 
 		@graph = new Graph(this.refs.graph, state, dispatch, graphData)
 

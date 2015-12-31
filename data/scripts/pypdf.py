@@ -52,8 +52,8 @@ def getMajor(fileName):
                 for match in matches:
                     majors[majorName].add(match.replace(' ', ''))
 
-for subdir, dirs, files in os.walk('Majors'):
+for subdir, dirs, files in os.walk('./../majors/pdf'):
     for pdf in files:
         getMajor('{}/{}'.format(subdir, pdf))
 
-json.dump({k:list(v) for k,v in majors.items()}, open('majors.json', 'wb'), indent=4)
+json.dump({k:list(v) for k,v in majors.items()}, open('../majors.json', 'wb'), indent=4)

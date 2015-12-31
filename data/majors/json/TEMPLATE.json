@@ -1,0 +1,48 @@
+{
+	"name": "MAJOR",
+	"year": 2015,
+	"type": "B.S | B.A | ETC",
+	"requirements": {
+		"GEP": {
+			"hour": 36,
+			"subgroups": {
+				"SUBGROUP1": {
+					"hours": 6,
+					"required": [
+						"COURSE1",
+						"COURSE2",
+						[
+							"OPTION1",
+							"OPTION2"
+						],
+						{
+							"PLACEHOLDERS": [
+								"GEP E.1",
+								"ELECTIVE"
+							]
+						}
+					],
+					"restricted": [
+						"COURSE"
+					],
+					"optional": [
+						"COURSE",
+					]
+				}
+			}
+		}
+	},
+	"POS": [
+		{
+			"semester": "NAME",
+			"courses": [
+				"NAMED COURSE",
+				[
+					"PLACE HOLDERS",
+					"e.g. GEP-MATH",
+					"e.g. GEP"
+				]
+			]
+		}
+	]
+}

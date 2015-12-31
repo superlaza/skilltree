@@ -2,7 +2,7 @@ webpackJsonp([0],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var DevTools, Plan_, Provider, React, ReactDOM, compose, createStore, finalCreateStore, model, reducer, ref, store;
+	var DevTools, Plan_, Provider, React, ReactDOM, addClassSpec, classSpec, compose, constraintSpec, createStore, finalCreateStore, graphProm, im, majorProm, model, reducer, ref, ref1, store;
 
 	ref = __webpack_require__(1), createStore = ref.createStore, compose = ref.compose;
 
@@ -18,6 +18,10 @@ webpackJsonp([0],[
 
 	DevTools = __webpack_require__(189);
 
+	im = __webpack_require__(180);
+
+	ref1 = __webpack_require__(179), classSpec = ref1.classSpec, addClassSpec = ref1.addClassSpec, constraintSpec = ref1.constraintSpec;
+
 	finalCreateStore = compose(DevTools.instrument())(createStore);
 
 	store = finalCreateStore(reducer);
@@ -26,13 +30,126 @@ webpackJsonp([0],[
 	  source: new falcor.HttpDataSource('model.json')
 	});
 
-	model.get("graph").then(function(response) {
-	  var graphData;
-	  graphData = JSON.parse(response.json.graph);
+	graphProm = model.get("graph");
+
+	majorProm = model.get("major");
+
+	Promise.all([graphProm, majorProm]).then(function(res) {
+	  var alignmentConstraint, btnAddClass, course, displacementConstraint, graph, graphData, group, groupAnchorIndex, groupIndex, i, initialState, j, k, len, len1, len2, major, majorData, newNode, newNodeIndex, nodeCount, placeholder, ref2, ref3, semester;
+	  graph = res[0], major = res[1];
+	  majorData = JSON.parse(major.json.major);
+	  graphData = JSON.parse(graph.json.graph);
+	  initialState = {
+	    nodes: [],
+	    links: [],
+	    groups: [],
+	    constraints: []
+	  };
+	  nodeCount = -1;
+	  ref2 = majorData.POS;
+	  for (i = 0, len = ref2.length; i < len; i++) {
+	    semester = ref2[i];
+	    console.log(semester.semester);
+	    group = [];
+	    groupIndex = initialState.groups.length;
+	    btnAddClass = {
+	      name: addClassSpec.TEXT,
+	      nid: nodeCount,
+	      opaque: true,
+	      type: addClassSpec.TYPE,
+	      width: addClassSpec.WIDTH,
+	      height: addClassSpec.HEIGHT,
+	      x: 0 + constraintSpec.displacement.GAP * groupIndex,
+	      y: 0
+	    };
+	    nodeCount -= 1;
+	    displacementConstraint = {
+	      type: 'alignment',
+	      axis: 'x',
+	      offsets: [],
+	      group: groupIndex
+	    };
+	    if (initialState.groups.length > 0) {
+	      alignmentConstraint = {
+	        axis: 'x',
+	        left: groupAnchorIndex,
+	        right: initialState.nodes.length,
+	        gap: constraintSpec.displacement.GAP
+	      };
+	      initialState.links.push({
+	        source: groupAnchorIndex,
+	        target: initialState.nodes.length,
+	        visible: false
+	      });
+	    }
+	    groupAnchorIndex = initialState.nodes.length;
+	    group.push(groupAnchorIndex);
+	    displacementConstraint.offsets.push({
+	      node: groupAnchorIndex,
+	      offset: constraintSpec.alignment.OFFSET.x
+	    });
+	    initialState.nodes.push(btnAddClass);
+	    ref3 = semester.courses;
+	    for (j = 0, len1 = ref3.length; j < len1; j++) {
+	      course = ref3[j];
+	      if (Array.isArray(course)) {
+	        for (k = 0, len2 = course.length; k < len2; k++) {
+	          placeholder = course[k];
+	          newNode = {
+	            opaque: true,
+	            type: classSpec.TYPE,
+	            width: classSpec.WIDTH,
+	            height: classSpec.HEIGHT
+	          };
+	          newNode.name = placeholder;
+	          newNode.nid = nodeCount;
+	          nodeCount -= 1;
+	          newNodeIndex = initialState.nodes.length;
+	          group.push(newNodeIndex);
+	          displacementConstraint.offsets.push({
+	            node: newNodeIndex,
+	            offset: constraintSpec.alignment.OFFSET.x
+	          });
+	          initialState.nodes.push(newNode);
+	        }
+	      } else {
+	        newNode = {
+	          opaque: true,
+	          type: classSpec.TYPE,
+	          width: classSpec.WIDTH,
+	          height: classSpec.HEIGHT
+	        };
+	        newNode.name = course;
+	        newNode.nid = nodeCount;
+	        nodeCount -= 1;
+	        newNodeIndex = initialState.nodes.length;
+	        group.push(newNodeIndex);
+	        displacementConstraint.offsets.push({
+	          node: newNodeIndex,
+	          offset: constraintSpec.alignment.OFFSET.x
+	        });
+	        initialState.nodes.push(newNode);
+	      }
+	    }
+	    initialState.groups.push({
+	      'leaves': group,
+	      'gid': groupIndex
+	    });
+	    if (alignmentConstraint != null) {
+	      initialState.constraints.push(alignmentConstraint);
+	    }
+	    initialState.constraints.unshift(displacementConstraint);
+	  }
+	  console.log('init stae', JSON.stringify(initialState, null, 4));
+	  store.dispatch({
+	    type: 'INIT',
+	    initialState: im.fromJS(initialState)
+	  });
 	  return ReactDOM.render(React.createElement(Provider, {
 	    "store": store
 	  }, React.createElement("div", null, React.createElement(Plan_, {
-	    "graphData": graphData
+	    "graphData": graphData,
+	    "majorData": majorData
 	  }), React.createElement(DevTools, null))), document.getElementById('react'));
 	});
 
@@ -225,7 +342,7 @@ webpackJsonp([0],[
 /* 177 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ADD_CLASS, ADD_SEMESTER, DELETE_CLASS, addClassSpec, addNode, addPositionData, classSpec, constraintSpec, createNode, im, initialState, reducer, ref, ref1,
+	var ADD_CLASS, ADD_SEMESTER, DELETE_CLASS, addClassSpec, addNode, addPositionData, classSpec, constraintSpec, createNode, im, init, initialState, reducer, ref, ref1,
 	  slice = [].slice;
 
 	ref = __webpack_require__(178), ADD_CLASS = ref.ADD_CLASS, DELETE_CLASS = ref.DELETE_CLASS, ADD_SEMESTER = ref.ADD_SEMESTER;
@@ -234,9 +351,12 @@ webpackJsonp([0],[
 
 	im = __webpack_require__(180);
 
-	initialState = __webpack_require__(181);
-
-	initialState = im.fromJS(initialState);
+	initialState = im.fromJS({
+	  nodes: [],
+	  links: [],
+	  groups: [],
+	  constraints: []
+	});
 
 	addPositionData = function(newState, data) {
 	  var index, node, nodePositions, positions, ref2, results;
@@ -311,6 +431,9 @@ webpackJsonp([0],[
 	    state = initialState;
 	  }
 	  switch (action.type) {
+	    case 'INIT':
+	      newState = state.toJS();
+	      return im.fromJS(action.initialState);
 	    case ADD_CLASS:
 	      newState = state.toJS();
 	      ref2 = action.positionData, nodePositions = ref2.nodePositions, groupPositions = ref2.groupPositions;
@@ -474,6 +597,10 @@ webpackJsonp([0],[
 	  }
 	};
 
+	init = function(init) {
+	  return initialState = im.fromJS(init);
+	};
+
 	module.exports = reducer;
 
 
@@ -530,137 +657,7 @@ webpackJsonp([0],[
 
 /***/ },
 /* 180 */,
-/* 181 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var addClassSpec, classSpec, constraintSpec, initialState, ref;
-
-	ref = __webpack_require__(179), classSpec = ref.classSpec, addClassSpec = ref.addClassSpec, constraintSpec = ref.constraintSpec;
-
-	initialState = {
-	  nodes: [
-	    {
-	      nid: -1,
-	      name: addClassSpec.TEXT,
-	      opaque: true,
-	      type: addClassSpec.TYPE,
-	      width: addClassSpec.WIDTH,
-	      height: addClassSpec.HEIGHT
-	    }, {
-	      nid: -2,
-	      name: 'POS3733',
-	      opaque: true,
-	      type: classSpec.TYPE,
-	      width: classSpec.WIDTH,
-	      height: classSpec.HEIGHT
-	    }, {
-	      nid: -3,
-	      name: 'COT4500',
-	      opaque: true,
-	      type: classSpec.TYPE,
-	      width: classSpec.WIDTH,
-	      height: classSpec.HEIGHT
-	    }, {
-	      nid: -4,
-	      name: addClassSpec.TEXT,
-	      opaque: true,
-	      type: addClassSpec.TYPE,
-	      width: addClassSpec.WIDTH,
-	      height: addClassSpec.HEIGHT
-	    }, {
-	      nid: -5,
-	      name: 'POS2041',
-	      opaque: true,
-	      type: classSpec.TYPE,
-	      width: classSpec.WIDTH,
-	      height: classSpec.HEIGHT
-	    }, {
-	      nid: -6,
-	      name: 'INR2002',
-	      opaque: true,
-	      type: classSpec.TYPE,
-	      width: classSpec.WIDTH,
-	      height: classSpec.HEIGHT
-	    }, {
-	      nid: -7,
-	      name: 'COP3223C',
-	      opaque: true,
-	      type: classSpec.TYPE,
-	      width: classSpec.WIDTH,
-	      height: classSpec.HEIGHT,
-	      hidden: false
-	    }
-	  ],
-	  links: [
-	    {
-	      source: 1,
-	      target: 4,
-	      visible: false
-	    }, {
-	      source: 1,
-	      target: 5,
-	      visible: false
-	    }, {
-	      source: 2,
-	      target: 5,
-	      visible: false
-	    }
-	  ],
-	  groups: [
-	    {
-	      gid: 0,
-	      leaves: [0, 1, 2]
-	    }, {
-	      gid: 1,
-	      leaves: [3, 4, 5]
-	    }
-	  ],
-	  constraints: [
-	    {
-	      type: 'alignment',
-	      axis: 'x',
-	      offsets: [
-	        {
-	          node: 0,
-	          offset: 50
-	        }, {
-	          node: 1,
-	          offset: 50
-	        }, {
-	          node: 2,
-	          offset: 50
-	        }
-	      ],
-	      group: 0
-	    }, {
-	      type: 'alignment',
-	      axis: 'x',
-	      offsets: [
-	        {
-	          node: 3,
-	          offset: 50
-	        }, {
-	          node: 4,
-	          offset: 50
-	        }, {
-	          node: 5,
-	          offset: 50
-	        }
-	      ],
-	      group: 1
-	    }, {
-	      axis: 'x',
-	      left: 0,
-	      right: 3,
-	      gap: constraintSpec.displacement.GAP
-	    }
-	  ]
-	};
-
-	module.exports = initialState;
-
-
-/***/ },
+/* 181 */,
 /* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -676,8 +673,8 @@ webpackJsonp([0],[
 
 	Plan = React.createClass({
 	  componentDidMount: function() {
-	    var dispatch, graphData, ref, state;
-	    ref = this.props, dispatch = ref.dispatch, state = ref.state, graphData = ref.graphData;
+	    var dispatch, graphData, majorData, ref, state;
+	    ref = this.props, dispatch = ref.dispatch, state = ref.state, graphData = ref.graphData, majorData = ref.majorData;
 	    return this.graph = new Graph(this.refs.graph, state, dispatch, graphData);
 	  },
 	  componentDidUpdate: function() {
@@ -764,31 +761,15 @@ webpackJsonp([0],[
 	    this.tick = bind(this.tick, this);
 	    this.clickedNode = null;
 	    d3.select('body').on('keydown', this.moveNode);
-	    this.width = 960;
-	    this.height = 500;
+	    this.width = 1800;
+	    this.height = 1000;
 	    this.pad = 3;
 	    this.color = d3.scale.category20();
 	    zoomed = (function(_this) {
 	      return function() {
-	        var node, ref2, ref3, targetNode;
+	        var ref2;
 	        if (((ref2 = d3.event.sourceEvent) != null ? ref2.type : void 0) === 'wheel') {
 	          _this.svg.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
-	        } else {
-	          targetNode = (ref3 = d3.event.sourceEvent) != null ? ref3.target.nodeName : void 0;
-	          if (((function() {
-	            var j, len, ref4, results;
-	            ref4 = ['rect', 'text', 'g', 'link', 'path'];
-	            results = [];
-	            for (j = 0, len = ref4.length; j < len; j++) {
-	              node = ref4[j];
-	              results.push(targetNode !== node);
-	            }
-	            return results;
-	          })()).every(function(e) {
-	            return e;
-	          })) {
-	            _this.svg.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
-	          }
 	        }
 	      };
 	    })(this);
@@ -1032,7 +1013,6 @@ webpackJsonp([0],[
 	    }
 	    targetNode = d3.event.target;
 	    datum = targetNode.__data__;
-	    console.log('d', datum.type);
 	    switch (datum.type) {
 	      case classSpec.TYPE:
 	        if (targetNode.nodeName === 'text') {
