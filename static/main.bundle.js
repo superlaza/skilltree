@@ -740,7 +740,7 @@ webpackJsonp([0],[
 /* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, Graph, actionAddClass, actionDeleteClass, addClassSpec, btnDeleteClassSpec, classSpec, d3, ref, ref1, webcola,
+	var $, Graph, actionAddClass, actionDeleteClass, addClassSpec, btnDeleteClassSpec, classSpec, constraintSpec, d3, ref, ref1, webcola,
 	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -752,7 +752,7 @@ webpackJsonp([0],[
 
 	__webpack_require__(186);
 
-	ref = __webpack_require__(179), classSpec = ref.classSpec, addClassSpec = ref.addClassSpec, btnDeleteClassSpec = ref.btnDeleteClassSpec;
+	ref = __webpack_require__(179), classSpec = ref.classSpec, addClassSpec = ref.addClassSpec, btnDeleteClassSpec = ref.btnDeleteClassSpec, constraintSpec = ref.constraintSpec;
 
 	ref1 = __webpack_require__(187), actionAddClass = ref1.actionAddClass, actionDeleteClass = ref1.actionDeleteClass;
 
@@ -1017,9 +1017,12 @@ webpackJsonp([0],[
 	    })(this);
 	    textGroup = enter.append('g').attr('transform', function(d) {
 	      return "translate(" + (d.width / 2) + "," + (d.height / 2) + ")";
-	    }).attr('class', 'cola label').call(this.cola.drag).append('text').text(function(d) {
-	      return d.name;
-	    }).call(wrap, classSpec.WIDTH, this.cola.nodes(), this.tick);
+	    }).attr('class', 'cola label').call(this.cola.drag).append('text').text((function(_this) {
+	      return function(d) {
+	        d.name;
+	        return _this.cola.nodes().indexOf(d);
+	      };
+	    })(this)).call(wrap, classSpec.WIDTH, this.cola.nodes(), this.tick);
 	    enter.append('title').text(function(d) {
 	      return d.name;
 	    });
@@ -1163,16 +1166,48 @@ webpackJsonp([0],[
 	  };
 
 	  Graph.prototype.moveNode = function() {
-	    var _, clickedNode, constraint, index, j, k, l, len, len1, len2, map, maxIndex, newConstraint, newConstraints, node, node1, node2, offset, ref2, ref3, ref4, ref5, ref6, ref7, ref8, saveIndex, swapIndex;
+	    var DOWN, LEFT, RIGHT, UP, _, clickedNode, clickedSemester, clickedSemesterIndex, constraint, directionals, groupPositions, index, insertIndex, j, k, key, len, len1, link, links, lower, map, maxIndex, moveOffset, newConstraints, newGroups, newNodes, newSemester, newSemesterIndex, newXcoord, node, node1, node2, nodePositions, offset, ref10, ref11, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, saveIndex, semester, semesters, splitNodeBottomList, splitNodeTop, swapIndex, updateConstraints, upper;
+	    updateConstraints = (function(_this) {
+	      return function(semesterID, modifyConstraint) {
+	        var constraint, j, len, newConstraint, newConstraints, ref2;
+	        newConstraints = [];
+	        ref2 = _this.cola.constraints();
+	        for (j = 0, len = ref2.length; j < len; j++) {
+	          constraint = ref2[j];
+	          if (constraint.type != null) {
+	            newConstraint = {
+	              axis: constraint.axis,
+	              group: constraint.group,
+	              type: constraint.type
+	            };
+	            if (constraint.group === semesterID) {
+	              newConstraint.offsets = modifyConstraint(constraint.offsets);
+	            } else {
+	              newConstraint.offsets = constraint.offsets;
+	            }
+	          } else {
+	            newConstraint = {
+	              axis: constraint.axis,
+	              left: constraint.left,
+	              right: constraint.right,
+	              gap: constraint.gap
+	            };
+	          }
+	          newConstraints.push(newConstraint);
+	        }
+	        return newConstraints;
+	      };
+	    })(this);
 	    if (this.clickedNode == null) {
 	      return;
 	    }
 	    clickedNode = this.clickedNode.__data__;
+	    clickedSemester = clickedNode.parent;
 	    map = {};
 	    ref2 = this.cola.constraints();
 	    for (j = 0, len = ref2.length; j < len; j++) {
 	      constraint = ref2[j];
-	      if ((constraint.type != null) && constraint.group === clickedNode.parent.gid) {
+	      if ((constraint.type != null) && constraint.group === clickedSemester.gid) {
 	        ref3 = constraint.offsets;
 	        for (index in ref3) {
 	          offset = ref3[index];
@@ -1183,49 +1218,37 @@ webpackJsonp([0],[
 	        }
 	      }
 	    }
-	    if (d3.event.keyCode === 40) {
+	    directionals = (ref4 = [37, 38, 39, 40], LEFT = ref4[0], UP = ref4[1], RIGHT = ref4[2], DOWN = ref4[3], ref4);
+	    key = d3.event.keyCode;
+	    if (indexOf.call(directionals, key) >= 0) {
 	      d3.event.preventDefault();
-	      offset = 1;
-	    }
-	    if (d3.event.keyCode === 38) {
-	      d3.event.preventDefault();
-	      offset = -1;
-	    }
-	    swapIndex = saveIndex + offset;
-	    maxIndex = ((function() {
-	      var results;
-	      results = [];
-	      for (_ in map) {
-	        results.push(_);
-	      }
-	      return results;
-	    })()).length;
-	    if (0 < swapIndex && swapIndex < maxIndex) {
-	      ref4 = [map[saveIndex + offset], map[saveIndex]], map[saveIndex] = ref4[0], map[saveIndex + offset] = ref4[1];
-	      ref5 = this.cola.nodes();
-	      for (k = 0, len1 = ref5.length; k < len1; k++) {
-	        node = ref5[k];
-	        if (node.index === clickedNode.index) {
-	          node1 = node;
-	        }
-	        if (node.index === map[saveIndex].node) {
-	          node2 = node;
-	        }
-	      }
-	      ref6 = [node2.x, node2.x], node1.x = ref6[0], node2.x = ref6[1];
-	      ref7 = [node2.y, node2.y], node1.y = ref7[0], node2.y = ref7[1];
-	      newConstraints = [];
-	      ref8 = this.cola.constraints();
-	      for (l = 0, len2 = ref8.length; l < len2; l++) {
-	        constraint = ref8[l];
-	        if (constraint.type != null) {
-	          newConstraint = {
-	            axis: constraint.axis,
-	            group: constraint.group,
-	            type: constraint.type
-	          };
-	          if (constraint.group === clickedNode.parent.gid) {
-	            newConstraint.offsets = (function() {
+	      if (key === UP || key === DOWN) {
+	        moveOffset = key === DOWN ? 1 : -1;
+	        swapIndex = saveIndex + moveOffset;
+	        maxIndex = ((function() {
+	          var results;
+	          results = [];
+	          for (_ in map) {
+	            results.push(_);
+	          }
+	          return results;
+	        })()).length;
+	        if (0 < swapIndex && swapIndex < maxIndex) {
+	          ref5 = [map[saveIndex + moveOffset], map[saveIndex]], map[saveIndex] = ref5[0], map[saveIndex + moveOffset] = ref5[1];
+	          ref6 = this.cola.nodes();
+	          for (k = 0, len1 = ref6.length; k < len1; k++) {
+	            node = ref6[k];
+	            if (node.index === clickedNode.index) {
+	              node1 = node;
+	            }
+	            if (node.index === map[saveIndex].node) {
+	              node2 = node;
+	            }
+	          }
+	          ref7 = [node2.x, node2.x], node1.x = ref7[0], node2.x = ref7[1];
+	          ref8 = [node2.y, node2.y], node1.y = ref8[0], node2.y = ref8[1];
+	          newConstraints = updateConstraints(clickedSemester.gid, (function(_this) {
+	            return function(offsets) {
 	              var results;
 	              results = [];
 	              for (_ in map) {
@@ -1233,22 +1256,87 @@ webpackJsonp([0],[
 	                results.push(offset);
 	              }
 	              return results;
-	            })();
-	          } else {
-	            newConstraint.offsets = constraint.offsets;
-	          }
-	        } else {
-	          newConstraint = {
-	            axis: constraint.axis,
-	            left: constraint.left,
-	            right: constraint.right,
-	            gap: constraint.gap
-	          };
+	            };
+	          })(this));
+	          this.cola.constraints(newConstraints);
+	          this.cola.start();
 	        }
-	        newConstraints.push(newConstraint);
 	      }
-	      this.cola.constraints(newConstraints);
-	      return this.cola.start();
+	      if (key === LEFT || key === RIGHT) {
+	        semesters = this.cola.groups();
+	        for (index in semesters) {
+	          semester = semesters[index];
+	          if (semester.gid === clickedSemester.gid) {
+	            clickedSemesterIndex = parseInt(index);
+	          }
+	        }
+	        moveOffset = key === LEFT ? -1 : 1;
+	        newSemesterIndex = clickedSemesterIndex + moveOffset;
+	        if (0 <= newSemesterIndex && newSemesterIndex < semesters.length) {
+	          clickedSemester.leaves.splice(clickedSemester.leaves.indexOf(clickedNode), 1);
+	          newSemester = semesters[newSemesterIndex];
+	          newXcoord = newSemester.leaves.slice(-1)[0].x;
+	          ref9 = newSemester.leaves;
+	          for (index in ref9) {
+	            node = ref9[index];
+	            console.log(node.y);
+	            upper = node.y;
+	            lower = node.y + (node.bounds.Y - node.bounds.y);
+	            if (upper <= clickedNode.y && clickedNode.y <= lower) {
+	              insertIndex = parseInt(index) + 1;
+	              console.log('test', upper + ", " + lower);
+	              splitNodeTop = node;
+	              splitNodeBottomList = newSemester.leaves.slice(parseInt(index) + 1);
+	            }
+	          }
+	          newSemester.leaves.push(clickedNode);
+	          newConstraints = updateConstraints(clickedSemester.gid, (function(_this) {
+	            return function(offsets) {
+	              var l, len2, results;
+	              results = [];
+	              for (l = 0, len2 = offsets.length; l < len2; l++) {
+	                offset = offsets[l];
+	                if (offset.node !== clickedNode.index) {
+	                  results.push(offset);
+	                }
+	              }
+	              return results;
+	            };
+	          })(this));
+	          console.log('newconstraint', newConstraints);
+	          newConstraints = updateConstraints(newSemester.gid, function(offsets) {
+	            offsets.splice(insertIndex, 0, {
+	              node: clickedNode.index,
+	              offest: constraintSpec.alignment.OFFSET.x
+	            });
+	            return offsets;
+	          });
+	          ref10 = [this.cola.nodes(), this.cola.groups()], newNodes = ref10[0], newGroups = ref10[1];
+	          ref11 = this.getPositiondata(newNodes, newGroups), nodePositions = ref11.nodePositions, groupPositions = ref11.groupPositions;
+	          console.log('close to giving up', nodePositions, groupPositions);
+	          links = (function() {
+	            var l, len2, ref12, results;
+	            ref12 = this.cola.links();
+	            results = [];
+	            for (l = 0, len2 = ref12.length; l < len2; l++) {
+	              link = ref12[l];
+	              results.push({
+	                source: link.source.index,
+	                target: link.target.index,
+	                visible: link.visible
+	              });
+	            }
+	            return results;
+	          }).call(this);
+	          console.log('links', links);
+	          return this.update({
+	            nodes: nodePositions,
+	            link: links,
+	            groups: groupPositions,
+	            constraints: newConstraints
+	          });
+	        }
+	      }
 	    }
 	  };
 

@@ -3,7 +3,7 @@ webcola = require 'webcola'
 $ = require 'jquery'
 require 'jquery-ui'
 
-{classSpec, addClassSpec, btnDeleteClassSpec} = require '../../constants/Specs.coffee'
+{classSpec, addClassSpec, btnDeleteClassSpec, constraintSpec} = require '../../constants/Specs.coffee'
 
 
 {actionAddClass, actionDeleteClass} = require '../../actions/PlanActions.coffee'
@@ -285,8 +285,9 @@ class Graph
 				.attr 'class', 'cola label'
 				.call @cola.drag
 				.append 'text'
-					.text (d) ->
+					.text (d) =>
 						d.name
+						@cola.nodes().indexOf(d)
 					.call wrap, classSpec.WIDTH, @cola.nodes(), @tick
 
 		enter.append 'title' # todo: inserts title multiple times
@@ -443,45 +444,8 @@ class Graph
 
 
 	moveNode: =>
-		return if !@clickedNode?
-		clickedNode = @clickedNode.__data__ # clicked node is stored as DOM element
-
-		map = {}
-		# make a map of index -> offset, get index of clickedNode's offset spec
-		for constraint in @cola.constraints()
-			if constraint.type? and constraint.group is clickedNode.parent.gid
-				for index, offset of constraint.offsets
-					map[index] = offset
-					if clickedNode.index is offset.node
-						saveIndex = parseInt(index)
-		
-		# move up or down
-		if d3.event.keyCode is 40
-			d3.event.preventDefault()
-			offset = 1
-		if d3.event.keyCode is 38
-			d3.event.preventDefault()
-			offset = -1
-
-		swapIndex = saveIndex+offset
-		maxIndex = (_ for _ of map).length
-		# so long as the index of the swapping node is in bounds...
-		if 0<swapIndex and swapIndex<maxIndex
-			# perform swap
-			[map[saveIndex],map[saveIndex+offset]] = [map[saveIndex+offset],map[saveIndex]]
-
-			# graph the relevant live node objects for updating their positions
-			for node in @cola.nodes()
-				if node.index is clickedNode.index
-					node1 = node
-				if node.index is map[saveIndex].node # since i switched them
-					node2 = node
-			
-			# swap their positions
-			[node1.x, node2.x] = [node2.x, node2.x]
-			[node1.y, node2.y] = [node2.y, node2.y]
-
-			# update the constraints with the switch
+		# update constraints for a semester
+		updateConstraints = (semesterID, modifyConstraint) =>
 			newConstraints = []
 			for constraint in @cola.constraints()
 				if constraint.type?
@@ -490,8 +454,8 @@ class Graph
 						group: constraint.group
 						type: constraint.type
 
-					if constraint.group is clickedNode.parent.gid
-						newConstraint.offsets = (offset for _, offset of map)
+					if constraint.group is semesterID
+						newConstraint.offsets = modifyConstraint constraint.offsets
 					else
 						newConstraint.offsets = constraint.offsets
 				else
@@ -502,11 +466,187 @@ class Graph
 						gap: constraint.gap
 
 				newConstraints.push newConstraint
+			newConstraints
 
-			# add to simulation and restart
-			@cola.constraints(newConstraints)
-			@cola.start()
+		return if !@clickedNode?
+		clickedNode = @clickedNode.__data__ # clicked node is stored as DOM element
+		clickedSemester = clickedNode.parent
 
+		map = {}
+		# make a map of index -> offset, get index of clickedNode's offset object
+		for constraint in @cola.constraints()
+			if constraint.type? and constraint.group is clickedSemester.gid
+				for index, offset of constraint.offsets
+					map[index] = offset
+					if clickedNode.index is offset.node
+						saveIndex = parseInt(index)
+		
+		directionals = [LEFT, UP, RIGHT, DOWN] = [37..40]
+		key 	= d3.event.keyCode
+
+		if key in directionals
+			d3.event.preventDefault()
+
+			# INTRA-GROUP MOVEMENT
+			if key in [UP, DOWN]
+				# move up or down
+				moveOffset = if key is DOWN then 1 else -1
+
+				swapIndex = saveIndex+moveOffset
+				maxIndex = (_ for _ of map).length
+				# so long as the index of the swapping node is in bounds...
+				if 0<swapIndex and swapIndex<maxIndex
+					# perform swap
+					[map[saveIndex],map[saveIndex+moveOffset]] = [map[saveIndex+moveOffset],map[saveIndex]]
+
+					# graph the relevant live node objects for updating their positions
+					for node in @cola.nodes()
+						if node.index is clickedNode.index
+							node1 = node
+						if node.index is map[saveIndex].node # since i switched them
+							node2 = node
+					
+					# swap their positions
+					[node1.x, node2.x] = [node2.x, node2.x]
+					[node1.y, node2.y] = [node2.y, node2.y]
+
+					# update the constraints with the switch
+					# newConstraints = []
+					# for constraint in @cola.constraints()
+					# 	if constraint.type?
+					# 		newConstraint = 
+					# 			axis: constraint.axis
+					# 			group: constraint.group
+					# 			type: constraint.type
+
+					# 		if constraint.group is clickedSemester.gid
+					# 			newConstraint.offsets = (offset for _, offset of map)
+					# 		else
+					# 			newConstraint.offsets = constraint.offsets
+					# 	else
+					# 		newConstraint =
+					# 			axis: constraint.axis
+					# 			left: constraint.left
+					# 			right: constraint.right
+					# 			gap: constraint.gap
+
+					# 	newConstraints.push newConstraint
+
+					newConstraints = updateConstraints clickedSemester.gid, (offsets) =>
+						(offset for _, offset of map)
+
+					# add to simulation and restart
+					@cola.constraints(newConstraints)
+					@cola.start()
+
+			if key in [LEFT, RIGHT]
+				semesters = @cola.groups()
+				for index, semester of semesters
+					if semester.gid is clickedSemester.gid
+						clickedSemesterIndex = parseInt index
+
+				moveOffset = if key is LEFT then -1 else 1
+
+				# todo: handle empty semeseters case
+				newSemesterIndex = clickedSemesterIndex+moveOffset
+				if 0 <= newSemesterIndex and newSemesterIndex < semesters.length
+					# remove from clicked group
+					clickedSemester.leaves.splice (clickedSemester.leaves.indexOf clickedNode),1
+
+					# place in corresponding adjacent semester
+					newSemester = semesters[newSemesterIndex]
+					newXcoord = newSemester.leaves[-1..][0].x
+
+
+
+					# console.log 'clickednod', "#{clickedNode.y}, #{clickedNode.y+(clickedNode.bounds.Y-clickedNode.bounds.y)}"
+					for index, node of newSemester.leaves
+						console.log node.y
+						upper = node.y
+						lower = node.y + (node.bounds.Y-node.bounds.y)
+						# if the incoming node's upper bound is within the bounds of a clashing node
+						if upper <= clickedNode.y and clickedNode.y <= lower
+							insertIndex = parseInt(index)+1
+							console.log 'test', "#{upper}, #{lower}"
+							splitNodeTop = node
+							splitNodeBottomList = newSemester.leaves[(parseInt(index)+1)..]
+
+					# clickedNode.y = splitNodeTop.y+(splitNodeTop.bounds.Y-splitNodeTop.bounds.y)+1 # just enough not to clash
+					# if splitNodeBottomList.length
+					# 	for splitNodeBottom in splitNodeBottomList
+					# 		splitNodeBottom.y += (clickedNode.bounds.Y-clickedNode.bounds.y)+3*@pad
+
+					# clickedNode.x = splitNodeTop.x
+					# @tick()
+					# @cola.start()
+
+					newSemester.leaves.push clickedNode
+
+					# remove clicked node from old constraints
+					newConstraints = updateConstraints clickedSemester.gid, (offsets) =>
+						(offset for offset in offsets when offset.node isnt clickedNode.index)
+					
+					# console.log "#{newXcoord}", "#{clickedNode.x}", moveOffset*newXcoord
+					# clickedNode.x += moveOffset*newXcoord
+
+
+
+					# add it to constraints of new group
+
+
+					# if !constraintExists
+					# 	console.log 'never here'
+					# 	newConstraint = 
+					# 		axis: 'x'
+					# 		group: newSemester.gid
+					# 		type: 'alignment'
+					# 		offsets: [
+					# 			{
+					# 				node: clickedNode.index
+					# 				offest: constraintSpec.alignment.OFFSET.x
+					# 			}
+					# 		]
+
+					console.log 'newconstraint', newConstraints
+						# newConstraints.push newConstraint
+
+					# @cola.constraints(newConstraints)
+					# @cola.start()
+
+					# constraintExists = false
+					# for constraint in newConstraints
+					# 	if constraint.type? and constraint.group is newSemester.gid
+					# 		constraintExists = true
+					# 		constraint.offsets.splice insertIndex, 0, {
+					# 			node: clickedNode.index
+					# 			offest: constraintSpec.alignment.OFFSET.x
+					# 		}
+					newConstraints = updateConstraints newSemester.gid, (offsets) ->
+						offsets.splice(insertIndex,
+										0, 
+										{
+											node: clickedNode.index
+											offest: constraintSpec.alignment.OFFSET.x
+										}
+						)
+						offsets
+
+					# @cola.constraints(newConstraints)
+					# @cola.start()
+					[newNodes, newGroups] = [@cola.nodes(), @cola.groups()]
+					{nodePositions, groupPositions} = @getPositiondata newNodes, newGroups
+					console.log 'close to giving up', nodePositions, groupPositions
+					
+					links = ({source:link.source.index, target:link.target.index, visible:link.visible}for link in @cola.links())
+					console.log 'links', links
+					@update(
+							{
+								nodes: nodePositions
+								link: links
+								groups: groupPositions
+								constraints: newConstraints
+							}
+						)
 	# pure
 	getPositiondata: (_nodes, _groups) =>
 		nodes = []
