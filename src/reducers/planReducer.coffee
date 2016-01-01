@@ -54,16 +54,15 @@ createNode = (attrsList...) ->
 
 	newNode
 
+# obsolete
 addNode = (state, index, node) ->
 	state.nodes.push node
 	state.groups[node.semester].leaves.push index
-	console.log 'node constraints', node
 	for constraint in state.constraints
 		if constraint.type is 'alignment' and constraint.group is node.semester
 			constraint.offsets.push
 				node: index
 				offset: constraintSpec.alignment.OFFSET.x
-	console.log state.constraints
 
 # add node, delete all in group 1, undo add node
 reducer = (state = initialState, action) ->

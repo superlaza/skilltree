@@ -49,7 +49,6 @@ webpackJsonp([0],[
 	  ref2 = majorData.POS;
 	  for (i = 0, len = ref2.length; i < len; i++) {
 	    semester = ref2[i];
-	    console.log(semester.semester);
 	    group = [];
 	    groupIndex = initialState.groups.length;
 	    btnAddClass = {
@@ -147,7 +146,6 @@ webpackJsonp([0],[
 	    }
 	    initialState.constraints.unshift(displacementConstraint);
 	  }
-	  console.log('init stae', JSON.stringify(initialState, null, 4));
 	  store.dispatch({
 	    type: 'INIT',
 	    initialState: im.fromJS(initialState)
@@ -416,21 +414,23 @@ webpackJsonp([0],[
 	};
 
 	addNode = function(state, index, node) {
-	  var constraint, j, len, ref2;
+	  var constraint, j, len, ref2, results;
 	  state.nodes.push(node);
 	  state.groups[node.semester].leaves.push(index);
-	  console.log('node constraints', node);
 	  ref2 = state.constraints;
+	  results = [];
 	  for (j = 0, len = ref2.length; j < len; j++) {
 	    constraint = ref2[j];
 	    if (constraint.type === 'alignment' && constraint.group === node.semester) {
-	      constraint.offsets.push({
+	      results.push(constraint.offsets.push({
 	        node: index,
 	        offset: constraintSpec.alignment.OFFSET.x
-	      });
+	      }));
+	    } else {
+	      results.push(void 0);
 	    }
 	  }
-	  return console.log(state.constraints);
+	  return results;
 	};
 
 	reducer = function(state, action) {
@@ -923,7 +923,7 @@ webpackJsonp([0],[
 	        return results;
 	      };
 	    })(this);
-	    enter = node.enter().insert('g', '.node-cont').style('opacity', function(d) {
+	    enter = node.enter().insert('g', '.node-cont').attr('class', 'node-cont').style('opacity', function(d) {
 	      if (d.opaque) {
 	        return 1;
 	      } else {
@@ -1011,7 +1011,6 @@ webpackJsonp([0],[
 	              child.setAttribute('height', "" + (height + lineNumber * lineHeight));
 	            }
 	          }
-	          console.log('linecount', lineNumber);
 	          return;
 	        });
 	      };
@@ -1076,7 +1075,7 @@ webpackJsonp([0],[
 	  };
 
 	  Graph.prototype.onNodeClick = function() {
-	    var addClass, className, datum, input, key, obj, targetNode;
+	    var addClass, child, className, datum, input, j, key, len, obj, parent, ref2, targetNode;
 	    if (d3.event.defaultPrevented) {
 	      return;
 	    }
@@ -1084,8 +1083,16 @@ webpackJsonp([0],[
 	    datum = targetNode.__data__;
 	    switch (datum.type) {
 	      case classSpec.TYPE:
-	        if (targetNode.nodeName === 'text') {
-	          targetNode = targetNode.parentNode.children[0];
+	        parent = targetNode;
+	        while (parent.className.animVal !== 'node-cont') {
+	          parent = parent.parentNode;
+	        }
+	        ref2 = parent.children;
+	        for (j = 0, len = ref2.length; j < len; j++) {
+	          child = ref2[j];
+	          if (child.nodeName === 'rect') {
+	            targetNode = child;
+	          }
 	        }
 	        if (this.clickedNode != null) {
 	          this.clickedNode.setAttribute('style', "fill: " + classSpec.COLOR.DEFAULT);
@@ -1095,7 +1102,7 @@ webpackJsonp([0],[
 	      case addClassSpec.TYPE:
 	        addClass = (function(_this) {
 	          return function(classCode) {
-	            var action, className, j, len, nodeData, optionName, optionsData, ref2;
+	            var action, className, k, len1, nodeData, optionName, optionsData, ref3;
 	            className = _this.adjList[classCode].name;
 	            nodeData = {
 	              className: className,
@@ -1107,9 +1114,9 @@ webpackJsonp([0],[
 	            };
 	            _this.nodeCount += 1;
 	            optionsData = [];
-	            ref2 = _this.adjList[classCode].prereqs;
-	            for (j = 0, len = ref2.length; j < len; j++) {
-	              optionName = ref2[j];
+	            ref3 = _this.adjList[classCode].prereqs;
+	            for (k = 0, len1 = ref3.length; k < len1; k++) {
+	              optionName = ref3[k];
 	              optionsData.push({
 	                className: _this.adjList[optionName].name,
 	                nid: _this.nodeCount,
@@ -1128,11 +1135,11 @@ webpackJsonp([0],[
 	        input = $('#class-select', this.graphElement);
 	        input.autocomplete({
 	          source: (function() {
-	            var ref2, results;
-	            ref2 = this.adjList;
+	            var ref3, results;
+	            ref3 = this.adjList;
 	            results = [];
-	            for (key in ref2) {
-	              obj = ref2[key];
+	            for (key in ref3) {
+	              obj = ref3[key];
 	              results.push({
 	                code: key,
 	                label: "(" + key + ") " + obj.name

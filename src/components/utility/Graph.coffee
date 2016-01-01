@@ -194,6 +194,7 @@ class Graph
 
 		enter = node.enter()
 			.insert 'g', '.node-cont'
+				.attr 'class', 'node-cont'
 				.style 'opacity', (d) ->
 					if d.opaque then 1 else addClassSpec.OPACITY
 				.call @cola.drag
@@ -230,7 +231,6 @@ class Graph
 		wrap = (text, width, nodes, tick) =>
 			text.each () ->
 				text = d3.select(this)
-				# console.log 'text', this.__data__
 				datum = this.__data__
 				words = text.text().split(/\s+/).reverse()
 				word = undefined
@@ -275,7 +275,6 @@ class Graph
 						child.setAttribute 'height', "#{height+lineNumber*lineHeight}"
 				
 				# tick()
-				console.log 'linecount', lineNumber
 				return
 		  return
 
@@ -364,9 +363,15 @@ class Graph
 
 		switch datum.type
 			when classSpec.TYPE
-		
-				if targetNode.nodeName is 'text'
-					targetNode = targetNode.parentNode.children[0] # switch to rect
+
+				parent = targetNode
+				while parent.className.animVal isnt 'node-cont'
+					parent = parent.parentNode
+				
+				# only one rect in group
+				for child in parent.children
+					if child.nodeName is 'rect'
+						targetNode = child
 
 				# set previously clicked node back to default color
 				if @clickedNode?

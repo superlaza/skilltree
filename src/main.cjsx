@@ -83,7 +83,6 @@ Promise.all([graphProm, majorProm]).then (res) ->
 	# to avoid conflict with nodeID gen (which is by node count) when adding nodes
 	nodeCount = -1 
 	for semester in majorData.POS
-		console.log semester.semester 
 		group = []
 		groupIndex = initialState.groups.length
 
@@ -187,7 +186,7 @@ Promise.all([graphProm, majorProm]).then (res) ->
 	# for index, node of initialState.nodes
 	# 	console.log index, node.name
 
-	console.log 'init stae', JSON.stringify initialState, null, 4
+	# console.log 'init stae', JSON.stringify initialState, null, 4
 
 	store.dispatch {
 		type:'INIT'
