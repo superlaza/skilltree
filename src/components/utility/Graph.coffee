@@ -225,13 +225,71 @@ class Graph
 				.attr 'rx', 5
 				.attr 'ry', 5
 				.style 'fill',   (d) => @color @graph.groups.length
-		enter.append 'text'
+		
+
+		wrap = (text, width, nodes, tick) =>
+			text.each () ->
+				text = d3.select(this)
+				# console.log 'text', this.__data__
+				datum = this.__data__
+				words = text.text().split(/\s+/).reverse()
+				word = undefined
+				line = []
+				lineNumber = 0
+				# lineHeight = 1.1 # measured in ems
+				lineHeight = 18
+				y = text.attr('y')
+				tspan = text.text(null)
+							.append('tspan')
+							.attr('x', 0)
+							.attr('y', 0)
+							# .attr('dy', dy + 'em')
+				while word = words.pop()
+					line.push word
+					tspan.text line.join(' ')
+					if tspan.node().getComputedTextLength() > width
+						line.pop()
+						tspan.text line.join(' ')
+						line = [ word ]
+						tspan = text.append('tspan')
+									.attr('x', 0)
+									.attr('y', 0)
+									# .attr('dy', ++lineNumber * lineHeight + 'em')
+									.attr('dy', ++lineNumber * lineHeight + 'px')
+									.text(word)
+
+				# change in simulation
+				if datum.index?
+					height = nodes[datum.index].height
+					nodes[datum.index].height += lineNumber*lineHeight
+				else
+					for _node in nodes # can't var name `node`
+						if _node.nid is datum.nid
+							height = _node.height
+							_node.height += lineNumber*lineHeight
+
+				# change in render
+				for child in this.parentNode.parentNode.children
+					if child.nodeName is 'rect'
+						height = parseInt child.getAttribute('height')
+						child.setAttribute 'height', "#{height+lineNumber*lineHeight}"
+				
+				# tick()
+				console.log 'linecount', lineNumber
+				return
+		  return
+
+
+		textGroup = enter.append 'g'
+				.attr 'transform', (d) ->
+					"translate(#{d.width/2},#{d.height/2})"
 				.attr 'class', 'cola label'
-				.attr 'x', (d) -> d.width/2
-				.attr 'y', (d) -> d.height/2
-			.call @cola.drag
-			.text (d) ->
-				d.name
+				.call @cola.drag
+				.append 'text'
+					.text (d) ->
+						d.name
+					.call wrap, classSpec.WIDTH, @cola.nodes(), @tick
+
 		enter.append 'title' # todo: inserts title multiple times
 				.text (d) ->
 					d.name
@@ -264,9 +322,6 @@ class Graph
 							.style 'stroke-linejoin', 'miter'
 							.style 'stroke-opacity', 1
 		appendButton path for path in ['M 100,60 L 60,100 L 230,270 L 270,230 L 100,60 z', 'M 60,230 L 230,60 L 270,100 L 100,270 L 60,230 z']
-
-
-
 
 		node.exit().remove()
 

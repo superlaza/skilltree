@@ -1,6 +1,6 @@
 module.exports =
 	classSpec:
-		WIDTH: 100
+		WIDTH: 150
 		HEIGHT: 40
 		TYPE: 'class'
 		status:
@@ -23,7 +23,7 @@ module.exports =
 		COLOR: '#e00'
 	constraintSpec:
 		displacement:
-			GAP: 200
+			GAP: 220
 		alignment:
 			OFFSET:
 				x: 50

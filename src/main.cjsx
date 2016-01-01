@@ -37,8 +37,7 @@ Promise.all([graphProm, majorProm]).then (res) ->
 	[graph, major] = res
 
 	majorData = JSON.parse major.json.major
-	graphData = JSON.parse graph.json.graph
-
+	graphData = JSON.parse graph.json.graph # used as a map from code to name below
 
 	initialState = {
 		nodes:[]
@@ -80,6 +79,7 @@ Promise.all([graphProm, majorProm]).then (res) ->
 	# 	]
 	# }
 	# initialize with major data
+
 	# to avoid conflict with nodeID gen (which is by node count) when adding nodes
 	nodeCount = -1 
 	for semester in majorData.POS
@@ -156,7 +156,11 @@ Promise.all([graphProm, majorProm]).then (res) ->
 					width: classSpec.WIDTH
 					height: classSpec.HEIGHT
 					status: classSpec.status.ENROLLED
-				newNode.name = course
+				if course of graphData
+					newNode.name = graphData[course].name
+				else
+					console.log "#{course} is not in graphData"
+					newNode.name = course
 				newNode.nid = nodeCount
 				nodeCount -= 1
 
