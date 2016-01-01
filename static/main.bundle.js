@@ -1026,7 +1026,7 @@ webpackJsonp([0],[
 	  };
 
 	  Graph.prototype.onNodeClick = function() {
-	    var className, datum, input, key, targetNode;
+	    var addClass, className, datum, input, key, obj, targetNode;
 	    if (d3.event.defaultPrevented) {
 	      return;
 	    }
@@ -1043,53 +1043,65 @@ webpackJsonp([0],[
 	        targetNode.setAttribute('style', "fill: " + classSpec.COLOR.SELECTED);
 	        return this.clickedNode = targetNode;
 	      case addClassSpec.TYPE:
-	        input = this.graphElement.children[0];
-	        input = $('#class-select', this.graphElement);
-	        input.autocomplete({
-	          source: (function() {
-	            var results;
-	            results = [];
-	            for (key in this.adjList) {
-	              results.push(key);
-	            }
-	            return results;
-	          }).call(this),
-	          autoFocus: true
-	        });
-	        input.focus();
-	        className = null;
-	        return input.keypress((function(_this) {
-	          return function(e) {
-	            var action, j, len, nodeData, optionName, optionsData, ref2;
-	            if (e.keyCode === 13) {
-	              className = e.target.value;
-	              nodeData = {
-	                className: className,
-	                semester: datum.parent.gid,
+	        addClass = (function(_this) {
+	          return function(classCode) {
+	            var action, className, j, len, nodeData, optionName, optionsData, ref2;
+	            className = _this.adjList[classCode].name;
+	            nodeData = {
+	              className: className,
+	              semester: datum.parent.gid,
+	              nid: _this.nodeCount,
+	              type: classSpec.TYPE,
+	              width: classSpec.WIDTH,
+	              height: classSpec.HEIGHT
+	            };
+	            _this.nodeCount += 1;
+	            optionsData = [];
+	            ref2 = _this.adjList[classCode].prereqs;
+	            for (j = 0, len = ref2.length; j < len; j++) {
+	              optionName = ref2[j];
+	              optionsData.push({
+	                className: _this.adjList[optionName].name,
 	                nid: _this.nodeCount,
 	                type: classSpec.TYPE,
 	                width: classSpec.WIDTH,
 	                height: classSpec.HEIGHT
-	              };
+	              });
 	              _this.nodeCount += 1;
-	              optionsData = [];
-	              ref2 = _this.adjList[className];
-	              for (j = 0, len = ref2.length; j < len; j++) {
-	                optionName = ref2[j];
-	                optionsData.push({
-	                  className: optionName,
-	                  nid: _this.nodeCount,
-	                  type: classSpec.TYPE,
-	                  width: classSpec.WIDTH,
-	                  height: classSpec.HEIGHT
-	                });
-	                _this.nodeCount += 1;
-	              }
-	              action = actionAddClass(nodeData, optionsData, _this.getPositiondata(_this.cola.nodes(), _this.cola.groups()));
-	              return _this.dispatch(action);
 	            }
+	            action = actionAddClass(nodeData, optionsData, _this.getPositiondata(_this.cola.nodes(), _this.cola.groups()));
+	            return _this.dispatch(action);
 	          };
-	        })(this));
+	        })(this);
+	        className = null;
+	        input = this.graphElement.children[0];
+	        input = $('#class-select', this.graphElement);
+	        input.autocomplete({
+	          source: (function() {
+	            var ref2, results;
+	            ref2 = this.adjList;
+	            results = [];
+	            for (key in ref2) {
+	              obj = ref2[key];
+	              results.push({
+	                code: key,
+	                label: "(" + key + ") " + obj.name
+	              });
+	            }
+	            return results;
+	          }).call(this),
+	          autoFocus: true,
+	          select: (function(_this) {
+	            return function(e, ui) {
+	              className = ui.item.code;
+	              input.val(ui.item.label);
+	              input.data('code', ui.item.code);
+	              addClass(className);
+	              return false;
+	            };
+	          })(this)
+	        });
+	        return input.focus();
 	    }
 	  };
 

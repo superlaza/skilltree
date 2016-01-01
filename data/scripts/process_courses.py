@@ -129,7 +129,10 @@ class Graph:
 		adjList = {}
 		for id, nodeList in self.adjList.items():
 			node, children = nodeList['node'], nodeList['children']
-			adjList[node.prefix+node.number] = [child.prefix+child.number for child in children]
+			adjList[node.prefix+node.number] = {
+				'name': node.name,
+				'prereqs': [child.prefix+child.number for child in children]
+			}
 
 		return adjList
 

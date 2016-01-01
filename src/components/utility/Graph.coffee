@@ -322,11 +322,54 @@ class Graph
 				
 
 			when addClassSpec.TYPE
+				addClass = (classCode) =>
+					className = @adjList[classCode].name
+
+					nodeData =
+						className: className
+						semester: datum.parent.gid # parent group
+						nid: @nodeCount
+						type: classSpec.TYPE
+						width: classSpec.WIDTH
+						height: classSpec.HEIGHT
+
+					@nodeCount += 1
+
+					optionsData = []
+					for optionName in @adjList[classCode].prereqs
+						optionsData.push
+							className: @adjList[optionName].name
+							nid: @nodeCount
+							type: classSpec.TYPE
+							width: classSpec.WIDTH
+							height: classSpec.HEIGHT
+						@nodeCount += 1
+
+					action = actionAddClass(
+							nodeData,
+							optionsData,
+							@getPositiondata @cola.nodes(), @cola.groups()
+						)
+					@dispatch action
+
+				# selected class name
+				className = null
 				input = @graphElement.children[0]
 				input = $('#class-select', @graphElement)
 				input.autocomplete {
-					source: (key for key of @adjList)
+					source: ({code: key, label:"(#{key}) #{obj.name}"} for key,obj of @adjList)
 					autoFocus: true
+					# focus: (e, ui) ->
+					# 	console.log 'ui', ui
+					# 	input.val(ui.name)
+					# 	false
+					select: (e, ui) =>
+						className = ui.item.code
+						input.val(ui.item.label)
+						input.data('code', ui.item.code) # not the idiomatic way to get data
+						
+						addClass className
+						false
 				}
 				input.focus()
 
@@ -334,38 +377,10 @@ class Graph
 				# input.css 'top', "#{datum.y+10}px"
 				
 				# className = window.prompt('Pick a class')
-				className = null
-				input.keypress (e) =>
-					if e.keyCode is 13
-						# todo: users will press enter multiple times to enter 
-						# a class, so it gets added multiple times
-						className = e.target.value
-						nodeData =
-							className: className
-							semester: datum.parent.gid # parent group
-							nid: @nodeCount
-							type: classSpec.TYPE
-							width: classSpec.WIDTH
-							height: classSpec.HEIGHT
+				
+				# input.keypress (e) =>
+				# 	if e.keyCode is 13
 
-						@nodeCount += 1
-
-						optionsData = []
-						for optionName in @adjList[className]
-							optionsData.push
-								className: optionName
-								nid: @nodeCount
-								type: classSpec.TYPE
-								width: classSpec.WIDTH
-								height: classSpec.HEIGHT
-							@nodeCount += 1
-
-						action = actionAddClass(
-								nodeData,
-								optionsData,
-								@getPositiondata @cola.nodes(), @cola.groups()
-							)
-						@dispatch action
 
 	moveNode: =>
 		return if !@clickedNode?
