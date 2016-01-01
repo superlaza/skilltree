@@ -12,6 +12,7 @@ class Graph
 	constructor: (@graphElement, @graph, @dispatch, @adjList) ->
 		# event result persistence
 		@clickedNode = null
+		@clickedNodeID = null
 
 		d3.select 'body'
 			.on 'keydown', @moveNode
@@ -87,6 +88,12 @@ class Graph
 		return
 
 	update: (graph = @graph, up) =>
+		# if @clickedNodeID?
+		# 	console.log 'fucking hell', @clickedNodeID
+		# 	for node in @graph.nodes
+		# 		if node.nid is @clickedNodeID
+		# 			@clickedNode = node
+
 		# if up?
 		# 	@cola.stop()
 		console.log 'update graph', graph
@@ -158,12 +165,60 @@ class Graph
 		@cola.start()
 		
 	updateNodes: (selection, data) =>
-		node = selection.data data,
-					(d) ->
-						d.nid
-		node
-			.call @cola.drag
-			.on 'click', @onNodeClick
+		wrap = (text, width, cola) =>
+			text.each () ->
+				text = d3.select(this)
+				datum = this.__data__
+				words = text.text().split(/\s+/).reverse()
+				word = undefined
+				line = []
+				lineNumber = 0
+				# lineHeight = 1.1 # measured in ems
+				lineHeight = 18
+				y = text.attr('y')
+				tspan = text.text(null)
+							.append('tspan')
+							.attr('x', 0)
+							.attr('y', 0)
+							# .attr('dy', dy + 'em')
+				while word = words.pop()
+					line.push word
+					tspan.text line.join(' ')
+					if tspan.node().getComputedTextLength() > width
+						line.pop()
+						tspan.text line.join(' ')
+						line = [ word ]
+						tspan = text.append('tspan')
+									.attr('x', 0)
+									.attr('y', 0)
+									# .attr('dy', ++lineNumber * lineHeight + 'em')
+									.attr('dy', ++lineNumber * lineHeight + 'px')
+									.text(word)
+
+				nodes = cola.nodes()
+				# change in simulation
+				if datum.index?
+					height = nodes[datum.index].height
+					if height < 60
+						nodes[datum.index].height += lineNumber*lineHeight
+				else
+					for _node in nodes # can't use var name `node`
+						if _node.nid is datum.nid
+							height = _node.height
+							if height < 60
+								_node.height += lineNumber*lineHeight
+
+				# change in render
+				for child in this.parentNode.parentNode.children
+					if child.nodeName is 'rect'
+						height = parseInt child.getAttribute('height')
+						child.setAttribute 'height', "#{height+lineNumber*lineHeight}"
+				
+
+				# cola.start()
+				return
+		  return
+
 
 		setVisibility = =>
 			eventType = d3.event.type
@@ -191,6 +246,25 @@ class Graph
 				if child.className.animVal is btnDeleteClassSpec.CLASS
 					child.setAttribute('visibility', if eventType is 'mouseenter' then 'visible' else 'hidden')
 					break
+
+		node = selection.data data,
+					(d) ->
+						d.nid
+		node
+			.call @cola.drag
+			.on 'click', @onNodeClick
+
+		# when heights are changed for text wrapping, this
+		# ensures that those heights get re-registered to the model
+		node.selectAll('.node-text')
+			.call (text, cola = @cola) =>
+				text.each () ->
+					datum = this.__data__
+					nodes = cola.nodes()
+					# this is data from the pre-existing render being added to model
+					nodes[datum.index].height = datum.height 
+					return
+				return
 
 		enter = node.enter()
 			.insert 'g', '.node-cont'
@@ -226,58 +300,6 @@ class Graph
 				.attr 'rx', 5
 				.attr 'ry', 5
 				.style 'fill',   (d) => @color @graph.groups.length
-		
-
-		wrap = (text, width, nodes, tick) =>
-			text.each () ->
-				text = d3.select(this)
-				datum = this.__data__
-				words = text.text().split(/\s+/).reverse()
-				word = undefined
-				line = []
-				lineNumber = 0
-				# lineHeight = 1.1 # measured in ems
-				lineHeight = 18
-				y = text.attr('y')
-				tspan = text.text(null)
-							.append('tspan')
-							.attr('x', 0)
-							.attr('y', 0)
-							# .attr('dy', dy + 'em')
-				while word = words.pop()
-					line.push word
-					tspan.text line.join(' ')
-					if tspan.node().getComputedTextLength() > width
-						line.pop()
-						tspan.text line.join(' ')
-						line = [ word ]
-						tspan = text.append('tspan')
-									.attr('x', 0)
-									.attr('y', 0)
-									# .attr('dy', ++lineNumber * lineHeight + 'em')
-									.attr('dy', ++lineNumber * lineHeight + 'px')
-									.text(word)
-
-				# change in simulation
-				if datum.index?
-					height = nodes[datum.index].height
-					nodes[datum.index].height += lineNumber*lineHeight
-				else
-					for _node in nodes # can't var name `node`
-						if _node.nid is datum.nid
-							height = _node.height
-							_node.height += lineNumber*lineHeight
-
-				# change in render
-				for child in this.parentNode.parentNode.children
-					if child.nodeName is 'rect'
-						height = parseInt child.getAttribute('height')
-						child.setAttribute 'height', "#{height+lineNumber*lineHeight}"
-				
-				# tick()
-				return
-		  return
-
 
 		textGroup = enter.append 'g'
 				.attr 'transform', (d) ->
@@ -285,10 +307,11 @@ class Graph
 				.attr 'class', 'cola label'
 				.call @cola.drag
 				.append 'text'
+					.attr 'class', 'node-text'
 					.text (d) =>
 						d.name
-						@cola.nodes().indexOf(d)
-					.call wrap, classSpec.WIDTH, @cola.nodes(), @tick
+						# "id: #{d.nid}, index: #{@cola.nodes().indexOf(d)}"
+					.call wrap, classSpec.WIDTH, @cola
 
 		enter.append 'title' # todo: inserts title multiple times
 				.text (d) ->
@@ -322,6 +345,7 @@ class Graph
 							.style 'stroke-linejoin', 'miter'
 							.style 'stroke-opacity', 1
 		appendButton path for path in ['M 100,60 L 60,100 L 230,270 L 270,230 L 100,60 z', 'M 60,230 L 230,60 L 270,100 L 100,270 L 60,230 z']
+
 
 		node.exit().remove()
 
@@ -366,6 +390,7 @@ class Graph
 			when classSpec.TYPE
 
 				parent = targetNode
+				console.log parent.className
 				while parent.className.animVal isnt 'node-cont'
 					parent = parent.parentNode
 				
@@ -469,6 +494,7 @@ class Graph
 			newConstraints
 
 		return if !@clickedNode?
+		console.log 'which node clicked', @clickedNode.nid
 		clickedNode = @clickedNode.__data__ # clicked node is stored as DOM element
 		clickedSemester = clickedNode.parent
 
@@ -510,28 +536,6 @@ class Graph
 					[node1.x, node2.x] = [node2.x, node2.x]
 					[node1.y, node2.y] = [node2.y, node2.y]
 
-					# update the constraints with the switch
-					# newConstraints = []
-					# for constraint in @cola.constraints()
-					# 	if constraint.type?
-					# 		newConstraint = 
-					# 			axis: constraint.axis
-					# 			group: constraint.group
-					# 			type: constraint.type
-
-					# 		if constraint.group is clickedSemester.gid
-					# 			newConstraint.offsets = (offset for _, offset of map)
-					# 		else
-					# 			newConstraint.offsets = constraint.offsets
-					# 	else
-					# 		newConstraint =
-					# 			axis: constraint.axis
-					# 			left: constraint.left
-					# 			right: constraint.right
-					# 			gap: constraint.gap
-
-					# 	newConstraints.push newConstraint
-
 					newConstraints = updateConstraints clickedSemester.gid, (offsets) =>
 						(offset for _, offset of map)
 
@@ -549,104 +553,33 @@ class Graph
 
 				# todo: handle empty semeseters case
 				newSemesterIndex = clickedSemesterIndex+moveOffset
-				if 0 <= newSemesterIndex and newSemesterIndex < semesters.length
-					# remove from clicked group
-					clickedSemester.leaves.splice (clickedSemester.leaves.indexOf clickedNode),1
+				newSemester = semesters[newSemesterIndex]
+				# if 0 <= newSemesterIndex and newSemesterIndex < semesters.length
+					# @dispatch actionDeleteClass(
+					# 		clickedNode.nid,
+					# 		@getPositiondata @cola.nodes(), @cola.groups()
+					# )
 
-					# place in corresponding adjacent semester
-					newSemester = semesters[newSemesterIndex]
-					newXcoord = newSemester.leaves[-1..][0].x
+					# className = clickedNode.name
 
+					# nodeData =
+					# 	className: className
+					# 	semester: newSemester.gid # parent group
+					# 	nid: clickedNode.nid
+					# 	type: classSpec.TYPE
+					# 	width: classSpec.WIDTH
+					# 	height: classSpec.HEIGHT
+					# @nodeCount += 1
 
+					# action = actionAddClass(
+					# 		nodeData,
+					# 		[],
+					# 		@getPositiondata @cola.nodes(), @cola.groups()
+					# 	)
+					# @dispatch action
 
-					# console.log 'clickednod', "#{clickedNode.y}, #{clickedNode.y+(clickedNode.bounds.Y-clickedNode.bounds.y)}"
-					for index, node of newSemester.leaves
-						console.log node.y
-						upper = node.y
-						lower = node.y + (node.bounds.Y-node.bounds.y)
-						# if the incoming node's upper bound is within the bounds of a clashing node
-						if upper <= clickedNode.y and clickedNode.y <= lower
-							insertIndex = parseInt(index)+1
-							console.log 'test', "#{upper}, #{lower}"
-							splitNodeTop = node
-							splitNodeBottomList = newSemester.leaves[(parseInt(index)+1)..]
-
-					# clickedNode.y = splitNodeTop.y+(splitNodeTop.bounds.Y-splitNodeTop.bounds.y)+1 # just enough not to clash
-					# if splitNodeBottomList.length
-					# 	for splitNodeBottom in splitNodeBottomList
-					# 		splitNodeBottom.y += (clickedNode.bounds.Y-clickedNode.bounds.y)+3*@pad
-
-					# clickedNode.x = splitNodeTop.x
-					# @tick()
-					# @cola.start()
-
-					newSemester.leaves.push clickedNode
-
-					# remove clicked node from old constraints
-					newConstraints = updateConstraints clickedSemester.gid, (offsets) =>
-						(offset for offset in offsets when offset.node isnt clickedNode.index)
-					
-					# console.log "#{newXcoord}", "#{clickedNode.x}", moveOffset*newXcoord
-					# clickedNode.x += moveOffset*newXcoord
-
-
-
-					# add it to constraints of new group
-
-
-					# if !constraintExists
-					# 	console.log 'never here'
-					# 	newConstraint = 
-					# 		axis: 'x'
-					# 		group: newSemester.gid
-					# 		type: 'alignment'
-					# 		offsets: [
-					# 			{
-					# 				node: clickedNode.index
-					# 				offest: constraintSpec.alignment.OFFSET.x
-					# 			}
-					# 		]
-
-					console.log 'newconstraint', newConstraints
-						# newConstraints.push newConstraint
-
-					# @cola.constraints(newConstraints)
-					# @cola.start()
-
-					# constraintExists = false
-					# for constraint in newConstraints
-					# 	if constraint.type? and constraint.group is newSemester.gid
-					# 		constraintExists = true
-					# 		constraint.offsets.splice insertIndex, 0, {
-					# 			node: clickedNode.index
-					# 			offest: constraintSpec.alignment.OFFSET.x
-					# 		}
-					newConstraints = updateConstraints newSemester.gid, (offsets) ->
-						offsets.splice(insertIndex,
-										0, 
-										{
-											node: clickedNode.index
-											offest: constraintSpec.alignment.OFFSET.x
-										}
-						)
-						offsets
-
-					# @cola.constraints(newConstraints)
-					# @cola.start()
-					[newNodes, newGroups] = [@cola.nodes(), @cola.groups()]
-					{nodePositions, groupPositions} = @getPositiondata newNodes, newGroups
-					console.log 'close to giving up', nodePositions, groupPositions
-					
-					links = ({source:link.source.index, target:link.target.index, visible:link.visible}for link in @cola.links())
-					console.log 'links', links
-					@update(
-							{
-								nodes: nodePositions
-								link: links
-								groups: groupPositions
-								constraints: newConstraints
-							}
-						)
+					# console.log 'id', clickedNode.nid
+					# @clickedNodeID = @clickedNode.nid
 	# pure
 	getPositiondata: (_nodes, _groups) =>
 		nodes = []

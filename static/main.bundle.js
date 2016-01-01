@@ -434,7 +434,7 @@ webpackJsonp([0],[
 	};
 
 	reducer = function(state, action) {
-	  var addClassNodeData, addClassNodeIndex, constraint, delNodeIndex, displacementConstraints, group, groupBounds, groupPositions, index, j, k, l, lastConstraint, leaf, len, len1, len2, link, newAlignmentConstraint, newDisplacementConstraint, newNode, newOption, newState, nextGroup, nextGroupBounds, node, nodeIndex, nodePositions, nodeSemester, offset, optionData, optionIndex, ref10, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, remap, semesterIndex;
+	  var addClassNodeData, addClassNodeIndex, constraint, delNodeIndex, displacementConstraints, group, groupBounds, groupPositions, index, j, k, l, lastConstraint, leaf, len, len1, len2, link, newAlignmentConstraint, newDisplacementConstraint, newNode, newOption, newState, node, nodeIndex, nodePositions, nodeSemester, offset, optionData, optionIndex, prevGroup, prevGroupBounds, ref10, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, remap, semesterIndex;
 	  if (state == null) {
 	    state = initialState;
 	  }
@@ -452,22 +452,22 @@ webpackJsonp([0],[
 	      nodeIndex = newState.nodes.length;
 	      nodeSemester = action.nodeData.semester;
 	      groupBounds = (ref3 = groupPositions[nodeSemester]) != null ? ref3.bounds : void 0;
-	      group = newState.groups[nodeSemester + 1];
+	      group = newState.groups[nodeSemester - 1];
 	      newNode = createNode(action.nodeData, {
 	        groupBounds: groupBounds
 	      });
 	      addNode(newState, nodeIndex, newNode);
-	      nextGroupBounds = (ref4 = groupPositions[nodeSemester + 1]) != null ? ref4.bounds : void 0;
-	      nextGroup = newState.groups[nodeSemester + 1];
-	      if ((nextGroup != null) && nextGroupBounds) {
+	      prevGroupBounds = (ref4 = groupPositions[nodeSemester - 1]) != null ? ref4.bounds : void 0;
+	      prevGroup = newState.groups[nodeSemester - 1];
+	      if ((prevGroup != null) && prevGroupBounds) {
 	        ref5 = action.options;
 	        for (j = 0, len = ref5.length; j < len; j++) {
 	          optionData = ref5[j];
 	          optionIndex = newState.nodes.length;
 	          newOption = createNode(optionData, {
-	            semester: nodeSemester + 1,
-	            groupBounds: nextGroupBounds,
-	            status: classSpec.status.OPTION
+	            semester: nodeSemester - 1,
+	            groupBounds: prevGroupBounds,
+	            status: classSpec.status.PREREQ
 	          });
 	          addNode(newState, optionIndex, newOption);
 	          newState.links.push({
@@ -773,6 +773,7 @@ webpackJsonp([0],[
 	    this.update = bind(this.update, this);
 	    this.tick = bind(this.tick, this);
 	    this.clickedNode = null;
+	    this.clickedNodeID = null;
 	    d3.select('body').on('keydown', this.moveNode);
 	    this.width = 1800;
 	    this.height = 1000;
@@ -876,13 +877,61 @@ webpackJsonp([0],[
 
 	  Graph.prototype.updateNodes = function(selection, data) {
 	    var appendButton, deleteButton, enter, j, len, node, path, ref2, setVisibility, textGroup, wrap;
-	    node = selection.data(data, function(d) {
-	      return d.nid;
-	    });
-	    node.call(this.cola.drag).on('click', this.onNodeClick);
+	    wrap = (function(_this) {
+	      return function(text, width, cola) {
+	        return text.each(function() {
+	          var _node, child, datum, height, j, k, len, len1, line, lineHeight, lineNumber, nodes, ref2, tspan, word, words, y;
+	          text = d3.select(this);
+	          datum = this.__data__;
+	          words = text.text().split(/\s+/).reverse();
+	          word = void 0;
+	          line = [];
+	          lineNumber = 0;
+	          lineHeight = 18;
+	          y = text.attr('y');
+	          tspan = text.text(null).append('tspan').attr('x', 0).attr('y', 0);
+	          while (word = words.pop()) {
+	            line.push(word);
+	            tspan.text(line.join(' '));
+	            if (tspan.node().getComputedTextLength() > width) {
+	              line.pop();
+	              tspan.text(line.join(' '));
+	              line = [word];
+	              tspan = text.append('tspan').attr('x', 0).attr('y', 0).attr('dy', ++lineNumber * lineHeight + 'px').text(word);
+	            }
+	          }
+	          nodes = cola.nodes();
+	          if (datum.index != null) {
+	            height = nodes[datum.index].height;
+	            if (height < 60) {
+	              nodes[datum.index].height += lineNumber * lineHeight;
+	            }
+	          } else {
+	            for (j = 0, len = nodes.length; j < len; j++) {
+	              _node = nodes[j];
+	              if (_node.nid === datum.nid) {
+	                height = _node.height;
+	                if (height < 60) {
+	                  _node.height += lineNumber * lineHeight;
+	                }
+	              }
+	            }
+	          }
+	          ref2 = this.parentNode.parentNode.children;
+	          for (k = 0, len1 = ref2.length; k < len1; k++) {
+	            child = ref2[k];
+	            if (child.nodeName === 'rect') {
+	              height = parseInt(child.getAttribute('height'));
+	              child.setAttribute('height', "" + (height + lineNumber * lineHeight));
+	            }
+	          }
+	          return;
+	        });
+	      };
+	    })(this);
 	    setVisibility = (function(_this) {
 	      return function() {
-	        var child, datum, eventType, index, j, k, len, len1, link, neighbors, ref2, ref3, ref4, ref5, results, source, target;
+	        var child, datum, eventType, index, j, k, len, len1, link, neighbors, node, ref2, ref3, ref4, ref5, results, source, target;
 	        eventType = d3.event.type;
 	        datum = d3.event.target.__data__;
 	        if (datum.type === classSpec.TYPE) {
@@ -923,6 +972,23 @@ webpackJsonp([0],[
 	        return results;
 	      };
 	    })(this);
+	    node = selection.data(data, function(d) {
+	      return d.nid;
+	    });
+	    node.call(this.cola.drag).on('click', this.onNodeClick);
+	    node.selectAll('.node-text').call((function(_this) {
+	      return function(text, cola) {
+	        if (cola == null) {
+	          cola = _this.cola;
+	        }
+	        text.each(function() {
+	          var datum, nodes;
+	          datum = this.__data__;
+	          nodes = cola.nodes();
+	          nodes[datum.index].height = datum.height;
+	        });
+	      };
+	    })(this));
 	    enter = node.enter().insert('g', '.node-cont').attr('class', 'node-cont').style('opacity', function(d) {
 	      if (d.opaque) {
 	        return 1;
@@ -968,61 +1034,13 @@ webpackJsonp([0],[
 	        return _this.color(_this.graph.groups.length);
 	      };
 	    })(this));
-	    wrap = (function(_this) {
-	      return function(text, width, nodes, tick) {
-	        return text.each(function() {
-	          var _node, child, datum, height, j, k, len, len1, line, lineHeight, lineNumber, ref2, tspan, word, words, y;
-	          text = d3.select(this);
-	          datum = this.__data__;
-	          words = text.text().split(/\s+/).reverse();
-	          word = void 0;
-	          line = [];
-	          lineNumber = 0;
-	          lineHeight = 18;
-	          y = text.attr('y');
-	          tspan = text.text(null).append('tspan').attr('x', 0).attr('y', 0);
-	          while (word = words.pop()) {
-	            line.push(word);
-	            tspan.text(line.join(' '));
-	            if (tspan.node().getComputedTextLength() > width) {
-	              line.pop();
-	              tspan.text(line.join(' '));
-	              line = [word];
-	              tspan = text.append('tspan').attr('x', 0).attr('y', 0).attr('dy', ++lineNumber * lineHeight + 'px').text(word);
-	            }
-	          }
-	          if (datum.index != null) {
-	            height = nodes[datum.index].height;
-	            nodes[datum.index].height += lineNumber * lineHeight;
-	          } else {
-	            for (j = 0, len = nodes.length; j < len; j++) {
-	              _node = nodes[j];
-	              if (_node.nid === datum.nid) {
-	                height = _node.height;
-	                _node.height += lineNumber * lineHeight;
-	              }
-	            }
-	          }
-	          ref2 = this.parentNode.parentNode.children;
-	          for (k = 0, len1 = ref2.length; k < len1; k++) {
-	            child = ref2[k];
-	            if (child.nodeName === 'rect') {
-	              height = parseInt(child.getAttribute('height'));
-	              child.setAttribute('height', "" + (height + lineNumber * lineHeight));
-	            }
-	          }
-	          return;
-	        });
-	      };
-	    })(this);
 	    textGroup = enter.append('g').attr('transform', function(d) {
 	      return "translate(" + (d.width / 2) + "," + (d.height / 2) + ")";
-	    }).attr('class', 'cola label').call(this.cola.drag).append('text').text((function(_this) {
+	    }).attr('class', 'cola label').call(this.cola.drag).append('text').attr('class', 'node-text').text((function(_this) {
 	      return function(d) {
-	        d.name;
-	        return _this.cola.nodes().indexOf(d);
+	        return d.name;
 	      };
-	    })(this)).call(wrap, classSpec.WIDTH, this.cola.nodes(), this.tick);
+	    })(this)).call(wrap, classSpec.WIDTH, this.cola);
 	    enter.append('title').text(function(d) {
 	      return d.name;
 	    });
@@ -1087,6 +1105,7 @@ webpackJsonp([0],[
 	    switch (datum.type) {
 	      case classSpec.TYPE:
 	        parent = targetNode;
+	        console.log(parent.className);
 	        while (parent.className.animVal !== 'node-cont') {
 	          parent = parent.parentNode;
 	        }
@@ -1166,7 +1185,7 @@ webpackJsonp([0],[
 	  };
 
 	  Graph.prototype.moveNode = function() {
-	    var DOWN, LEFT, RIGHT, UP, _, clickedNode, clickedSemester, clickedSemesterIndex, constraint, directionals, groupPositions, index, insertIndex, j, k, key, len, len1, link, links, lower, map, maxIndex, moveOffset, newConstraints, newGroups, newNodes, newSemester, newSemesterIndex, newXcoord, node, node1, node2, nodePositions, offset, ref10, ref11, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, saveIndex, semester, semesters, splitNodeBottomList, splitNodeTop, swapIndex, updateConstraints, upper;
+	    var DOWN, LEFT, RIGHT, UP, _, clickedNode, clickedSemester, clickedSemesterIndex, constraint, directionals, index, j, k, key, len, len1, map, maxIndex, moveOffset, newConstraints, newSemester, newSemesterIndex, node, node1, node2, offset, ref2, ref3, ref4, ref5, ref6, ref7, ref8, saveIndex, semester, semesters, swapIndex, updateConstraints;
 	    updateConstraints = (function(_this) {
 	      return function(semesterID, modifyConstraint) {
 	        var constraint, j, len, newConstraint, newConstraints, ref2;
@@ -1201,6 +1220,7 @@ webpackJsonp([0],[
 	    if (this.clickedNode == null) {
 	      return;
 	    }
+	    console.log('which node clicked', this.clickedNode.nid);
 	    clickedNode = this.clickedNode.__data__;
 	    clickedSemester = clickedNode.parent;
 	    map = {};
@@ -1272,70 +1292,7 @@ webpackJsonp([0],[
 	        }
 	        moveOffset = key === LEFT ? -1 : 1;
 	        newSemesterIndex = clickedSemesterIndex + moveOffset;
-	        if (0 <= newSemesterIndex && newSemesterIndex < semesters.length) {
-	          clickedSemester.leaves.splice(clickedSemester.leaves.indexOf(clickedNode), 1);
-	          newSemester = semesters[newSemesterIndex];
-	          newXcoord = newSemester.leaves.slice(-1)[0].x;
-	          ref9 = newSemester.leaves;
-	          for (index in ref9) {
-	            node = ref9[index];
-	            console.log(node.y);
-	            upper = node.y;
-	            lower = node.y + (node.bounds.Y - node.bounds.y);
-	            if (upper <= clickedNode.y && clickedNode.y <= lower) {
-	              insertIndex = parseInt(index) + 1;
-	              console.log('test', upper + ", " + lower);
-	              splitNodeTop = node;
-	              splitNodeBottomList = newSemester.leaves.slice(parseInt(index) + 1);
-	            }
-	          }
-	          newSemester.leaves.push(clickedNode);
-	          newConstraints = updateConstraints(clickedSemester.gid, (function(_this) {
-	            return function(offsets) {
-	              var l, len2, results;
-	              results = [];
-	              for (l = 0, len2 = offsets.length; l < len2; l++) {
-	                offset = offsets[l];
-	                if (offset.node !== clickedNode.index) {
-	                  results.push(offset);
-	                }
-	              }
-	              return results;
-	            };
-	          })(this));
-	          console.log('newconstraint', newConstraints);
-	          newConstraints = updateConstraints(newSemester.gid, function(offsets) {
-	            offsets.splice(insertIndex, 0, {
-	              node: clickedNode.index,
-	              offest: constraintSpec.alignment.OFFSET.x
-	            });
-	            return offsets;
-	          });
-	          ref10 = [this.cola.nodes(), this.cola.groups()], newNodes = ref10[0], newGroups = ref10[1];
-	          ref11 = this.getPositiondata(newNodes, newGroups), nodePositions = ref11.nodePositions, groupPositions = ref11.groupPositions;
-	          console.log('close to giving up', nodePositions, groupPositions);
-	          links = (function() {
-	            var l, len2, ref12, results;
-	            ref12 = this.cola.links();
-	            results = [];
-	            for (l = 0, len2 = ref12.length; l < len2; l++) {
-	              link = ref12[l];
-	              results.push({
-	                source: link.source.index,
-	                target: link.target.index,
-	                visible: link.visible
-	              });
-	            }
-	            return results;
-	          }).call(this);
-	          console.log('links', links);
-	          return this.update({
-	            nodes: nodePositions,
-	            link: links,
-	            groups: groupPositions,
-	            constraints: newConstraints
-	          });
-	        }
+	        return newSemester = semesters[newSemesterIndex];
 	      }
 	    }
 	  };

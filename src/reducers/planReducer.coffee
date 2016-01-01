@@ -85,25 +85,25 @@ reducer = (state = initialState, action) ->
 			nodeSemester = action.nodeData.semester
 
 			groupBounds = groupPositions[nodeSemester]?.bounds
-			group = newState.groups[nodeSemester+1]
+			group = newState.groups[nodeSemester-1]
 			newNode = createNode action.nodeData, {
 				groupBounds: groupBounds
 			}
 			addNode newState, nodeIndex, newNode
 
-			nextGroupBounds = groupPositions[nodeSemester+1]?.bounds
-			nextGroup = newState.groups[nodeSemester+1]
+			prevGroupBounds = groupPositions[nodeSemester-1]?.bounds
+			prevGroup = newState.groups[nodeSemester-1]
 
 			# === ADD OPTIONS COURSES
-			# add option nodes only if the next semester exists
-			if nextGroup? and nextGroupBounds
+			# add option nodes only if the prev semester exists
+			if prevGroup? and prevGroupBounds
 				for optionData in action.options
 					optionIndex = newState.nodes.length
 
 					newOption = createNode optionData, {
-						semester: 		nodeSemester+1
-						groupBounds:	nextGroupBounds
-						status:			classSpec.status.OPTION
+						semester: 		nodeSemester-1
+						groupBounds:	prevGroupBounds
+						status:			classSpec.status.PREREQ
 					}
 					addNode newState, optionIndex, newOption
 
