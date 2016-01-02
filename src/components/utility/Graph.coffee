@@ -62,6 +62,9 @@ class Graph
 		# node count, serves as id for new node creation
 		@nodeCount = 0
 
+		# for mapping global mouse coords to svg loc
+		@refPoint = @_svg[0][0].createSVGPoint()
+
 		@update()
 
 	tick: =>
@@ -76,6 +79,11 @@ class Graph
 			x = d.x - (d.width/2)
 			y = d.y - (d.height / 2) + @pad
 			"translate(#{x}, #{y})"
+		.attr 'visibility', (d) ->
+			if d.hidden?
+				'hidden'
+			else
+				'visible'
 		
 		if @opacityChanged
 			@link.transition()
@@ -98,16 +106,12 @@ class Graph
 
 		return
 
-	update: (graph = @graph, up) =>
-		# if @clickedNodeID?
-		# 	console.log 'fucking hell', @clickedNodeID
-		# 	for node in @graph.nodes
-		# 		if node.nid is @clickedNodeID
-		# 			@clickedNode = node
-
-		# if up?
-		# 	@cola.stop()
-		console.log 'update graph', graph
+	update: (graph = @graph) =>
+		# DEBUGGING
+		# console.log 'update graph', graph
+		# console.log 'new graph', JSON.stringify graph, null, 4 if !@cola?
+		# console.log 'update graph', JSON.stringify @stripRefs(graph), null, 4 if @cola?
+		
 		@cola.stop() if @cola
 		@cola = webcola.d3adaptor()
 					# .linkDistance(100)
@@ -125,55 +129,16 @@ class Graph
 			.groups(graph.groups)
 			.constraints(graph.constraints)
 
-		# console.log 'wtf cola'
-		# for cons in @cola.nodes()
-		# 	console.log cons.name
 		@cola.on 'tick', @tick
+
+		@nodeIDMap = {} # this isn't implemented everywhere yet
+		for index, node of @cola.nodes()
+			@nodeIDMap[node.nid] = node
 		
 		@group = @updateGroups @group, @cola.groups()
 		@link = @updateLinks @link, @cola.links()
 		@node = @updateNodes @node, @cola.nodes()
 		
-
-		# if up?
-		# 	duration = 2000
-		# 	start = =>
-		# 		@cola.start()
-		# 	@group.transition().duration(duration)
-		# 	.attr 		'x', 		(d) ->
-		# 		# console.log 'in first d', d
-		# 		# console.log 'bounds', webcola.vpsc.computeGroupBounds(d)
-		# 		d.bounds.x
-		# 	.attr 		'y', 		(d) ->	d.bounds.y
-		# 	.attr 		'width',	(d) ->
-		# 		# console.log 'd', d.bounds, d.bounds.X-d.bounds.x
-		# 		d.bounds.X-d.bounds.x
-		# 	.attr 		'height', 	(d) ->	d.bounds.Y-d.bounds.y
-
-		# 	@node.transition().duration(duration)
-		# 	.attr 		'x', (d) ->
-		# 		# console.log 'nodedx', d.name, d.x, d.width
-		# 		d.x = if d.x? then d.x else 0
-		# 		d.x - (d.width / 2)
-		# 	.attr 		'y', (d) =>
-		# 		# console.log 'nodedy', d.name, d.y, @pad
-		# 		d.y = if d.y? then d.y else 0
-		# 		d.y - (d.height / 2) + @pad
-
-		# 	@label.transition().duration(duration)
-		# 	.attr 		'x', (d) ->
-		# 		# console.log 'nodedx', d.name, d.x
-		# 		d.x = if d.x? then d.x else 0
-		# 	.attr 		'y', (d) ->
-		# 		h = @getBBox().height
-		# 		# console.log 'labeld', d.name, d.y, h
-		# 		d.y = if d.y? then d.y else 0
-		# 		d.y + h / 2
-		# 	.each 'end', start
-
-		# else
-		# 	@cola.start()
-
 		@cola.start()
 		
 	updateNodes: (selection, data) =>
@@ -260,29 +225,65 @@ class Graph
 					break
 
 		moveGhostNode = (e) =>
-			@cir
-			.attr 'cx', e.clientX
-			.attr 'cy', e.clientY
+			
+			@refPoint.x = e.clientX
+			@refPoint.y = e.clientY
+			# convert to global screen coordinates
+			{x,y} = @refPoint.matrixTransform @svg[0][0].getScreenCTM().inverse()
+			
+			@ghost
+			.attr 'x', x
+			.attr 'y', y
+
+			false
 
 		onMouseDown = =>
+			console.log 'mousedown'
+			# get coordinates to filter simple click
+			@currentPosition = [d3.event.clientX, d3.event.clientY]
+
 			targetNode = d3.event.target
 			@moveNode = targetNode.__data__
 
+			# don't move add class buttons
 			if @moveNode.type is addClassSpec.TYPE
 				return
 
+			# get container
 			while targetNode.className.animVal isnt 'node-cont'
 				targetNode = targetNode.parentNode
 
+			# convert from global coordinates
+			[@refPoint.x, @refPoint.y] = @currentPosition
+			{x,y} = @refPoint.matrixTransform @svg[0][0].getScreenCTM().inverse()
+			
 
-			@svg.append 'circle'
+			# STYLE CHANGES
+			# get relevant svg rect element
+			for child in targetNode.children
+				if child.nodeName is 'rect'
+					rect = child
+					break
+
+			# style the ghost node
+			ghostFill = rect.getAttribute('style').match(/fill: (.*?);/)[1]
+			# attach ghost node, then grab it, storing in global
+			@svg.append 'rect'
 					.attr 'class', 'move-node-ghost'
-					.attr 'r', 5
-					.attr 'cx', @moveNode.x
-					.attr 'cy', @moveNode.y
+					.attr 'width', classSpec.WIDTH
+					.attr 'height', classSpec.HEIGHT
+					.attr 'rx', 5
+					.attr 'ry', 5
+					.attr 'x', x
+					.attr 'y', y
+					.style 'opacity', 0.3
+					.style 'fill', ghostFill ? 'grey'
+			@ghost = @svg.select('.move-node-ghost')
 
-			@cir = @svg.select('.move-node-ghost')
+			@cola.nodes()[@moveNode.index].hidden = true
+			# ============
 
+			# add listeners to be removed later
 			@graphElement.addEventListener 'mousemove', moveGhostNode
 			@graphElement.addEventListener 'mouseup', onMouseUp
 			return true
@@ -290,13 +291,15 @@ class Graph
 		onMouseUp = (e) =>
 			targetNode = e.target
 
+			# if we landed in anything within a node container
 			if targetNode.className.animVal.indexOf('class-node') isnt -1
+				# get top level node container
 				while targetNode.className.animVal isnt 'node-cont'
 					targetNode = targetNode.parentNode
 				datum = targetNode.__data__
 
-				console.log 'name', @moveNode.nid
-
+				# create node to be added from old, using the
+				# target node's semester id
 				nodeData =
 					className: @moveNode.name
 					semester: datum.parent.gid # parent group
@@ -325,8 +328,13 @@ class Graph
 				}
 
 			else
-				console.log 'ah-ah', targetNode.className.animVal
+				@nodeIDMap[@moveNode.nid].hidden = undefined
+				@tick()
+				console.log 'did not land on element', targetNode.className.animVal
 
+
+			# clean up
+			@ghost.remove()
 			@graphElement.removeEventListener 'mousemove', moveGhostNode
 
 
@@ -341,15 +349,12 @@ class Graph
 		# when heights are changed for text wrapping, this
 		# ensures that those heights get re-registered to the model
 		node.selectAll('.class-node-text')
-			.call (text, cola = @cola) =>
-				nodeIndexMap = {}
-				for index, _node of cola.nodes()
-					nodeIndexMap[_node.nid] = parseInt index
+			.call (text, cola = @cola, nmap=@nodeIDMap) =>
 				text.each () ->
 					datum = this.__data__
 					nodes = cola.nodes()
 					# this is data from the pre-existing render being added to model
-					nodes[nodeIndexMap[datum.nid]].height = datum.height
+					nmap[datum.nid].height = datum.height
 					return
 				return
 
@@ -415,7 +420,7 @@ class Graph
 							classSpec.STYLE.PLACEHOLDER.FILL
 					.text (d) =>
 						d.name
-						# "id: #{d.nid}, index: #{@cola.nodes().indexOf(d)}"
+						"id: #{d.nid}, index: #{@cola.nodes().indexOf(d)}"
 					.call wrap, classSpec.WIDTH, @cola
 
 		enter.append 'title' # todo: inserts title multiple times
@@ -489,6 +494,7 @@ class Graph
 		link
 
 	onNodeClick: =>
+		console.log 'click'
 		return if d3.event.defaultPrevented # default is prevented on drag
 		
 		targetNode = d3.event.target
@@ -516,11 +522,11 @@ class Graph
 				style = "stroke: #{classSpec.STYLE.SELECTED.BORDER.COLOR}; "
 				style += "stroke-width: #{classSpec.STYLE.SELECTED.BORDER.WIDTH}"
 				if oldStyle.indexOf('stroke') isnt -1
-					oldStyle = oldStyle.replace /stroke: rgb\(.*\); stroke-width: rgb\(.*\)/, style
+					newStyle = oldStyle.replace /stroke: rgb\(.*\); stroke-width: rgb\(.*\)/, style
 				else
-					oldStyle += "; #{style}"
+					newStyle = oldStyle + "; #{style}"
 
-				targetNode.setAttribute('style', oldStyle)
+				targetNode.setAttribute('style', newStyle)
 
 			when addClassSpec.TYPE
 				addClass = (classCode) =>
@@ -588,7 +594,7 @@ class Graph
 		updateConstraints = (semesterID, modifyConstraint) =>
 			newConstraints = []
 			for constraint in @cola.constraints()
-				if constraint.type?
+				if constraint.type is 'alignment'
 					newConstraint = 
 						axis: constraint.axis
 						group: constraint.group
@@ -616,7 +622,7 @@ class Graph
 		map = {}
 		# make a map of index -> offset, get index of clickedNode's offset object
 		for constraint in @cola.constraints()
-			if constraint.type? and constraint.group is clickedSemester.gid
+			if constraint.type is 'alignment' and constraint.group is clickedSemester.gid
 				for index, offset of constraint.offsets
 					map[index] = offset
 					if clickedNode.index is offset.node
@@ -726,6 +732,32 @@ class Graph
 		nodes: @cola.nodes()
 		groups: @cola.groups()
 		links: @cola.links()
+
+	# for debugging
+	stripRefs: (graph) ->
+		# for node in graph.nodes
+		nodes = []
+		for node in graph.nodes
+			newNode = {}
+			for key,value of node
+				unless key in ['bounds','parent', 'variable', 'index']
+					newNode[key] = value
+			nodes.push newNode
+
+		groups = []
+		for group in graph.groups
+			leaves = []
+			for leaf in group.leaves
+				leaves.push(if typeof(leaf) is 'number' then leaf else leaf.index)
+
+			groups.push
+				id: group.id
+				leaves: leaves
+
+		nodes: nodes
+		groups: groups
+		links: graph.links
+		constraints: graph.constraints
 
 module.exports = 
 	Graph: Graph

@@ -19,7 +19,7 @@ Plan = React.createClass
 		{dispatch, state, graphData} = @props
 		
 		console.log 'newstate?', state
-		@graph.update(state, 'up')
+		@graph.update(state)
 
 		window.dispatch = dispatch
 

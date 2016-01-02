@@ -54,19 +54,30 @@ createNode = (attrsList...) ->
 
 	newNode
 
+addNode = (state, index, node) ->
+	state.nodes.push node
+	state.groups[node.semester].leaves.push index
+	for constraint in state.constraints
+		if constraint.type is 'alignment' and constraint.group is node.semester
+			constraint.offsets.push
+				node: index
+				offset: constraintSpec.alignment.OFFSET.x
+
+	# state.constraints.unshift {
+	# 	axis: 'y'
+	# 	left: state.groups[node.semester].leaves[0] # root node of group
+	# 	right: index # new anchor index
+	# 	gap: 20
+	# 	equality: 'true'
+	# }
+
 fn_ADD_CLASS = (newState, action) ->
 	{nodePositions, groupPositions} = action.positionData
 
-	addPositionData newState, {
-		nodePositions: nodePositions
-		groupPositions: groupPositions
-	}
-
-	nodeIndex = newState.nodes.length
+	nodeIndex = if action.nodeData.index? then action.nodeData else newState.nodes.length
 	nodeSemester = action.nodeData.semester
 
 	groupBounds = groupPositions[nodeSemester]?.bounds
-	group = newState.groups[nodeSemester-1]
 	newNode = createNode action.nodeData, {
 		groupBounds: groupBounds
 	}
@@ -97,13 +108,6 @@ fn_ADD_CLASS = (newState, action) ->
 	newState
 
 fn_DELETE_CLASS = (newState, action) ->
-	{nodePositions, groupPositions} = action.positionData
-
-	addPositionData newState, {
-		nodePositions: nodePositions
-		groupPositions: groupPositions
-	}
-
 	# get index by node id
 	for index, node of newState.nodes
 		delNodeIndex = parseInt index
@@ -118,25 +122,25 @@ fn_DELETE_CLASS = (newState, action) ->
 	remap = (i) -> if i>delNodeIndex then i-1 else i
 	for group in newState.groups
 		group.leaves = (remap leaf for leaf in group.leaves when leaf isnt delNodeIndex)
+	
+	newState.contraints = newState.constraints.filter (c) ->
+		if !c.type?
+			# nodes that can be deleted only appear on right for now
+			if c.left is delNodeIndex or c.right is delNodeIndex
+				return false
+		true
 	for constraint in newState.constraints
 		if constraint.type is 'alignment'					# yo dawg...
 			constraint.offsets = ({node:(remap offset.node), offset:offset.offset} for offset in constraint.offsets when offset.node isnt delNodeIndex)
-	
+		else
+			constraint.left = remap	constraint.left
+			constraint.right = remap constraint.right
 	# delete all links attached to node
 	# maybe later we might want to delete the nodes it points to as well
 	newState.links = ({source:(remap link.source), target:(remap link.target)} for link in newState.links when (link.source isnt delNodeIndex and link.target isnt delNodeIndex))
 
 	newState
 
-# obsolete
-addNode = (state, index, node) ->
-	state.nodes.push node
-	state.groups[node.semester].leaves.push index
-	for constraint in state.constraints
-		if constraint.type is 'alignment' and constraint.group is node.semester
-			constraint.offsets.push
-				node: index
-				offset: constraintSpec.alignment.OFFSET.x
 
 # add node, delete all in group 1, undo add node
 reducer = (state = initialState, action) ->
@@ -149,6 +153,13 @@ reducer = (state = initialState, action) ->
 
 		when ADD_CLASS
 			newState = state.toJS()
+
+			{nodePositions, groupPositions} = action.positionData
+			addPositionData newState, {
+				nodePositions: nodePositions
+				groupPositions: groupPositions
+			}
+
 			im.fromJS fn_ADD_CLASS(newState, action)
 
 		when ADD_SEMESTER
@@ -181,7 +192,7 @@ reducer = (state = initialState, action) ->
 
 			# new group constraint based on old one
 			# displacements constraints don't have type yet, todo: add them
-			displacementConstraints = newState.constraints.filter( (c) -> !c.type?)
+			displacementConstraints = newState.constraints.filter( (c) -> c.type isnt 'alignment')
 			lastConstraint = displacementConstraints[displacementConstraints.length-1]
 			newDisplacementConstraint =
 				axis: 'x'
@@ -205,13 +216,28 @@ reducer = (state = initialState, action) ->
 		when DELETE_CLASS
 			# newState = action.graph
 			newState = state.toJS() # todo: shouldn't need to convert to js, fix later
+			
+			{nodePositions, groupPositions} = action.positionData
+			addPositionData newState, {
+				nodePositions: nodePositions
+				groupPositions: groupPositions
+			}
+
 			im.fromJS fn_DELETE_CLASS(newState, action)
 
 		when 'MOVE_CLASS'
 			console.log 'state', typeof state, state
 			newState = state.toJS() # todo: shouldn't need to convert to js, fix later
 
+			{nodePositions, groupPositions} = action.positionData
+			addPositionData newState, {
+				nodePositions: nodePositions
+				groupPositions: groupPositions
+			}
+
 			im.fromJS (fn_ADD_CLASS fn_DELETE_CLASS(newState, action), action)
+			# im.fromJS fn_DELETE_CLASS(newState, action)
+			# im.fromJS fn_ADD_CLASS newState, action
 		else state
 
 init = (init) ->
