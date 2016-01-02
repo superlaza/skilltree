@@ -7,7 +7,7 @@ module.exports =
 			ENROLLED: 'enrolled'
 			OPTION: 'option'
 			PREREQ: 'prereq'
-		CLASS: 'classNode'
+		CLASS: 'class-node'
 		STYLE:
 			DEFAULT:
 				FILL: 'rgb(255, 127, 14)'

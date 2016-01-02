@@ -51,18 +51,13 @@ class Graph
 		# ==== #
 
 		#========= feature selections
-		# add groups (in appropriate render order) for each element type
-		# this shit is super unreadable
-		classes = ['group', 'link', 'node']
-		@svg.append('g').attr('class', cls) for cls in ("#{cls}-group" for cls in classes)
-		sel = (className) -> d3.select("g.#{className}-group").selectAll ".#{className}"
-		[@group, @link, @node, @label] = (sel cls for cls in classes)
+		@svg.append('g').attr('class', 'group-group')
+		@svg.append('g').attr('class', 'link-group')
+		@svg.append('g').attr('class', 'node-group')
 
-		# @group = @svg.selectAll '.group'
-		# @link = @svg.selectAll '.link'
-		# @node = @svg.selectAll '.node'
-		# @label = @svg.selectAll '.label'
-		#==========
+		@group = d3.select("g.group-group").selectAll ".group"
+		@link = d3.select("g.link-group").selectAll ".link"
+		@node = d3.select("g.node-group").selectAll ".node"
 
 		# node count, serves as id for new node creation
 		@nodeCount = 0
@@ -85,7 +80,6 @@ class Graph
 		if @opacityChanged
 			@link.transition()
 				.delay (d) ->
-					console.log 'umm..', d.opaque
 					if d.opaque then 400 else 0
 				# .ease('exp')
 				.style 'opacity', (d) ->
@@ -195,6 +189,7 @@ class Graph
 				y = text.attr('y')
 				tspan = text.text(null)
 							.append('tspan')
+							.attr 'class', 'class-node-tspan'
 							.attr('x', 0)
 							.attr('y', 0)
 							# .attr('dy', dy + 'em')
@@ -206,6 +201,7 @@ class Graph
 						tspan.text line.join(' ')
 						line = [ word ]
 						tspan = text.append('tspan')
+									.attr 'class', 'class-node-tspan'
 									.attr('x', 0)
 									.attr('y', 0)
 									# .attr('dy', ++lineNumber * lineHeight + 'em')
@@ -262,16 +258,88 @@ class Graph
 					child.setAttribute('visibility', if eventType is 'mouseenter' then 'visible' else 'hidden')
 					break
 
+		moveGhostNode = (e) =>
+			@cir
+			.attr 'cx', e.clientX
+			.attr 'cy', e.clientY
+
+		onMouseDown = =>
+			targetNode = d3.event.target
+			@moveNode = targetNode.__data__
+
+			if @moveNode.type is addClassSpec.TYPE
+				return
+
+			while targetNode.className.animVal isnt 'node-cont'
+				targetNode = targetNode.parentNode
+
+
+			@svg.append 'circle'
+					.attr 'class', 'move-node-ghost'
+					.attr 'r', 5
+					.attr 'cx', @moveNode.x
+					.attr 'cy', @moveNode.y
+
+			@cir = @svg.select('.move-node-ghost')
+
+			@graphElement.addEventListener 'mousemove', moveGhostNode
+			@graphElement.addEventListener 'mouseup', onMouseUp
+			return true
+
+		onMouseUp = (e) =>
+			targetNode = e.target
+
+			if targetNode.className.animVal.indexOf('class-node') isnt -1
+				while targetNode.className.animVal isnt 'node-cont'
+					targetNode = targetNode.parentNode
+				datum = targetNode.__data__
+
+				console.log 'name', @moveNode.nid
+
+				nodeData =
+					className: @moveNode.name
+					semester: datum.parent.gid # parent group
+					nid: @moveNode.nid
+					type: classSpec.TYPE
+					width: classSpec.WIDTH
+					height: classSpec.HEIGHT
+				@nodeCount += 1
+
+				# optionsData = []
+				# for optionName in @adjList[classCode].prereqs
+				# 	optionsData.push
+				# 		className: @adjList[optionName].name
+				# 		nid: optionName
+				# 		type: classSpec.TYPE
+				# 		width: classSpec.WIDTH
+				# 		height: classSpec.HEIGHT
+				# 	@nodeCount += 1
+
+				@dispatch {
+					type: 			'MOVE_CLASS'
+					nodeData:		nodeData
+					options:		[]
+					nodeID:			nodeData.nid
+					positionData:	@getPositiondata @cola.nodes(), @cola.groups()
+				}
+
+			else
+				console.log 'ah-ah', targetNode.className.animVal
+
+			@graphElement.removeEventListener 'mousemove', moveGhostNode
+
+
 		node = selection.data data,
 					(d) ->
 						d.nid
 		node
-			.call @cola.drag
+			# .call @cola.drag
 			.on 'click', @onNodeClick
+			.on 'mousedown', onMouseDown
 
 		# when heights are changed for text wrapping, this
 		# ensures that those heights get re-registered to the model
-		node.selectAll('.node-text')
+		node.selectAll('.class-node-text')
 			.call (text, cola = @cola) =>
 				nodeIndexMap = {}
 				for index, _node of cola.nodes()
@@ -290,10 +358,11 @@ class Graph
 				.attr 'class', 'node-cont'
 				.style 'opacity', (d) ->
 					if d.opaque then 1 else addClassSpec.OPACITY
-				.call @cola.drag
+				# .call @cola.drag
 				.on 'click', @onNodeClick
 				.on 'mouseenter', setVisibility
 				.on 'mouseleave', setVisibility
+				.on 'mousedown', onMouseDown
 		enter.append 'rect'
 				.attr 'class', (d) ->
 					classStem = 'cola node'
@@ -334,10 +403,10 @@ class Graph
 		textGroup = enter.append 'g'
 				.attr 'transform', (d) ->
 					"translate(#{d.width/2},#{d.height/2})"
-				.attr 'class', 'cola label'
-				.call @cola.drag
+				.attr 'class', 'cola label class-node-label'
+				# .call @cola.drag
 				.append 'text'
-					.attr 'class', 'node-text'
+					.attr 'class', 'class-node-text'
 					.style 'fill', (d) ->
 						if d.nid.indexOf('placeholder') isnt -1
 							'#BDBDBD'
@@ -363,10 +432,9 @@ class Graph
 				.attr 'visibility', 'hidden'
 				.on 'click', =>
 					targetNode = d3.event.target
-					parent = targetNode
-					while parent.className.animVal isnt 'node-cont'
-						parent = parent.parentNode
-					datum = parent.__data__
+					while targetNode.className.animVal isnt 'node-cont'
+						targetNode = targetNode.parentNode
+					datum = targetNode.__data__
 					@dispatch actionDeleteClass(
 							datum.nid,
 							@getPositiondata @cola.nodes(), @cola.groups()
@@ -428,18 +496,16 @@ class Graph
 		switch datum.type
 			when classSpec.TYPE
 
-				parent = targetNode
-				while parent.className.animVal isnt 'node-cont'
-					parent = parent.parentNode
+				while targetNode.className.animVal isnt 'node-cont'
+					targetNode = targetNode.parentNode
 				
 				# only one rect in group
-				for child in parent.children
+				for child in targetNode.children
 					if child.nodeName is 'rect'
 						targetNode = child
 
 				# set previously clicked node back to default color
 				if @clickedNode?
-					console.log 'iold', @clickedNode.oldStyle
 					@clickedNode.setAttribute('style', @clickedNode.oldStyle)
 				
 				@clickedNode = targetNode

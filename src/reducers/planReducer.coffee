@@ -54,6 +54,80 @@ createNode = (attrsList...) ->
 
 	newNode
 
+fn_ADD_CLASS = (newState, action) ->
+	{nodePositions, groupPositions} = action.positionData
+
+	addPositionData newState, {
+		nodePositions: nodePositions
+		groupPositions: groupPositions
+	}
+
+	nodeIndex = newState.nodes.length
+	nodeSemester = action.nodeData.semester
+
+	groupBounds = groupPositions[nodeSemester]?.bounds
+	group = newState.groups[nodeSemester-1]
+	newNode = createNode action.nodeData, {
+		groupBounds: groupBounds
+	}
+	addNode newState, nodeIndex, newNode
+
+	prevGroupBounds = groupPositions[nodeSemester-1]?.bounds
+	prevGroup = newState.groups[nodeSemester-1]
+
+	# === ADD OPTIONS COURSES
+	# add option nodes only if the prev semester exists
+	if prevGroup? and prevGroupBounds
+		for optionData in action.options
+			optionIndex = newState.nodes.length
+
+			newOption = createNode optionData, {
+				semester: 		nodeSemester-1
+				groupBounds:	prevGroupBounds
+				status:			classSpec.status.PREREQ
+			}
+			addNode newState, optionIndex, newOption
+
+			# add new links
+			newState.links.push
+				source: nodeIndex
+				target: optionIndex
+				opaque: false
+
+	im.fromJS newState
+
+fn_DELETE_CLASS = (newState, action) ->
+	{nodePositions, groupPositions} = action.positionData
+
+	addPositionData newState, {
+		nodePositions: nodePositions
+		groupPositions: groupPositions
+	}
+
+	# get index by node id
+	for index, node of newState.nodes
+		delNodeIndex = parseInt index
+		if node.nid is action.nodeID
+			break
+
+	# the deletion
+	newState.nodes.splice(delNodeIndex, 1)
+
+	# remap index refs
+	# these lines are too long, this is not Disney.
+	remap = (i) -> if i>delNodeIndex then i-1 else i
+	for group in newState.groups
+		group.leaves = (remap leaf for leaf in group.leaves when leaf isnt delNodeIndex)
+	for constraint in newState.constraints
+		if constraint.type is 'alignment'					# yo dawg...
+			constraint.offsets = ({node:(remap offset.node), offset:offset.offset} for offset in constraint.offsets when offset.node isnt delNodeIndex)
+	
+	# delete all links attached to node
+	# maybe later we might want to delete the nodes it points to as well
+	newState.links = ({source:(remap link.source), target:(remap link.target)} for link in newState.links when (link.source isnt delNodeIndex and link.target isnt delNodeIndex))
+
+	im.fromJS newState
+
 # obsolete
 addNode = (state, index, node) ->
 	state.nodes.push node
@@ -68,52 +142,14 @@ addNode = (state, index, node) ->
 reducer = (state = initialState, action) ->
 	switch action.type
 		when 'INIT'
+			console.log 'state', typeof state, state
 			newState = state.toJS()
 
 			im.fromJS action.initialState
 
 		when ADD_CLASS
 			newState = state.toJS()
-			{nodePositions, groupPositions} = action.positionData
-
-			addPositionData newState, {
-				nodePositions: nodePositions
-				groupPositions: groupPositions
-			}
-
-			nodeIndex = newState.nodes.length
-			nodeSemester = action.nodeData.semester
-
-			groupBounds = groupPositions[nodeSemester]?.bounds
-			group = newState.groups[nodeSemester-1]
-			newNode = createNode action.nodeData, {
-				groupBounds: groupBounds
-			}
-			addNode newState, nodeIndex, newNode
-
-			prevGroupBounds = groupPositions[nodeSemester-1]?.bounds
-			prevGroup = newState.groups[nodeSemester-1]
-
-			# === ADD OPTIONS COURSES
-			# add option nodes only if the prev semester exists
-			if prevGroup? and prevGroupBounds
-				for optionData in action.options
-					optionIndex = newState.nodes.length
-
-					newOption = createNode optionData, {
-						semester: 		nodeSemester-1
-						groupBounds:	prevGroupBounds
-						status:			classSpec.status.PREREQ
-					}
-					addNode newState, optionIndex, newOption
-
-					# add new links
-					newState.links.push
-						source: nodeIndex
-						target: optionIndex
-						opaque: false
-
-			im.fromJS newState
+			fn_ADD_CLASS(newState, action)
 
 		when ADD_SEMESTER
 			newState = state.toJS()
@@ -169,34 +205,14 @@ reducer = (state = initialState, action) ->
 		when DELETE_CLASS
 			# newState = action.graph
 			newState = state.toJS() # todo: shouldn't need to convert to js, fix later
-			{nodePositions, groupPositions} = action.positionData
+			# fn_DELETE_CLASS(newState, action)
+			im.fromJS newState
 
-			addPositionData newState, {
-				nodePositions: nodePositions
-				groupPositions: groupPositions
-			}
+		when 'MOVE_CLASS'
+			console.log 'state', typeof state, state
+			newState = state.toJS() # todo: shouldn't need to convert to js, fix later
 
-			# get index by node id
-			for index, node of newState.nodes
-				delNodeIndex = parseInt index
-				if node.nid is action.nodeID
-					break
 
-			# the deletion
-			newState.nodes.splice(delNodeIndex, 1)
-
-			# remap index refs
-			# these lines are too long, this is not Disney.
-			remap = (i) -> if i>delNodeIndex then i-1 else i
-			for group in newState.groups
-				group.leaves = (remap leaf for leaf in group.leaves when leaf isnt delNodeIndex)
-			for constraint in newState.constraints
-				if constraint.type is 'alignment'					# yo dawg...
-					constraint.offsets = ({node:(remap offset.node), offset:offset.offset} for offset in constraint.offsets when offset.node isnt delNodeIndex)
-			
-			# delete all links attached to node
-			# maybe later we might want to delete the nodes it points to as well
-			newState.links = ({source:(remap link.source), target:(remap link.target)} for link in newState.links when (link.source isnt delNodeIndex and link.target isnt delNodeIndex))
 
 			im.fromJS newState
 		else state
