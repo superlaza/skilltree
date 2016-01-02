@@ -111,7 +111,7 @@ reducer = (state = initialState, action) ->
 					newState.links.push
 						source: nodeIndex
 						target: optionIndex
-						visible: false
+						opaque: false
 
 			im.fromJS newState
 
@@ -135,7 +135,7 @@ reducer = (state = initialState, action) ->
 				name:			addClassSpec.TEXT
 				semester: 		semesterIndex
 				type: 			addClassSpec.TYPE
-				nid: 			"s#{semesterIndex}"
+				nid: 			"#{addClassSpec.TYPE}#{semesterIndex}"
 				width:			addClassSpec.WIDTH
 				height:			addClassSpec.HEIGHT
 				opaque:			true
@@ -195,7 +195,7 @@ reducer = (state = initialState, action) ->
 					constraint.offsets = ({node:(remap offset.node), offset:offset.offset} for offset in constraint.offsets when offset.node isnt delNodeIndex)
 			
 			# delete all links attached to node
-			# maybe later we might want to delte the nodes it points to as well
+			# maybe later we might want to delete the nodes it points to as well
 			newState.links = ({source:(remap link.source), target:(remap link.target)} for link in newState.links when (link.source isnt delNodeIndex and link.target isnt delNodeIndex))
 
 			im.fromJS newState

@@ -3,8 +3,12 @@ webcola = require 'webcola'
 $ = require 'jquery'
 require 'jquery-ui'
 
-{classSpec, addClassSpec, btnDeleteClassSpec, constraintSpec} = require '../../constants/Specs.coffee'
-
+Specs = require '../../constants/Specs.coffee'
+classSpec 			= Specs.classSpec
+addClassSpec 		= Specs.addClassSpec
+btnDeleteClassSpec 	= Specs.btnDeleteClassSpec
+constraintSpec 		= Specs.constraintSpec
+groupSpec			= Specs.groupSpec
 
 {actionAddClass, actionDeleteClass} = require '../../actions/PlanActions.coffee'
 
@@ -13,6 +17,9 @@ class Graph
 		# event result persistence
 		@clickedNode = null
 		@clickedNodeID = null
+
+		# flags
+		@opacityChanged = false
 
 		d3.select 'body'
 			.on 'keydown', @moveNode
@@ -68,16 +75,26 @@ class Graph
 		.attr 'y1', (d) -> d.source.y
 		.attr 'x2', (d) -> d.target.x
 		.attr 'y2', (d) -> d.target.y
-		.attr 'visibility', (d) ->
-			if d.visible then 'visible' else 'hidden'
 
 		@node
 		.attr 'transform', (d) =>
 			x = d.x - (d.width/2)
 			y = d.y - (d.height / 2) + @pad
 			"translate(#{x}, #{y})"
-		.style 'opacity', (d) ->
-			if d.opaque then 1 else classSpec.OPACITY
+		
+		if @opacityChanged
+			@link.transition()
+				.delay (d) ->
+					console.log 'umm..', d.opaque
+					if d.opaque then 400 else 0
+				# .ease('exp')
+				.style 'opacity', (d) ->
+					if d.opaque then 1 else 0
+			@node.transition()
+				.delay(250)
+				# .ease('linear')
+				.style 'opacity', (d) ->
+					if d.opaque then 1 else classSpec.OPACITY
 
 		@group
 		.attr 		'x', 		(d) ->	d.bounds.x
@@ -199,14 +216,12 @@ class Graph
 				# change in simulation
 				if datum.index?
 					height = nodes[datum.index].height
-					if height < 60
-						nodes[datum.index].height += lineNumber*lineHeight
+					nodes[datum.index].height += lineNumber*lineHeight
 				else
 					for _node in nodes # can't use var name `node`
 						if _node.nid is datum.nid
 							height = _node.height
-							if height < 60
-								_node.height += lineNumber*lineHeight
+							_node.height += lineNumber*lineHeight
 
 				# change in render
 				for child in this.parentNode.parentNode.children
@@ -214,7 +229,6 @@ class Graph
 						height = parseInt child.getAttribute('height')
 						child.setAttribute 'height', "#{height+lineNumber*lineHeight}"
 				
-
 				# cola.start()
 				return
 		  return
@@ -230,7 +244,7 @@ class Graph
 				for index, link of @cola.links()
 					{source, target} = link
 					if source.index is datum.index or target.index is datum.index
-						link.visible = if eventType is 'mouseenter' then true else false
+						link.opaque = if eventType is 'mouseenter' then true else false
 						if source.index is datum.index
 							neighbors.push target.index
 						else
@@ -239,8 +253,9 @@ class Graph
 				for node in @cola.nodes()
 					if node.type is classSpec.TYPE and node.index not in neighbors
 						node.opaque = if eventType is 'mouseenter' then false else true
-				@tick() # draw changes
-
+				@opacityChanged = true
+				@tick() # draw changes with a flag to signifiy we're changing opacity
+				@opacityChanged = false
 			# set visibility of delete button
 			for child in d3.event.target.children
 				if child.className.animVal is btnDeleteClassSpec.CLASS
@@ -258,13 +273,17 @@ class Graph
 		# ensures that those heights get re-registered to the model
 		node.selectAll('.node-text')
 			.call (text, cola = @cola) =>
+				nodeIndexMap = {}
+				for index, _node of cola.nodes()
+					nodeIndexMap[_node.nid] = parseInt index
 				text.each () ->
 					datum = this.__data__
 					nodes = cola.nodes()
 					# this is data from the pre-existing render being added to model
-					nodes[datum.index].height = datum.height 
+					nodes[nodeIndexMap[datum.nid]].height = datum.height
 					return
 				return
+
 
 		enter = node.enter()
 			.insert 'g', '.node-cont'
@@ -294,12 +313,23 @@ class Graph
 				.attr 'width',
 					(d) =>
 						if d.hidden then 0 else d.width - (2 * @pad)
-				.attr 	'height',
+				.attr 'height',
 					(d) => 
 						if d.hidden then 0 else d.height - (2 * @pad)
 				.attr 'rx', 5
 				.attr 'ry', 5
-				.style 'fill',   (d) => @color @graph.groups.length
+				.style 'fill', 
+					(d) => 
+						switch d.type
+							when classSpec.TYPE
+								switch d.status
+									when classSpec.status.PREREQ
+										return 'rgb(255,29,25)'
+							
+								if d.nid.indexOf('placeholder') isnt -1
+									classSpec.STYLE.PLACEHOLDER.FILL
+								else
+									@color @graph.groups.length
 
 		textGroup = enter.append 'g'
 				.attr 'transform', (d) ->
@@ -308,6 +338,11 @@ class Graph
 				.call @cola.drag
 				.append 'text'
 					.attr 'class', 'node-text'
+					.style 'fill', (d) ->
+						if d.nid.indexOf('placeholder') isnt -1
+							'#BDBDBD'
+						else
+							classSpec.STYLE.PLACEHOLDER.FILL
 					.text (d) =>
 						d.name
 						# "id: #{d.nid}, index: #{@cola.nodes().indexOf(d)}"
@@ -327,7 +362,11 @@ class Graph
 				.attr 'class', btnDeleteClassSpec.CLASS
 				.attr 'visibility', 'hidden'
 				.on 'click', =>
-					datum = d3.event.target.__data__
+					targetNode = d3.event.target
+					parent = targetNode
+					while parent.className.animVal isnt 'node-cont'
+						parent = parent.parentNode
+					datum = parent.__data__
 					@dispatch actionDeleteClass(
 							datum.nid,
 							@getPositiondata @cola.nodes(), @cola.groups()
@@ -346,7 +385,6 @@ class Graph
 							.style 'stroke-opacity', 1
 		appendButton path for path in ['M 100,60 L 60,100 L 230,270 L 270,230 L 100,60 z', 'M 60,230 L 230,60 L 270,100 L 100,270 L 60,230 z']
 
-
 		node.exit().remove()
 
 		node
@@ -363,7 +401,8 @@ class Graph
 			.attr 'ry', 8
 			.attr 'class', 'cola group'
 			.style 'fill', (d, i) =>
-					@color i
+					# @color i
+					groupSpec.STYLE.FILL
 			.call @cola.drag
 		group.exit().remove()
 
@@ -374,8 +413,8 @@ class Graph
 		link.enter()
 			.insert 'line', '.link'
 				.attr 'class', 'cola link'
-				.attr 'visibility', (d) ->
-					if d.visible then 'visible' else 'hidden'
+				.style 'opacity', (d) ->
+					if d.opaque then 1 else 0
 		link.exit().remove()
 
 		link
@@ -390,7 +429,6 @@ class Graph
 			when classSpec.TYPE
 
 				parent = targetNode
-				console.log parent.className
 				while parent.className.animVal isnt 'node-cont'
 					parent = parent.parentNode
 				
@@ -401,11 +439,21 @@ class Graph
 
 				# set previously clicked node back to default color
 				if @clickedNode?
-					@clickedNode.setAttribute('style', "fill: #{classSpec.COLOR.DEFAULT}")
-				# set newly clicked node's color, and store it
-				targetNode.setAttribute('style', "fill: #{classSpec.COLOR.SELECTED}")
-				@clickedNode = targetNode
+					console.log 'iold', @clickedNode.oldStyle
+					@clickedNode.setAttribute('style', @clickedNode.oldStyle)
 				
+				@clickedNode = targetNode
+				oldStyle = targetNode.getAttribute('style')
+				@clickedNode.oldStyle = oldStyle
+				
+				style = "stroke: #{classSpec.STYLE.SELECTED.BORDER.COLOR}; "
+				style += "stroke-width: #{classSpec.STYLE.SELECTED.BORDER.WIDTH}"
+				if oldStyle.indexOf('stroke') isnt -1
+					oldStyle = oldStyle.replace /stroke: rgb\(.*\); stroke-width: rgb\(.*\)/, style
+				else
+					oldStyle += "; #{style}"
+
+				targetNode.setAttribute('style', oldStyle)
 
 			when addClassSpec.TYPE
 				addClass = (classCode) =>
@@ -414,7 +462,7 @@ class Graph
 					nodeData =
 						className: className
 						semester: datum.parent.gid # parent group
-						nid: @nodeCount
+						nid: classCode
 						type: classSpec.TYPE
 						width: classSpec.WIDTH
 						height: classSpec.HEIGHT
@@ -425,7 +473,7 @@ class Graph
 					for optionName in @adjList[classCode].prereqs
 						optionsData.push
 							className: @adjList[optionName].name
-							nid: @nodeCount
+							nid: optionName
 							type: classSpec.TYPE
 							width: classSpec.WIDTH
 							height: classSpec.HEIGHT

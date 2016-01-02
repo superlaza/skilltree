@@ -8,22 +8,31 @@ module.exports =
 			OPTION: 'option'
 			PREREQ: 'prereq'
 		CLASS: 'classNode'
-		COLOR:
-			DEFAULT: 'rgb(255, 127, 14)'
-			SELECTED: 'rgb(0, 153, 0)'
+		STYLE:
+			DEFAULT:
+				FILL: 'rgb(255, 127, 14)'
+			PLACEHOLDER:
+				FILL: 'white'
+			SELECTED:
+				BORDER:
+					COLOR: 'rgb(255,197,0)'
+					WIDTH: 4
 		OPACITY: 0.3
 	addClassSpec:
 		TEXT: "Add Class"
 		TYPE: 'btnAddClass'
 		CLASS: 'btn-add-class'
-		WIDTH: 160
+		WIDTH: 210
 		HEIGHT: 40
 	btnDeleteClassSpec:
 		CLASS: 'btn-delete-class'
 		COLOR: '#e00'
+	groupSpec:
+		STYLE:
+			FILL: 'rgb(214,214,214)'
 	constraintSpec:
 		displacement:
 			GAP: 220
 		alignment:
 			OFFSET:
-				x: 50
+				x: 0

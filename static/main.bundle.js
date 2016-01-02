@@ -35,7 +35,7 @@ webpackJsonp([0],[
 	majorProm = model.get("major");
 
 	Promise.all([graphProm, majorProm]).then(function(res) {
-	  var alignmentConstraint, btnAddClass, course, displacementConstraint, graph, graphData, group, groupAnchorIndex, groupIndex, i, initialState, j, k, len, len1, len2, major, majorData, newNode, newNodeIndex, nodeCount, placeholder, ref2, ref3, semester;
+	  var alignmentConstraint, btnAddClass, course, displacementConstraint, graph, graphData, group, groupAnchorIndex, groupIndex, i, index, initialState, j, k, l, len, len1, len2, len3, major, majorData, newNode, newNodeIndex, node, nodeCount, nodeIndexMap, option, placeholder, ref2, ref3, ref4, ref5, ref6, semester;
 	  graph = res[0], major = res[1];
 	  majorData = JSON.parse(major.json.major);
 	  graphData = JSON.parse(graph.json.graph);
@@ -53,7 +53,7 @@ webpackJsonp([0],[
 	    groupIndex = initialState.groups.length;
 	    btnAddClass = {
 	      name: addClassSpec.TEXT,
-	      nid: nodeCount,
+	      nid: "" + addClassSpec.TYPE + groupIndex,
 	      opaque: true,
 	      type: addClassSpec.TYPE,
 	      width: addClassSpec.WIDTH,
@@ -78,7 +78,7 @@ webpackJsonp([0],[
 	      initialState.links.push({
 	        source: groupAnchorIndex,
 	        target: initialState.nodes.length,
-	        visible: false
+	        opaque: false
 	      });
 	    }
 	    groupAnchorIndex = initialState.nodes.length;
@@ -102,7 +102,7 @@ webpackJsonp([0],[
 	            status: classSpec.status.ENROLLED
 	          };
 	          newNode.name = placeholder;
-	          newNode.nid = nodeCount;
+	          newNode.nid = "placeholder" + nodeCount;
 	          nodeCount -= 1;
 	          newNodeIndex = initialState.nodes.length;
 	          group.push(newNodeIndex);
@@ -122,12 +122,12 @@ webpackJsonp([0],[
 	        };
 	        if (course in graphData) {
 	          newNode.name = graphData[course].name;
+	          newNode.nid = course;
 	        } else {
 	          console.log(course + " is not in graphData");
 	          newNode.name = course;
+	          newNode.nid = course;
 	        }
-	        newNode.nid = nodeCount;
-	        nodeCount -= 1;
 	        newNodeIndex = initialState.nodes.length;
 	        group.push(newNodeIndex);
 	        displacementConstraint.offsets.push({
@@ -135,6 +135,27 @@ webpackJsonp([0],[
 	          offset: constraintSpec.alignment.OFFSET.x
 	        });
 	        initialState.nodes.push(newNode);
+	      }
+	    }
+	    nodeIndexMap = {};
+	    ref4 = initialState.nodes;
+	    for (index in ref4) {
+	      node = ref4[index];
+	      nodeIndexMap[node.nid] = parseInt(index);
+	    }
+	    ref5 = initialState.nodes;
+	    for (index in ref5) {
+	      node = ref5[index];
+	      if (node.nid in graphData) {
+	        ref6 = graphData[node.nid].prereqs;
+	        for (l = 0, len3 = ref6.length; l < len3; l++) {
+	          option = ref6[l];
+	          initialState.links.push({
+	            source: parseInt(index),
+	            target: nodeIndexMap[option],
+	            opaque: false
+	          });
+	        }
 	      }
 	    }
 	    initialState.groups.push({
@@ -473,7 +494,7 @@ webpackJsonp([0],[
 	          newState.links.push({
 	            source: nodeIndex,
 	            target: optionIndex,
-	            visible: false
+	            opaque: false
 	          });
 	        }
 	      }
@@ -495,7 +516,7 @@ webpackJsonp([0],[
 	        name: addClassSpec.TEXT,
 	        semester: semesterIndex,
 	        type: addClassSpec.TYPE,
-	        nid: "s" + semesterIndex,
+	        nid: "" + addClassSpec.TYPE + semesterIndex,
 	        width: addClassSpec.WIDTH,
 	        height: addClassSpec.HEIGHT,
 	        opaque: true
@@ -639,9 +660,19 @@ webpackJsonp([0],[
 	      PREREQ: 'prereq'
 	    },
 	    CLASS: 'classNode',
-	    COLOR: {
-	      DEFAULT: 'rgb(255, 127, 14)',
-	      SELECTED: 'rgb(0, 153, 0)'
+	    STYLE: {
+	      DEFAULT: {
+	        FILL: 'rgb(255, 127, 14)'
+	      },
+	      PLACEHOLDER: {
+	        FILL: 'white'
+	      },
+	      SELECTED: {
+	        BORDER: {
+	          COLOR: 'rgb(255,197,0)',
+	          WIDTH: 4
+	        }
+	      }
 	    },
 	    OPACITY: 0.3
 	  },
@@ -649,12 +680,17 @@ webpackJsonp([0],[
 	    TEXT: "Add Class",
 	    TYPE: 'btnAddClass',
 	    CLASS: 'btn-add-class',
-	    WIDTH: 160,
+	    WIDTH: 210,
 	    HEIGHT: 40
 	  },
 	  btnDeleteClassSpec: {
 	    CLASS: 'btn-delete-class',
 	    COLOR: '#e00'
+	  },
+	  groupSpec: {
+	    STYLE: {
+	      FILL: 'rgb(214,214,214)'
+	    }
 	  },
 	  constraintSpec: {
 	    displacement: {
@@ -662,7 +698,7 @@ webpackJsonp([0],[
 	    },
 	    alignment: {
 	      OFFSET: {
-	        x: 50
+	        x: 0
 	      }
 	    }
 	  }
@@ -740,7 +776,7 @@ webpackJsonp([0],[
 /* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var $, Graph, actionAddClass, actionDeleteClass, addClassSpec, btnDeleteClassSpec, classSpec, constraintSpec, d3, ref, ref1, webcola,
+	var $, Graph, Specs, actionAddClass, actionDeleteClass, addClassSpec, btnDeleteClassSpec, classSpec, constraintSpec, d3, groupSpec, ref, webcola,
 	  bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -752,13 +788,23 @@ webpackJsonp([0],[
 
 	__webpack_require__(186);
 
-	ref = __webpack_require__(179), classSpec = ref.classSpec, addClassSpec = ref.addClassSpec, btnDeleteClassSpec = ref.btnDeleteClassSpec, constraintSpec = ref.constraintSpec;
+	Specs = __webpack_require__(179);
 
-	ref1 = __webpack_require__(187), actionAddClass = ref1.actionAddClass, actionDeleteClass = ref1.actionDeleteClass;
+	classSpec = Specs.classSpec;
+
+	addClassSpec = Specs.addClassSpec;
+
+	btnDeleteClassSpec = Specs.btnDeleteClassSpec;
+
+	constraintSpec = Specs.constraintSpec;
+
+	groupSpec = Specs.groupSpec;
+
+	ref = __webpack_require__(187), actionAddClass = ref.actionAddClass, actionDeleteClass = ref.actionDeleteClass;
 
 	Graph = (function() {
 	  function Graph(graphElement, graph1, dispatch, adjList) {
-	    var classes, cls, j, len, ref2, ref3, sel, zoom, zoomed;
+	    var classes, cls, j, len, ref1, ref2, sel, zoom, zoomed;
 	    this.graphElement = graphElement;
 	    this.graph = graph1;
 	    this.dispatch = dispatch;
@@ -774,6 +820,7 @@ webpackJsonp([0],[
 	    this.tick = bind(this.tick, this);
 	    this.clickedNode = null;
 	    this.clickedNodeID = null;
+	    this.opacityChanged = false;
 	    d3.select('body').on('keydown', this.moveNode);
 	    this.width = 1800;
 	    this.height = 1000;
@@ -781,8 +828,8 @@ webpackJsonp([0],[
 	    this.color = d3.scale.category20();
 	    zoomed = (function(_this) {
 	      return function() {
-	        var ref2;
-	        if (((ref2 = d3.event.sourceEvent) != null ? ref2.type : void 0) === 'wheel') {
+	        var ref1;
+	        if (((ref1 = d3.event.sourceEvent) != null ? ref1.type : void 0) === 'wheel') {
 	          _this.svg.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
 	        }
 	      };
@@ -791,7 +838,7 @@ webpackJsonp([0],[
 	    this._svg = d3.select(this.graphElement).append('svg').attr('width', this.width).attr('height', this.height).call(zoom);
 	    this.svg = this._svg.append('g');
 	    classes = ['group', 'link', 'node'];
-	    ref2 = (function() {
+	    ref1 = (function() {
 	      var k, len, results;
 	      results = [];
 	      for (k = 0, len = classes.length; k < len; k++) {
@@ -800,14 +847,14 @@ webpackJsonp([0],[
 	      }
 	      return results;
 	    })();
-	    for (j = 0, len = ref2.length; j < len; j++) {
-	      cls = ref2[j];
+	    for (j = 0, len = ref1.length; j < len; j++) {
+	      cls = ref1[j];
 	      this.svg.append('g').attr('class', cls);
 	    }
 	    sel = function(className) {
 	      return d3.select("g." + className + "-group").selectAll("." + className);
 	    };
-	    ref3 = (function() {
+	    ref2 = (function() {
 	      var k, len1, results;
 	      results = [];
 	      for (k = 0, len1 = classes.length; k < len1; k++) {
@@ -815,7 +862,7 @@ webpackJsonp([0],[
 	        results.push(sel(cls));
 	      }
 	      return results;
-	    })(), this.group = ref3[0], this.link = ref3[1], this.node = ref3[2], this.label = ref3[3];
+	    })(), this.group = ref2[0], this.link = ref2[1], this.node = ref2[2], this.label = ref2[3];
 	    this.nodeCount = 0;
 	    this.update();
 	  }
@@ -829,12 +876,6 @@ webpackJsonp([0],[
 	      return d.target.x;
 	    }).attr('y2', function(d) {
 	      return d.target.y;
-	    }).attr('visibility', function(d) {
-	      if (d.visible) {
-	        return 'visible';
-	      } else {
-	        return 'hidden';
-	      }
 	    });
 	    this.node.attr('transform', (function(_this) {
 	      return function(d) {
@@ -843,13 +884,30 @@ webpackJsonp([0],[
 	        y = d.y - (d.height / 2) + _this.pad;
 	        return "translate(" + x + ", " + y + ")";
 	      };
-	    })(this)).style('opacity', function(d) {
-	      if (d.opaque) {
-	        return 1;
-	      } else {
-	        return classSpec.OPACITY;
-	      }
-	    });
+	    })(this));
+	    if (this.opacityChanged) {
+	      this.link.transition().delay(function(d) {
+	        console.log('umm..', d.opaque);
+	        if (d.opaque) {
+	          return 400;
+	        } else {
+	          return 0;
+	        }
+	      }).style('opacity', function(d) {
+	        if (d.opaque) {
+	          return 1;
+	        } else {
+	          return 0;
+	        }
+	      });
+	      this.node.transition().delay(250).style('opacity', function(d) {
+	        if (d.opaque) {
+	          return 1;
+	        } else {
+	          return classSpec.OPACITY;
+	        }
+	      });
+	    }
 	    this.group.attr('x', function(d) {
 	      return d.bounds.x;
 	    }).attr('y', function(d) {
@@ -876,11 +934,11 @@ webpackJsonp([0],[
 	  };
 
 	  Graph.prototype.updateNodes = function(selection, data) {
-	    var appendButton, deleteButton, enter, j, len, node, path, ref2, setVisibility, textGroup, wrap;
+	    var appendButton, deleteButton, enter, j, len, node, path, ref1, setVisibility, textGroup, wrap;
 	    wrap = (function(_this) {
 	      return function(text, width, cola) {
 	        return text.each(function() {
-	          var _node, child, datum, height, j, k, len, len1, line, lineHeight, lineNumber, nodes, ref2, tspan, word, words, y;
+	          var _node, child, datum, height, j, k, len, len1, line, lineHeight, lineNumber, nodes, ref1, tspan, word, words, y;
 	          text = d3.select(this);
 	          datum = this.__data__;
 	          words = text.text().split(/\s+/).reverse();
@@ -903,23 +961,19 @@ webpackJsonp([0],[
 	          nodes = cola.nodes();
 	          if (datum.index != null) {
 	            height = nodes[datum.index].height;
-	            if (height < 60) {
-	              nodes[datum.index].height += lineNumber * lineHeight;
-	            }
+	            nodes[datum.index].height += lineNumber * lineHeight;
 	          } else {
 	            for (j = 0, len = nodes.length; j < len; j++) {
 	              _node = nodes[j];
 	              if (_node.nid === datum.nid) {
 	                height = _node.height;
-	                if (height < 60) {
-	                  _node.height += lineNumber * lineHeight;
-	                }
+	                _node.height += lineNumber * lineHeight;
 	              }
 	            }
 	          }
-	          ref2 = this.parentNode.parentNode.children;
-	          for (k = 0, len1 = ref2.length; k < len1; k++) {
-	            child = ref2[k];
+	          ref1 = this.parentNode.parentNode.children;
+	          for (k = 0, len1 = ref1.length; k < len1; k++) {
+	            child = ref1[k];
 	            if (child.nodeName === 'rect') {
 	              height = parseInt(child.getAttribute('height'));
 	              child.setAttribute('height', "" + (height + lineNumber * lineHeight));
@@ -931,17 +985,17 @@ webpackJsonp([0],[
 	    })(this);
 	    setVisibility = (function(_this) {
 	      return function() {
-	        var child, datum, eventType, index, j, k, len, len1, link, neighbors, node, ref2, ref3, ref4, ref5, results, source, target;
+	        var child, datum, eventType, index, j, k, len, len1, link, neighbors, node, ref1, ref2, ref3, ref4, results, source, target;
 	        eventType = d3.event.type;
 	        datum = d3.event.target.__data__;
 	        if (datum.type === classSpec.TYPE) {
 	          neighbors = [datum.index];
-	          ref2 = _this.cola.links();
-	          for (index in ref2) {
-	            link = ref2[index];
+	          ref1 = _this.cola.links();
+	          for (index in ref1) {
+	            link = ref1[index];
 	            source = link.source, target = link.target;
 	            if (source.index === datum.index || target.index === datum.index) {
-	              link.visible = eventType === 'mouseenter' ? true : false;
+	              link.opaque = eventType === 'mouseenter' ? true : false;
 	              if (source.index === datum.index) {
 	                neighbors.push(target.index);
 	              } else {
@@ -949,19 +1003,21 @@ webpackJsonp([0],[
 	              }
 	            }
 	          }
-	          ref3 = _this.cola.nodes();
-	          for (j = 0, len = ref3.length; j < len; j++) {
-	            node = ref3[j];
-	            if (node.type === classSpec.TYPE && (ref4 = node.index, indexOf.call(neighbors, ref4) < 0)) {
+	          ref2 = _this.cola.nodes();
+	          for (j = 0, len = ref2.length; j < len; j++) {
+	            node = ref2[j];
+	            if (node.type === classSpec.TYPE && (ref3 = node.index, indexOf.call(neighbors, ref3) < 0)) {
 	              node.opaque = eventType === 'mouseenter' ? false : true;
 	            }
 	          }
+	          _this.opacityChanged = true;
 	          _this.tick();
+	          _this.opacityChanged = false;
 	        }
-	        ref5 = d3.event.target.children;
+	        ref4 = d3.event.target.children;
 	        results = [];
-	        for (k = 0, len1 = ref5.length; k < len1; k++) {
-	          child = ref5[k];
+	        for (k = 0, len1 = ref4.length; k < len1; k++) {
+	          child = ref4[k];
 	          if (child.className.animVal === btnDeleteClassSpec.CLASS) {
 	            child.setAttribute('visibility', eventType === 'mouseenter' ? 'visible' : 'hidden');
 	            break;
@@ -978,14 +1034,21 @@ webpackJsonp([0],[
 	    node.call(this.cola.drag).on('click', this.onNodeClick);
 	    node.selectAll('.node-text').call((function(_this) {
 	      return function(text, cola) {
+	        var _node, index, nodeIndexMap, ref1;
 	        if (cola == null) {
 	          cola = _this.cola;
+	        }
+	        nodeIndexMap = {};
+	        ref1 = cola.nodes();
+	        for (index in ref1) {
+	          _node = ref1[index];
+	          nodeIndexMap[_node.nid] = parseInt(index);
 	        }
 	        text.each(function() {
 	          var datum, nodes;
 	          datum = this.__data__;
 	          nodes = cola.nodes();
-	          nodes[datum.index].height = datum.height;
+	          nodes[nodeIndexMap[datum.nid]].height = datum.height;
 	        });
 	      };
 	    })(this));
@@ -1031,12 +1094,29 @@ webpackJsonp([0],[
 	      };
 	    })(this)).attr('rx', 5).attr('ry', 5).style('fill', (function(_this) {
 	      return function(d) {
-	        return _this.color(_this.graph.groups.length);
+	        switch (d.type) {
+	          case classSpec.TYPE:
+	            switch (d.status) {
+	              case classSpec.status.PREREQ:
+	                return 'rgb(255,29,25)';
+	            }
+	            if (d.nid.indexOf('placeholder') !== -1) {
+	              return classSpec.STYLE.PLACEHOLDER.FILL;
+	            } else {
+	              return _this.color(_this.graph.groups.length);
+	            }
+	        }
 	      };
 	    })(this));
 	    textGroup = enter.append('g').attr('transform', function(d) {
 	      return "translate(" + (d.width / 2) + "," + (d.height / 2) + ")";
-	    }).attr('class', 'cola label').call(this.cola.drag).append('text').attr('class', 'node-text').text((function(_this) {
+	    }).attr('class', 'cola label').call(this.cola.drag).append('text').attr('class', 'node-text').style('fill', function(d) {
+	      if (d.nid.indexOf('placeholder') !== -1) {
+	        return '#BDBDBD';
+	      } else {
+	        return classSpec.STYLE.PLACEHOLDER.FILL;
+	      }
+	    }).text((function(_this) {
 	      return function(d) {
 	        return d.name;
 	      };
@@ -1049,17 +1129,22 @@ webpackJsonp([0],[
 	    });
 	    deleteButton = enter.append('g').attr('transform', 'scale(0.13) translate(-150, -80)').attr('class', btnDeleteClassSpec.CLASS).attr('visibility', 'hidden').on('click', (function(_this) {
 	      return function() {
-	        var datum;
-	        datum = d3.event.target.__data__;
+	        var datum, parent, targetNode;
+	        targetNode = d3.event.target;
+	        parent = targetNode;
+	        while (parent.className.animVal !== 'node-cont') {
+	          parent = parent.parentNode;
+	        }
+	        datum = parent.__data__;
 	        return _this.dispatch(actionDeleteClass(datum.nid, _this.getPositiondata(_this.cola.nodes(), _this.cola.groups())));
 	      };
 	    })(this));
 	    appendButton = function(path) {
 	      return deleteButton.append('path').attr('d', path).style('fill', '#e00').style('fill-opacity', 1).style('fill-rule', 'evenodd').style('stroke', 'none').style('stroke-width', '0.25pt').style('stroke-linecap', 'butt').style('stroke-linejoin', 'miter').style('stroke-opacity', 1);
 	    };
-	    ref2 = ['M 100,60 L 60,100 L 230,270 L 270,230 L 100,60 z', 'M 60,230 L 230,60 L 270,100 L 100,270 L 60,230 z'];
-	    for (j = 0, len = ref2.length; j < len; j++) {
-	      path = ref2[j];
+	    ref1 = ['M 100,60 L 60,100 L 230,270 L 270,230 L 100,60 z', 'M 60,230 L 230,60 L 270,100 L 100,270 L 60,230 z'];
+	    for (j = 0, len = ref1.length; j < len; j++) {
+	      path = ref1[j];
 	      appendButton(path);
 	    }
 	    node.exit().remove();
@@ -1074,7 +1159,7 @@ webpackJsonp([0],[
 	    group.call(this.cola.drag);
 	    group.enter().append('rect').attr('rx', 8).attr('ry', 8).attr('class', 'cola group').style('fill', (function(_this) {
 	      return function(d, i) {
-	        return _this.color(i);
+	        return groupSpec.STYLE.FILL;
 	      };
 	    })(this)).call(this.cola.drag);
 	    group.exit().remove();
@@ -1084,11 +1169,11 @@ webpackJsonp([0],[
 	  Graph.prototype.updateLinks = function(selection, data) {
 	    var link;
 	    link = selection.data(data);
-	    link.enter().insert('line', '.link').attr('class', 'cola link').attr('visibility', function(d) {
-	      if (d.visible) {
-	        return 'visible';
+	    link.enter().insert('line', '.link').attr('class', 'cola link').style('opacity', function(d) {
+	      if (d.opaque) {
+	        return 1;
 	      } else {
-	        return 'hidden';
+	        return 0;
 	      }
 	    });
 	    link.exit().remove();
@@ -1096,7 +1181,7 @@ webpackJsonp([0],[
 	  };
 
 	  Graph.prototype.onNodeClick = function() {
-	    var addClass, child, className, datum, input, j, key, len, obj, parent, ref2, targetNode;
+	    var addClass, child, className, datum, input, j, key, len, obj, oldStyle, parent, ref1, style, targetNode;
 	    if (d3.event.defaultPrevented) {
 	      return;
 	    }
@@ -1105,43 +1190,52 @@ webpackJsonp([0],[
 	    switch (datum.type) {
 	      case classSpec.TYPE:
 	        parent = targetNode;
-	        console.log(parent.className);
 	        while (parent.className.animVal !== 'node-cont') {
 	          parent = parent.parentNode;
 	        }
-	        ref2 = parent.children;
-	        for (j = 0, len = ref2.length; j < len; j++) {
-	          child = ref2[j];
+	        ref1 = parent.children;
+	        for (j = 0, len = ref1.length; j < len; j++) {
+	          child = ref1[j];
 	          if (child.nodeName === 'rect') {
 	            targetNode = child;
 	          }
 	        }
 	        if (this.clickedNode != null) {
-	          this.clickedNode.setAttribute('style', "fill: " + classSpec.COLOR.DEFAULT);
+	          console.log('iold', this.clickedNode.oldStyle);
+	          this.clickedNode.setAttribute('style', this.clickedNode.oldStyle);
 	        }
-	        targetNode.setAttribute('style', "fill: " + classSpec.COLOR.SELECTED);
-	        return this.clickedNode = targetNode;
+	        this.clickedNode = targetNode;
+	        oldStyle = targetNode.getAttribute('style');
+	        this.clickedNode.oldStyle = oldStyle;
+	        style = "stroke: " + classSpec.STYLE.SELECTED.BORDER.COLOR + "; ";
+	        style += "stroke-width: " + classSpec.STYLE.SELECTED.BORDER.WIDTH;
+	        if (oldStyle.indexOf('stroke') !== -1) {
+	          oldStyle = oldStyle.replace(/stroke: rgb\(.*\); stroke-width: rgb\(.*\)/, style);
+	        } else {
+	          oldStyle += "; " + style;
+	        }
+	        return targetNode.setAttribute('style', oldStyle);
 	      case addClassSpec.TYPE:
 	        addClass = (function(_this) {
 	          return function(classCode) {
-	            var action, className, k, len1, nodeData, optionName, optionsData, ref3;
+	            var action, className, k, len1, nodeData, optionName, optionsData, ref2;
 	            className = _this.adjList[classCode].name;
 	            nodeData = {
 	              className: className,
 	              semester: datum.parent.gid,
-	              nid: _this.nodeCount,
+	              nid: classCode,
 	              type: classSpec.TYPE,
 	              width: classSpec.WIDTH,
 	              height: classSpec.HEIGHT
 	            };
 	            _this.nodeCount += 1;
 	            optionsData = [];
-	            ref3 = _this.adjList[classCode].prereqs;
-	            for (k = 0, len1 = ref3.length; k < len1; k++) {
-	              optionName = ref3[k];
+	            ref2 = _this.adjList[classCode].prereqs;
+	            for (k = 0, len1 = ref2.length; k < len1; k++) {
+	              optionName = ref2[k];
 	              optionsData.push({
 	                className: _this.adjList[optionName].name,
-	                nid: _this.nodeCount,
+	                nid: optionName,
 	                type: classSpec.TYPE,
 	                width: classSpec.WIDTH,
 	                height: classSpec.HEIGHT
@@ -1157,11 +1251,11 @@ webpackJsonp([0],[
 	        input = $('#class-select', this.graphElement);
 	        input.autocomplete({
 	          source: (function() {
-	            var ref3, results;
-	            ref3 = this.adjList;
+	            var ref2, results;
+	            ref2 = this.adjList;
 	            results = [];
-	            for (key in ref3) {
-	              obj = ref3[key];
+	            for (key in ref2) {
+	              obj = ref2[key];
 	              results.push({
 	                code: key,
 	                label: "(" + key + ") " + obj.name
@@ -1185,14 +1279,14 @@ webpackJsonp([0],[
 	  };
 
 	  Graph.prototype.moveNode = function() {
-	    var DOWN, LEFT, RIGHT, UP, _, clickedNode, clickedSemester, clickedSemesterIndex, constraint, directionals, index, j, k, key, len, len1, map, maxIndex, moveOffset, newConstraints, newSemester, newSemesterIndex, node, node1, node2, offset, ref2, ref3, ref4, ref5, ref6, ref7, ref8, saveIndex, semester, semesters, swapIndex, updateConstraints;
+	    var DOWN, LEFT, RIGHT, UP, _, clickedNode, clickedSemester, clickedSemesterIndex, constraint, directionals, index, j, k, key, len, len1, map, maxIndex, moveOffset, newConstraints, newSemester, newSemesterIndex, node, node1, node2, offset, ref1, ref2, ref3, ref4, ref5, ref6, ref7, saveIndex, semester, semesters, swapIndex, updateConstraints;
 	    updateConstraints = (function(_this) {
 	      return function(semesterID, modifyConstraint) {
-	        var constraint, j, len, newConstraint, newConstraints, ref2;
+	        var constraint, j, len, newConstraint, newConstraints, ref1;
 	        newConstraints = [];
-	        ref2 = _this.cola.constraints();
-	        for (j = 0, len = ref2.length; j < len; j++) {
-	          constraint = ref2[j];
+	        ref1 = _this.cola.constraints();
+	        for (j = 0, len = ref1.length; j < len; j++) {
+	          constraint = ref1[j];
 	          if (constraint.type != null) {
 	            newConstraint = {
 	              axis: constraint.axis,
@@ -1224,13 +1318,13 @@ webpackJsonp([0],[
 	    clickedNode = this.clickedNode.__data__;
 	    clickedSemester = clickedNode.parent;
 	    map = {};
-	    ref2 = this.cola.constraints();
-	    for (j = 0, len = ref2.length; j < len; j++) {
-	      constraint = ref2[j];
+	    ref1 = this.cola.constraints();
+	    for (j = 0, len = ref1.length; j < len; j++) {
+	      constraint = ref1[j];
 	      if ((constraint.type != null) && constraint.group === clickedSemester.gid) {
-	        ref3 = constraint.offsets;
-	        for (index in ref3) {
-	          offset = ref3[index];
+	        ref2 = constraint.offsets;
+	        for (index in ref2) {
+	          offset = ref2[index];
 	          map[index] = offset;
 	          if (clickedNode.index === offset.node) {
 	            saveIndex = parseInt(index);
@@ -1238,7 +1332,7 @@ webpackJsonp([0],[
 	        }
 	      }
 	    }
-	    directionals = (ref4 = [37, 38, 39, 40], LEFT = ref4[0], UP = ref4[1], RIGHT = ref4[2], DOWN = ref4[3], ref4);
+	    directionals = (ref3 = [37, 38, 39, 40], LEFT = ref3[0], UP = ref3[1], RIGHT = ref3[2], DOWN = ref3[3], ref3);
 	    key = d3.event.keyCode;
 	    if (indexOf.call(directionals, key) >= 0) {
 	      d3.event.preventDefault();
@@ -1254,10 +1348,10 @@ webpackJsonp([0],[
 	          return results;
 	        })()).length;
 	        if (0 < swapIndex && swapIndex < maxIndex) {
-	          ref5 = [map[saveIndex + moveOffset], map[saveIndex]], map[saveIndex] = ref5[0], map[saveIndex + moveOffset] = ref5[1];
-	          ref6 = this.cola.nodes();
-	          for (k = 0, len1 = ref6.length; k < len1; k++) {
-	            node = ref6[k];
+	          ref4 = [map[saveIndex + moveOffset], map[saveIndex]], map[saveIndex] = ref4[0], map[saveIndex + moveOffset] = ref4[1];
+	          ref5 = this.cola.nodes();
+	          for (k = 0, len1 = ref5.length; k < len1; k++) {
+	            node = ref5[k];
 	            if (node.index === clickedNode.index) {
 	              node1 = node;
 	            }
@@ -1265,8 +1359,8 @@ webpackJsonp([0],[
 	              node2 = node;
 	            }
 	          }
-	          ref7 = [node2.x, node2.x], node1.x = ref7[0], node2.x = ref7[1];
-	          ref8 = [node2.y, node2.y], node1.y = ref8[0], node2.y = ref8[1];
+	          ref6 = [node2.x, node2.x], node1.x = ref6[0], node2.x = ref6[1];
+	          ref7 = [node2.y, node2.y], node1.y = ref7[0], node2.y = ref7[1];
 	          newConstraints = updateConstraints(clickedSemester.gid, (function(_this) {
 	            return function(offsets) {
 	              var results;

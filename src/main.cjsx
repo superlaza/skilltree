@@ -88,7 +88,7 @@ Promise.all([graphProm, majorProm]).then (res) ->
 
 		btnAddClass = 
 			name: addClassSpec.TEXT
-			nid: nodeCount
+			nid: "#{addClassSpec.TYPE}#{groupIndex}"
 			opaque: true
 			type: addClassSpec.TYPE
 			width: addClassSpec.WIDTH
@@ -116,7 +116,7 @@ Promise.all([graphProm, majorProm]).then (res) ->
 			initialState.links.push
 				source: groupAnchorIndex
 				target: initialState.nodes.length
-				visible: false
+				opaque: false
 
 		groupAnchorIndex = initialState.nodes.length
 		group.push groupAnchorIndex
@@ -127,6 +127,7 @@ Promise.all([graphProm, majorProm]).then (res) ->
 		initialState.nodes.push btnAddClass
 
 		for course in semester.courses
+			# an array signifies a list of non-class placeholders
 			if Array.isArray course
 				for placeholder in course
 					newNode =
@@ -136,7 +137,7 @@ Promise.all([graphProm, majorProm]).then (res) ->
 						height: classSpec.HEIGHT
 						status: classSpec.status.ENROLLED
 					newNode.name = placeholder
-					newNode.nid = nodeCount
+					newNode.nid = "placeholder#{nodeCount}"
 					nodeCount -= 1
 
 					newNodeIndex = initialState.nodes.length
@@ -157,11 +158,11 @@ Promise.all([graphProm, majorProm]).then (res) ->
 					status: classSpec.status.ENROLLED
 				if course of graphData
 					newNode.name = graphData[course].name
+					newNode.nid = course
 				else
 					console.log "#{course} is not in graphData"
 					newNode.name = course
-				newNode.nid = nodeCount
-				nodeCount -= 1
+					newNode.nid = course
 
 				newNodeIndex = initialState.nodes.length
 				group.push newNodeIndex
@@ -172,7 +173,18 @@ Promise.all([graphProm, majorProm]).then (res) ->
 				
 				initialState.nodes.push newNode
 
-		
+		nodeIndexMap = {}
+		for index, node of initialState.nodes
+			nodeIndexMap[node.nid] = parseInt index
+		for index, node of initialState.nodes
+			if node.nid of graphData
+				for option in graphData[node.nid].prereqs
+					initialState.links.push {
+						source: parseInt index
+						target: nodeIndexMap[option]
+						opaque: false
+					}
+
 		initialState.groups.push {
 			'leaves': group
 			'gid': groupIndex

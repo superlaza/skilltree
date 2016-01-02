@@ -33,10 +33,10 @@ body {
 	fill: rgb(188,188,188) !important;
 }
 
-.cola.node.prereq{
+/*.cola.node.prereq{
 	fill: rgb(255,29,25) !important;
 }
-
+*/
 .cola.group {
 	stroke: #fff;
 	stroke-width: 1.5px;
