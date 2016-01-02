@@ -94,7 +94,7 @@ fn_ADD_CLASS = (newState, action) ->
 				target: optionIndex
 				opaque: false
 
-	im.fromJS newState
+	newState
 
 fn_DELETE_CLASS = (newState, action) ->
 	{nodePositions, groupPositions} = action.positionData
@@ -126,7 +126,7 @@ fn_DELETE_CLASS = (newState, action) ->
 	# maybe later we might want to delete the nodes it points to as well
 	newState.links = ({source:(remap link.source), target:(remap link.target)} for link in newState.links when (link.source isnt delNodeIndex and link.target isnt delNodeIndex))
 
-	im.fromJS newState
+	newState
 
 # obsolete
 addNode = (state, index, node) ->
@@ -149,7 +149,7 @@ reducer = (state = initialState, action) ->
 
 		when ADD_CLASS
 			newState = state.toJS()
-			fn_ADD_CLASS(newState, action)
+			im.fromJS fn_ADD_CLASS(newState, action)
 
 		when ADD_SEMESTER
 			newState = state.toJS()
@@ -205,16 +205,13 @@ reducer = (state = initialState, action) ->
 		when DELETE_CLASS
 			# newState = action.graph
 			newState = state.toJS() # todo: shouldn't need to convert to js, fix later
-			# fn_DELETE_CLASS(newState, action)
-			im.fromJS newState
+			im.fromJS fn_DELETE_CLASS(newState, action)
 
 		when 'MOVE_CLASS'
 			console.log 'state', typeof state, state
 			newState = state.toJS() # todo: shouldn't need to convert to js, fix later
 
-
-
-			im.fromJS newState
+			im.fromJS (fn_ADD_CLASS fn_DELETE_CLASS(newState, action), action)
 		else state
 
 init = (init) ->

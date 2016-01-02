@@ -108,6 +108,7 @@ class Graph
 		# if up?
 		# 	@cola.stop()
 		console.log 'update graph', graph
+		@cola.stop() if @cola
 		@cola = webcola.d3adaptor()
 					# .linkDistance(100)
 					# .jaccardLinkLengths(20,5)

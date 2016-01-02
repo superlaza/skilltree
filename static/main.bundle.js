@@ -469,7 +469,7 @@ webpackJsonp([0],[
 	      });
 	    }
 	  }
-	  return im.fromJS(newState);
+	  return newState;
 	};
 
 	fn_DELETE_CLASS = function(newState, action) {
@@ -547,7 +547,7 @@ webpackJsonp([0],[
 	    }
 	    return results;
 	  })();
-	  return im.fromJS(newState);
+	  return newState;
 	};
 
 	addNode = function(state, index, node) {
@@ -582,7 +582,7 @@ webpackJsonp([0],[
 	      return im.fromJS(action.initialState);
 	    case ADD_CLASS:
 	      newState = state.toJS();
-	      return fn_ADD_CLASS(newState, action);
+	      return im.fromJS(fn_ADD_CLASS(newState, action));
 	    case ADD_SEMESTER:
 	      newState = state.toJS();
 	      ref2 = action.positionData, nodePositions = ref2.nodePositions, groupPositions = ref2.groupPositions;
@@ -632,11 +632,11 @@ webpackJsonp([0],[
 	      return im.fromJS(newState);
 	    case DELETE_CLASS:
 	      newState = state.toJS();
-	      return im.fromJS(newState);
+	      return im.fromJS(fn_DELETE_CLASS(newState, action));
 	    case 'MOVE_CLASS':
 	      console.log('state', typeof state, state);
 	      newState = state.toJS();
-	      return im.fromJS(newState);
+	      return im.fromJS(fn_ADD_CLASS(fn_DELETE_CLASS(newState, action), action));
 	    default:
 	      return state;
 	  }
@@ -918,6 +918,9 @@ webpackJsonp([0],[
 	      graph = this.graph;
 	    }
 	    console.log('update graph', graph);
+	    if (this.cola) {
+	      this.cola.stop();
+	    }
 	    this.cola = webcola.d3adaptor().symmetricDiffLinkLengths(40).avoidOverlaps(true).handleDisconnected(false).size([this.width, this.height]);
 	    this.cola.nodes(graph.nodes).links(graph.links).groups(graph.groups).constraints(graph.constraints);
 	    this.cola.on('tick', this.tick);
