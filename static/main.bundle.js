@@ -650,7 +650,8 @@ webpackJsonp([0],[
 	      };
 	    })(this);
 	    selectorStyle = {
-	      position: 'absolute'
+	      position: 'absolute',
+	      display: 'none'
 	    };
 	    return React.createElement("div", {
 	      "id": 'graph',
@@ -731,17 +732,21 @@ webpackJsonp([0],[
 	    this.height = 1000;
 	    this.pad = 3;
 	    this.color = d3.scale.category20();
+	    this.defaultScale = 0.6;
 	    zoomed = (function(_this) {
 	      return function() {
 	        var ref1;
 	        if (((ref1 = d3.event.sourceEvent) != null ? ref1.type : void 0) === 'wheel') {
-	          _this.svg.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
+	          if (_this.zoomDisabled != null) {
+	            return;
+	          }
+	          _this.svg.attr('transform', "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 	        }
 	      };
 	    })(this);
 	    zoom = d3.behavior.zoom().on('zoom', zoomed);
 	    this._svg = d3.select(this.graphElement).append('svg').attr('width', this.width).attr('height', this.height).call(zoom);
-	    this.svg = this._svg.append('g');
+	    this.svg = this._svg.append('g').attr('transform', "translate(5,110)scale(" + this.defaultScale + ")");
 	    this.svg.append('g').attr('class', 'group-group');
 	    this.svg.append('g').attr('class', 'link-group');
 	    this.svg.append('g').attr('class', 'node-group');
@@ -1168,18 +1173,18 @@ webpackJsonp([0],[
 	  };
 
 	  Graph.prototype.onNodeClick = function() {
-	    var addClass, child, className, datum, input, j, key, len, newStyle, obj, oldStyle, ref1, style, targetNode;
+	    var addClass, child, datum, j, len, newStyle, oldStyle, ref1, showInput, style, targetNode;
 	    console.log('click');
 	    if (d3.event.defaultPrevented) {
 	      return;
 	    }
 	    targetNode = d3.event.target;
 	    datum = targetNode.__data__;
+	    while (targetNode.className.animVal !== 'node-cont') {
+	      targetNode = targetNode.parentNode;
+	    }
 	    switch (datum.type) {
 	      case classSpec.TYPE:
-	        while (targetNode.className.animVal !== 'node-cont') {
-	          targetNode = targetNode.parentNode;
-	        }
 	        ref1 = targetNode.children;
 	        for (j = 0, len = ref1.length; j < len; j++) {
 	          child = ref1[j];
@@ -1232,35 +1237,60 @@ webpackJsonp([0],[
 	            return _this.dispatch(action);
 	          };
 	        })(this);
-	        className = null;
-	        input = this.graphElement.children[0];
-	        input = $('#class-select', this.graphElement);
-	        input.autocomplete({
-	          source: (function() {
-	            var ref2, results;
-	            ref2 = this.adjList;
-	            results = [];
-	            for (key in ref2) {
-	              obj = ref2[key];
-	              results.push({
-	                code: key,
-	                label: "(" + key + ") " + obj.name
-	              });
-	            }
-	            return results;
-	          }).call(this),
-	          autoFocus: true,
-	          select: (function(_this) {
-	            return function(e, ui) {
-	              className = ui.item.code;
-	              input.val(ui.item.label);
-	              input.data('code', ui.item.code);
-	              addClass(className);
-	              return false;
-	            };
-	          })(this)
-	        });
-	        return input.focus();
+	        this.cola.stop();
+	        this.zoomDisabled = true;
+	        this.oldTransform = this.svg.attr('transform');
+	        showInput = (function(_this) {
+	          return function() {
+	            var className, input, key, liveDatum, obj, ref2, x, y;
+	            className = null;
+	            input = $('#class-select', _this.graphElement);
+	            input.show();
+	            input.autocomplete({
+	              source: (function() {
+	                var ref2, results;
+	                ref2 = this.adjList;
+	                results = [];
+	                for (key in ref2) {
+	                  obj = ref2[key];
+	                  results.push({
+	                    code: key,
+	                    label: "(" + key + ") " + obj.name
+	                  });
+	                }
+	                return results;
+	              }).call(_this),
+	              autoFocus: true,
+	              select: function(e, ui) {
+	                className = ui.item.code;
+	                input.val(ui.item.label);
+	                input.data('code', ui.item.code);
+	                addClass(className);
+	                _this.zoomDisabled = void 0;
+	                _this.svg.transition().attr('transform', _this.oldTransform);
+	                input.hide();
+	                input.val('');
+	                return false;
+	              }
+	            });
+	            input.keyup(function(e) {
+	              if (e.keyCode === 27) {
+	                _this.zoomDisabled = void 0;
+	                _this.svg.transition().attr('transform', _this.oldTransform);
+	                return input.hide();
+	              }
+	            });
+	            input.focus();
+	            liveDatum = _this.nodeIDMap[datum.nid];
+	            _this.refPoint.x = liveDatum.x;
+	            _this.refPoint.y = liveDatum.y;
+	            ref2 = _this.refPoint.matrixTransform(_this.svg[0][0].getScreenCTM()), x = ref2.x, y = ref2.y;
+	            input.css('left', (x - addClassSpec.WIDTH / 2 + 2 * _this.pad + 25) + "px");
+	            input.css('top', (y - addClassSpec.HEIGHT / 2 + 2 * _this.pad - 5) + "px");
+	            return input.css('width', "" + (liveDatum.width * _this.defaultScale));
+	          };
+	        })(this);
+	        return this.svg.transition().attr('transform', "scale(" + this.defaultScale + ")").each('end', showInput);
 	    }
 	  };
 
@@ -35018,8 +35048,8 @@ webpackJsonp([0],[
 	      type: addClassSpec.TYPE,
 	      width: addClassSpec.WIDTH,
 	      height: addClassSpec.HEIGHT,
-	      x: 0 + constraintSpec.displacement.GAP * groupIndex,
-	      y: 0
+	      x: 50 + constraintSpec.displacement.GAP * groupIndex,
+	      y: 80
 	    };
 	    nodeCount -= 1;
 	    alignmentConstraint = {

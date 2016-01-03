@@ -28,13 +28,26 @@ class Graph
 		@height = 1000
 		@pad = 3
 		@color = d3.scale.category20()
+		@defaultScale = 0.6
 
 
 		# === SETUP CONTAINING SVG ELEMENT === #
 		# by the way, a double click zooms...
 		zoomed = => # there's a zoom pan bug when you drag graph, event picks up from point where drag started
 			if d3.event.sourceEvent?.type is 'wheel'
-				@svg.attr 'transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')'
+				if @zoomDisabled?
+					return
+
+				# doesn't fix the issue that when scale is 
+				# restored after input, d3.event.translate keeps changing value
+				# if @oldTransform?
+				# 	[tx, ty, scale] = @oldTransform.match(/translate\((.*?),(.*?)\)scale\((.*?)\)/)[1..3]
+				# 	d3.event.translate = [tx, ty]
+				# 	d3.event.scale = scale
+				# 	@oldTransform = undefined
+
+				@svg.attr 'transform', "translate(#{d3.event.translate})scale(#{d3.event.scale})"
+				
 			# else
 			# 	targetNode = d3.event.sourceEvent?.target.nodeName
 			# 	if (targetNode isnt node for node in ['rect','text','g','link','path']).every((e)->e)
@@ -47,6 +60,7 @@ class Graph
 					.attr('height', @height)
 				.call zoom
 		@svg = @_svg.append('g')
+					.attr 'transform', "translate(5,110)scale(#{@defaultScale})"
 		# ==== #
 
 		#========= feature selections
@@ -517,12 +531,12 @@ class Graph
 		
 		targetNode = d3.event.target
 		datum = targetNode.__data__ 
+		while targetNode.className.animVal isnt 'node-cont'
+			targetNode = targetNode.parentNode
 
 		switch datum.type
 			when classSpec.TYPE
 
-				while targetNode.className.animVal isnt 'node-cont'
-					targetNode = targetNode.parentNode
 				
 				# only one rect in group
 				for child in targetNode.children
@@ -577,34 +591,54 @@ class Graph
 						)
 					@dispatch action
 
-				# selected class name
-				className = null
-				input = @graphElement.children[0]
-				input = $('#class-select', @graphElement)
-				input.autocomplete {
-					source: ({code: key, label:"(#{key}) #{obj.name}"} for key,obj of @adjList)
-					autoFocus: true
-					# focus: (e, ui) ->
-					# 	console.log 'ui', ui
-					# 	input.val(ui.name)
-					# 	false
-					select: (e, ui) =>
-						className = ui.item.code
-						input.val(ui.item.label)
-						input.data('code', ui.item.code) # not the idiomatic way to get data
-						
-						addClass className
-						false
-				}
-				input.focus()
+				# stop simulation for a moment
+				@cola.stop()
+				# disable zooming while entering class
+				@zoomDisabled = true
+				@oldTransform = @svg.attr 'transform' # used in zoom
 
-				# input.css 'left', "#{datum.x-13}px"
-				# input.css 'top', "#{datum.y+10}px"
-				
-				# className = window.prompt('Pick a class')
-				
-				# input.keypress (e) =>
-				# 	if e.keyCode is 13
+				showInput = =>
+					# selected class name
+					className = null
+					input = $('#class-select', @graphElement)
+					input.show()
+					input.autocomplete {
+						source: ({code: key, label:"(#{key}) #{obj.name}"} for key,obj of @adjList)
+						autoFocus: true
+						select: (e, ui) =>
+							className = ui.item.code
+							input.val(ui.item.label)
+							input.data('code', ui.item.code) # not the idiomatic way to get data
+							
+							addClass className
+
+							@zoomDisabled = undefined
+							@svg.transition()
+								.attr('transform', @oldTransform)
+							input.hide()
+							input.val('')
+							false
+					}
+					input.keyup (e) =>
+						if e.keyCode is 27
+							@zoomDisabled = undefined
+							@svg.transition()
+								.attr('transform', @oldTransform)
+							input.hide()
+					input.focus()
+
+					liveDatum = @nodeIDMap[datum.nid]
+					@refPoint.x = liveDatum.x
+					@refPoint.y = liveDatum.y
+					# convert to global screen coordinates
+					{x,y} = @refPoint.matrixTransform @svg[0][0].getScreenCTM()
+					input.css 'left', "#{x-addClassSpec.WIDTH/2+2*@pad + 25}px" # using hackish offsets
+					input.css 'top', "#{y-addClassSpec.HEIGHT/2+2*@pad - 5}px"
+					input.css 'width', "#{liveDatum.width*@defaultScale}"
+
+				@svg.transition()
+					.attr('transform', "scale(#{@defaultScale})")
+					.each('end', showInput)
 
 
 	moveNode: =>

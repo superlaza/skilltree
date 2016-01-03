@@ -20,8 +20,8 @@ POS2State = (planOfStudy, graphData) ->
 			type: addClassSpec.TYPE
 			width: addClassSpec.WIDTH
 			height: addClassSpec.HEIGHT
-			x: 0 + constraintSpec.displacement.GAP*groupIndex
-			y: 0
+			x: 50 + constraintSpec.displacement.GAP*groupIndex
+			y: 80
 		nodeCount -= 1
 
 		# alignment and displacement constraints are per group

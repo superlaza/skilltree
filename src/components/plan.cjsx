@@ -29,7 +29,10 @@ Plan = React.createClass
 			{nodes, groups, links} = @graph.getGraph()
 			dispatch actionAddSemester(@graph.getPositiondata nodes, groups)
 
-		selectorStyle = {position: 'absolute'}
+		selectorStyle = {
+			position: 'absolute'
+			display: 'none'
+		}
 		<div id='graph' ref='graph'>
 			<input 	id='class-select'
 					style={selectorStyle}
