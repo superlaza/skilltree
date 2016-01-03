@@ -2,7 +2,7 @@ webpackJsonp([0],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var DevTools, Plan_, Provider, React, ReactDOM, addClassSpec, classSpec, compose, constraintSpec, createStore, finalCreateStore, graphProm, im, majorProm, model, reducer, ref, ref1, store;
+	var DevTools, POS2State, Plan_, Provider, React, ReactDOM, addClassSpec, classSpec, compose, constraintSpec, createStore, finalCreateStore, graphProm, im, majorProm, model, reducer, ref, ref1, store;
 
 	ref = __webpack_require__(1), createStore = ref.createStore, compose = ref.compose;
 
@@ -22,6 +22,8 @@ webpackJsonp([0],[
 
 	ref1 = __webpack_require__(179), classSpec = ref1.classSpec, addClassSpec = ref1.addClassSpec, constraintSpec = ref1.constraintSpec;
 
+	POS2State = __webpack_require__(413);
+
 	finalCreateStore = compose(DevTools.instrument())(createStore);
 
 	store = finalCreateStore(reducer);
@@ -35,138 +37,11 @@ webpackJsonp([0],[
 	majorProm = model.get("major");
 
 	Promise.all([graphProm, majorProm]).then(function(res) {
-	  var alignmentConstraint, btnAddClass, course, displacementConstraint, graph, graphData, group, groupAnchorIndex, groupIndex, i, index, initialState, j, k, l, len, len1, len2, len3, major, majorData, newNode, newNodeIndex, node, nodeCount, nodeIndexMap, option, placeholder, ref2, ref3, ref4, ref5, ref6, semester;
+	  var graph, graphData, initialState, major, majorData;
 	  graph = res[0], major = res[1];
 	  majorData = JSON.parse(major.json.major);
 	  graphData = JSON.parse(graph.json.graph);
-	  initialState = {
-	    nodes: [],
-	    links: [],
-	    groups: [],
-	    constraints: []
-	  };
-	  nodeCount = -1;
-	  ref2 = majorData.POS;
-	  for (i = 0, len = ref2.length; i < len; i++) {
-	    semester = ref2[i];
-	    group = [];
-	    groupIndex = initialState.groups.length;
-	    btnAddClass = {
-	      name: addClassSpec.TEXT,
-	      nid: "" + addClassSpec.TYPE + groupIndex,
-	      opaque: true,
-	      type: addClassSpec.TYPE,
-	      width: addClassSpec.WIDTH,
-	      height: addClassSpec.HEIGHT,
-	      x: 0 + constraintSpec.displacement.GAP * groupIndex,
-	      y: 0
-	    };
-	    nodeCount -= 1;
-	    displacementConstraint = {
-	      type: 'alignment',
-	      axis: 'x',
-	      offsets: [],
-	      group: groupIndex
-	    };
-	    if (initialState.groups.length > 0) {
-	      alignmentConstraint = {
-	        axis: 'x',
-	        left: groupAnchorIndex,
-	        right: initialState.nodes.length,
-	        gap: constraintSpec.displacement.GAP
-	      };
-	      initialState.links.push({
-	        source: groupAnchorIndex,
-	        target: initialState.nodes.length,
-	        opaque: false
-	      });
-	    }
-	    groupAnchorIndex = initialState.nodes.length;
-	    group.push(groupAnchorIndex);
-	    displacementConstraint.offsets.push({
-	      node: groupAnchorIndex,
-	      offset: constraintSpec.alignment.OFFSET.x
-	    });
-	    initialState.nodes.push(btnAddClass);
-	    ref3 = semester.courses;
-	    for (j = 0, len1 = ref3.length; j < len1; j++) {
-	      course = ref3[j];
-	      if (Array.isArray(course)) {
-	        for (k = 0, len2 = course.length; k < len2; k++) {
-	          placeholder = course[k];
-	          newNode = {
-	            opaque: true,
-	            type: classSpec.TYPE,
-	            width: classSpec.WIDTH,
-	            height: classSpec.HEIGHT,
-	            status: classSpec.status.ENROLLED
-	          };
-	          newNode.name = placeholder;
-	          newNode.nid = "placeholder" + nodeCount;
-	          nodeCount -= 1;
-	          newNodeIndex = initialState.nodes.length;
-	          group.push(newNodeIndex);
-	          displacementConstraint.offsets.push({
-	            node: newNodeIndex,
-	            offset: constraintSpec.alignment.OFFSET.x
-	          });
-	          initialState.nodes.push(newNode);
-	        }
-	      } else {
-	        newNode = {
-	          opaque: true,
-	          type: classSpec.TYPE,
-	          width: classSpec.WIDTH,
-	          height: classSpec.HEIGHT,
-	          status: classSpec.status.ENROLLED
-	        };
-	        if (course in graphData) {
-	          newNode.name = graphData[course].name;
-	          newNode.nid = course;
-	        } else {
-	          console.log(course + " is not in graphData");
-	          newNode.name = course;
-	          newNode.nid = course;
-	        }
-	        newNodeIndex = initialState.nodes.length;
-	        group.push(newNodeIndex);
-	        displacementConstraint.offsets.push({
-	          node: newNodeIndex,
-	          offset: constraintSpec.alignment.OFFSET.x
-	        });
-	        initialState.nodes.push(newNode);
-	      }
-	    }
-	    nodeIndexMap = {};
-	    ref4 = initialState.nodes;
-	    for (index in ref4) {
-	      node = ref4[index];
-	      nodeIndexMap[node.nid] = parseInt(index);
-	    }
-	    ref5 = initialState.nodes;
-	    for (index in ref5) {
-	      node = ref5[index];
-	      if (node.nid in graphData) {
-	        ref6 = graphData[node.nid].prereqs;
-	        for (l = 0, len3 = ref6.length; l < len3; l++) {
-	          option = ref6[l];
-	          initialState.links.push({
-	            source: parseInt(index),
-	            target: nodeIndexMap[option],
-	            opaque: false
-	          });
-	        }
-	      }
-	    }
-	    initialState.groups.push({
-	      'leaves': group,
-	      'gid': groupIndex
-	    });
-	    if (alignmentConstraint != null) {
-	      initialState.constraints.push(alignmentConstraint);
-	    }
-	    initialState.constraints.unshift(displacementConstraint);
-	  }
+	  initialState = POS2State(majorData.POS, graphData);
 	  store.dispatch({
 	    type: 'INIT',
 	    initialState: im.fromJS(initialState)
@@ -434,17 +309,32 @@ webpackJsonp([0],[
 	  return newNode;
 	};
 
+	addNode = function(state, index, node) {
+	  var constraint, j, len, ref2, results;
+	  state.nodes.push(node);
+	  state.groups[node.semester].leaves.push(index);
+	  ref2 = state.constraints;
+	  results = [];
+	  for (j = 0, len = ref2.length; j < len; j++) {
+	    constraint = ref2[j];
+	    if (constraint.type === 'alignment' && constraint.group === node.semester) {
+	      results.push(constraint.offsets.push({
+	        node: index,
+	        offset: constraintSpec.alignment.OFFSET.x
+	      }));
+	    } else {
+	      results.push(void 0);
+	    }
+	  }
+	  return results;
+	};
+
 	fn_ADD_CLASS = function(newState, action) {
-	  var group, groupBounds, groupPositions, j, len, newNode, newOption, nodeIndex, nodePositions, nodeSemester, optionData, optionIndex, prevGroup, prevGroupBounds, ref2, ref3, ref4, ref5;
+	  var groupBounds, groupPositions, j, len, newNode, newOption, nodeIndex, nodePositions, nodeSemester, optionData, optionIndex, prevGroup, prevGroupBounds, ref2, ref3, ref4, ref5;
 	  ref2 = action.positionData, nodePositions = ref2.nodePositions, groupPositions = ref2.groupPositions;
-	  addPositionData(newState, {
-	    nodePositions: nodePositions,
-	    groupPositions: groupPositions
-	  });
-	  nodeIndex = newState.nodes.length;
+	  nodeIndex = action.nodeData.index != null ? action.nodeData : newState.nodes.length;
 	  nodeSemester = action.nodeData.semester;
 	  groupBounds = (ref3 = groupPositions[nodeSemester]) != null ? ref3.bounds : void 0;
-	  group = newState.groups[nodeSemester - 1];
 	  newNode = createNode(action.nodeData, {
 	    groupBounds: groupBounds
 	  });
@@ -473,15 +363,10 @@ webpackJsonp([0],[
 	};
 
 	fn_DELETE_CLASS = function(newState, action) {
-	  var constraint, delNodeIndex, group, groupPositions, index, j, k, leaf, len, len1, link, node, nodePositions, offset, ref2, ref3, ref4, ref5, remap;
-	  ref2 = action.positionData, nodePositions = ref2.nodePositions, groupPositions = ref2.groupPositions;
-	  addPositionData(newState, {
-	    nodePositions: nodePositions,
-	    groupPositions: groupPositions
-	  });
-	  ref3 = newState.nodes;
-	  for (index in ref3) {
-	    node = ref3[index];
+	  var constraint, delNodeIndex, group, index, j, k, leaf, len, len1, link, node, offset, ref2, ref3, ref4, remap;
+	  ref2 = newState.nodes;
+	  for (index in ref2) {
+	    node = ref2[index];
 	    delNodeIndex = parseInt(index);
 	    if (node.nid === action.nodeID) {
 	      break;
@@ -495,15 +380,15 @@ webpackJsonp([0],[
 	      return i;
 	    }
 	  };
-	  ref4 = newState.groups;
-	  for (j = 0, len = ref4.length; j < len; j++) {
-	    group = ref4[j];
+	  ref3 = newState.groups;
+	  for (j = 0, len = ref3.length; j < len; j++) {
+	    group = ref3[j];
 	    group.leaves = (function() {
-	      var k, len1, ref5, results;
-	      ref5 = group.leaves;
+	      var k, len1, ref4, results;
+	      ref4 = group.leaves;
 	      results = [];
-	      for (k = 0, len1 = ref5.length; k < len1; k++) {
-	        leaf = ref5[k];
+	      for (k = 0, len1 = ref4.length; k < len1; k++) {
+	        leaf = ref4[k];
 	        if (leaf !== delNodeIndex) {
 	          results.push(remap(leaf));
 	        }
@@ -511,16 +396,24 @@ webpackJsonp([0],[
 	      return results;
 	    })();
 	  }
-	  ref5 = newState.constraints;
-	  for (k = 0, len1 = ref5.length; k < len1; k++) {
-	    constraint = ref5[k];
+	  newState.contraints = newState.constraints.filter(function(c) {
+	    if (c.type == null) {
+	      if (c.left === delNodeIndex || c.right === delNodeIndex) {
+	        return false;
+	      }
+	    }
+	    return true;
+	  });
+	  ref4 = newState.constraints;
+	  for (k = 0, len1 = ref4.length; k < len1; k++) {
+	    constraint = ref4[k];
 	    if (constraint.type === 'alignment') {
 	      constraint.offsets = (function() {
-	        var l, len2, ref6, results;
-	        ref6 = constraint.offsets;
+	        var l, len2, ref5, results;
+	        ref5 = constraint.offsets;
 	        results = [];
-	        for (l = 0, len2 = ref6.length; l < len2; l++) {
-	          offset = ref6[l];
+	        for (l = 0, len2 = ref5.length; l < len2; l++) {
+	          offset = ref5[l];
 	          if (offset.node !== delNodeIndex) {
 	            results.push({
 	              node: remap(offset.node),
@@ -530,14 +423,17 @@ webpackJsonp([0],[
 	        }
 	        return results;
 	      })();
+	    } else {
+	      constraint.left = remap(constraint.left);
+	      constraint.right = remap(constraint.right);
 	    }
 	  }
 	  newState.links = (function() {
-	    var l, len2, ref6, results;
-	    ref6 = newState.links;
+	    var l, len2, ref5, results;
+	    ref5 = newState.links;
 	    results = [];
-	    for (l = 0, len2 = ref6.length; l < len2; l++) {
-	      link = ref6[l];
+	    for (l = 0, len2 = ref5.length; l < len2; l++) {
+	      link = ref5[l];
 	      if (link.source !== delNodeIndex && link.target !== delNodeIndex) {
 	        results.push({
 	          source: remap(link.source),
@@ -550,28 +446,8 @@ webpackJsonp([0],[
 	  return newState;
 	};
 
-	addNode = function(state, index, node) {
-	  var constraint, j, len, ref2, results;
-	  state.nodes.push(node);
-	  state.groups[node.semester].leaves.push(index);
-	  ref2 = state.constraints;
-	  results = [];
-	  for (j = 0, len = ref2.length; j < len; j++) {
-	    constraint = ref2[j];
-	    if (constraint.type === 'alignment' && constraint.group === node.semester) {
-	      results.push(constraint.offsets.push({
-	        node: index,
-	        offset: constraintSpec.alignment.OFFSET.x
-	      }));
-	    } else {
-	      results.push(void 0);
-	    }
-	  }
-	  return results;
-	};
-
 	reducer = function(state, action) {
-	  var addClassNodeData, addClassNodeIndex, displacementConstraints, groupPositions, lastConstraint, newAlignmentConstraint, newDisplacementConstraint, newState, nodePositions, ref2, semesterIndex;
+	  var addClassNodeData, addClassNodeIndex, displacementConstraints, groupPositions, lastConstraint, newAlignmentConstraint, newDisplacementConstraint, newState, nodePositions, ref2, ref3, ref4, ref5, semesterIndex;
 	  if (state == null) {
 	    state = initialState;
 	  }
@@ -582,10 +458,15 @@ webpackJsonp([0],[
 	      return im.fromJS(action.initialState);
 	    case ADD_CLASS:
 	      newState = state.toJS();
+	      ref2 = action.positionData, nodePositions = ref2.nodePositions, groupPositions = ref2.groupPositions;
+	      addPositionData(newState, {
+	        nodePositions: nodePositions,
+	        groupPositions: groupPositions
+	      });
 	      return im.fromJS(fn_ADD_CLASS(newState, action));
 	    case ADD_SEMESTER:
 	      newState = state.toJS();
-	      ref2 = action.positionData, nodePositions = ref2.nodePositions, groupPositions = ref2.groupPositions;
+	      ref3 = action.positionData, nodePositions = ref3.nodePositions, groupPositions = ref3.groupPositions;
 	      addPositionData(newState, {
 	        nodePositions: nodePositions,
 	        groupPositions: groupPositions
@@ -607,7 +488,7 @@ webpackJsonp([0],[
 	      };
 	      addNode(newState, addClassNodeIndex, addClassNodeData);
 	      displacementConstraints = newState.constraints.filter(function(c) {
-	        return c.type == null;
+	        return c.type !== 'alignment';
 	      });
 	      lastConstraint = displacementConstraints[displacementConstraints.length - 1];
 	      newDisplacementConstraint = {
@@ -632,10 +513,20 @@ webpackJsonp([0],[
 	      return im.fromJS(newState);
 	    case DELETE_CLASS:
 	      newState = state.toJS();
+	      ref4 = action.positionData, nodePositions = ref4.nodePositions, groupPositions = ref4.groupPositions;
+	      addPositionData(newState, {
+	        nodePositions: nodePositions,
+	        groupPositions: groupPositions
+	      });
 	      return im.fromJS(fn_DELETE_CLASS(newState, action));
 	    case 'MOVE_CLASS':
 	      console.log('state', typeof state, state);
 	      newState = state.toJS();
+	      ref5 = action.positionData, nodePositions = ref5.nodePositions, groupPositions = ref5.groupPositions;
+	      addPositionData(newState, {
+	        nodePositions: nodePositions,
+	        groupPositions: groupPositions
+	      });
 	      return im.fromJS(fn_ADD_CLASS(fn_DELETE_CLASS(newState, action), action));
 	    default:
 	      return state;
@@ -745,7 +636,7 @@ webpackJsonp([0],[
 	    var dispatch, graphData, ref, state;
 	    ref = this.props, dispatch = ref.dispatch, state = ref.state, graphData = ref.graphData;
 	    console.log('newstate?', state);
-	    this.graph.update(state, 'up');
+	    this.graph.update(state);
 	    return window.dispatch = dispatch;
 	  },
 	  render: function() {
@@ -35097,6 +34988,150 @@ webpackJsonp([0],[
 	      , 'space': '\u0000'
 	    }
 	};
+
+
+/***/ },
+/* 413 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var POS2State, addClassSpec, classSpec, constraintSpec, ref;
+
+	ref = __webpack_require__(179), classSpec = ref.classSpec, addClassSpec = ref.addClassSpec, constraintSpec = ref.constraintSpec;
+
+	POS2State = function(planOfStudy, graphData) {
+	  var alignmentConstraint, btnAddClass, course, displacementConstraint, group, groupAnchorIndex, groupIndex, i, index, initialState, j, k, l, len, len1, len2, len3, newNode, newNodeIndex, node, nodeCount, nodeIndexMap, option, placeholder, ref1, ref2, ref3, ref4, semester;
+	  initialState = {
+	    nodes: [],
+	    links: [],
+	    groups: [],
+	    constraints: []
+	  };
+	  nodeCount = -1;
+	  for (i = 0, len = planOfStudy.length; i < len; i++) {
+	    semester = planOfStudy[i];
+	    group = [];
+	    groupIndex = initialState.groups.length;
+	    btnAddClass = {
+	      name: addClassSpec.TEXT,
+	      nid: "" + addClassSpec.TYPE + groupIndex,
+	      opaque: true,
+	      type: addClassSpec.TYPE,
+	      width: addClassSpec.WIDTH,
+	      height: addClassSpec.HEIGHT,
+	      x: 0 + constraintSpec.displacement.GAP * groupIndex,
+	      y: 0
+	    };
+	    nodeCount -= 1;
+	    alignmentConstraint = {
+	      type: 'alignment',
+	      axis: 'x',
+	      offsets: [],
+	      group: groupIndex
+	    };
+	    if (initialState.groups.length > 0) {
+	      displacementConstraint = {
+	        axis: 'x',
+	        _type: 'displacement',
+	        left: groupAnchorIndex,
+	        right: initialState.nodes.length,
+	        gap: constraintSpec.displacement.GAP
+	      };
+	      initialState.links.push({
+	        source: groupAnchorIndex,
+	        target: initialState.nodes.length,
+	        opaque: false
+	      });
+	    }
+	    groupAnchorIndex = initialState.nodes.length;
+	    group.push(groupAnchorIndex);
+	    alignmentConstraint.offsets.push({
+	      node: groupAnchorIndex,
+	      offset: constraintSpec.alignment.OFFSET.x
+	    });
+	    initialState.nodes.push(btnAddClass);
+	    ref1 = semester.courses;
+	    for (j = 0, len1 = ref1.length; j < len1; j++) {
+	      course = ref1[j];
+	      if (Array.isArray(course)) {
+	        for (k = 0, len2 = course.length; k < len2; k++) {
+	          placeholder = course[k];
+	          newNode = {
+	            opaque: true,
+	            type: classSpec.TYPE,
+	            width: classSpec.WIDTH,
+	            height: classSpec.HEIGHT,
+	            status: classSpec.status.ENROLLED
+	          };
+	          newNode.name = placeholder;
+	          newNode.nid = "placeholder" + nodeCount;
+	          nodeCount -= 1;
+	          newNodeIndex = initialState.nodes.length;
+	          group.push(newNodeIndex);
+	          alignmentConstraint.offsets.push({
+	            node: newNodeIndex,
+	            offset: constraintSpec.alignment.OFFSET.x
+	          });
+	          initialState.nodes.push(newNode);
+	        }
+	      } else {
+	        newNode = {
+	          opaque: true,
+	          type: classSpec.TYPE,
+	          width: classSpec.WIDTH,
+	          height: classSpec.HEIGHT,
+	          status: classSpec.status.ENROLLED
+	        };
+	        if (course in graphData) {
+	          newNode.name = graphData[course].name;
+	          newNode.nid = course;
+	        } else {
+	          console.log(course + " is not in graphData");
+	          newNode.name = course;
+	          newNode.nid = course;
+	        }
+	        newNodeIndex = initialState.nodes.length;
+	        group.push(newNodeIndex);
+	        alignmentConstraint.offsets.push({
+	          node: newNodeIndex,
+	          offset: constraintSpec.alignment.OFFSET.x
+	        });
+	        initialState.nodes.push(newNode);
+	      }
+	    }
+	    nodeIndexMap = {};
+	    ref2 = initialState.nodes;
+	    for (index in ref2) {
+	      node = ref2[index];
+	      nodeIndexMap[node.nid] = parseInt(index);
+	    }
+	    ref3 = initialState.nodes;
+	    for (index in ref3) {
+	      node = ref3[index];
+	      if (node.nid in graphData) {
+	        ref4 = graphData[node.nid].prereqs;
+	        for (l = 0, len3 = ref4.length; l < len3; l++) {
+	          option = ref4[l];
+	          initialState.links.push({
+	            source: parseInt(index),
+	            target: nodeIndexMap[option],
+	            opaque: false
+	          });
+	        }
+	      }
+	    }
+	    initialState.groups.push({
+	      'leaves': group,
+	      'gid': groupIndex
+	    });
+	    if (displacementConstraint != null) {
+	      initialState.constraints.push(displacementConstraint);
+	    }
+	    initialState.constraints.unshift(alignmentConstraint);
+	  }
+	  return initialState;
+	};
+
+	module.exports = POS2State;
 
 
 /***/ }
