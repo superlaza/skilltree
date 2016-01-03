@@ -16,7 +16,6 @@ class Graph
 	constructor: (@graphElement, @graph, @dispatch, @adjList) ->
 		# event result persistence
 		@clickedNode = null
-		@clickedNodeID = null
 
 		# flags
 		@opacityChanged = false
@@ -135,12 +134,13 @@ class Graph
 		for index, node of @cola.nodes()
 			@nodeIDMap[node.nid] = node
 		
+		console.log 'cliekcen onode', @clickedNode
 		@group = @updateGroups @group, @cola.groups()
 		@link = @updateLinks @link, @cola.links()
 		@node = @updateNodes @node, @cola.nodes()
 		
 		@cola.start()
-		
+
 	updateNodes: (selection, data) =>
 		wrap = (text, width, cola) =>
 			text.each () ->
@@ -225,20 +225,32 @@ class Graph
 					break
 
 		moveGhostNode = (e) =>
-			
-			@refPoint.x = e.clientX
-			@refPoint.y = e.clientY
-			# convert to global screen coordinates
-			{x,y} = @refPoint.matrixTransform @svg[0][0].getScreenCTM().inverse()
-			
-			@ghost
-			.attr 'x', x
-			.attr 'y', y
+			[oldX, oldY] = @currentPosition
+			offset = 25
+			inXrange = oldX-offset < e.clientX and e.clientX < oldX+offset
+			inYrange = oldY-offset < e.clientY and e.clientY < oldY+offset
+
+			# not much of a drag
+			if inXrange and inYrange
+				@inRange = true
+				return false
+			else
+				@inRange = false
+				@ghost.style 'opacity', 0.3
+				@cola.nodes()[@moveNode.index].hidden = true # set to true a bazillion times
+
+				@refPoint.x = e.clientX
+				@refPoint.y = e.clientY
+				# convert to global screen coordinates
+				{x,y} = @refPoint.matrixTransform @svg[0][0].getScreenCTM().inverse()
+				
+				@ghost
+				.attr 'x', x
+				.attr 'y', y
 
 			false
 
 		onMouseDown = =>
-			console.log 'mousedown'
 			# get coordinates to filter simple click
 			@currentPosition = [d3.event.clientX, d3.event.clientY]
 
@@ -259,6 +271,7 @@ class Graph
 			
 
 			# STYLE CHANGES
+
 			# get relevant svg rect element
 			for child in targetNode.children
 				if child.nodeName is 'rect'
@@ -276,11 +289,11 @@ class Graph
 					.attr 'ry', 5
 					.attr 'x', x
 					.attr 'y', y
-					.style 'opacity', 0.3
+					.style 'opacity', 0
 					.style 'fill', ghostFill ? 'grey'
 			@ghost = @svg.select('.move-node-ghost')
 
-			@cola.nodes()[@moveNode.index].hidden = true
+			# @cola.nodes()[@moveNode.index].hidden = true
 			# ============
 
 			# add listeners to be removed later
@@ -289,6 +302,11 @@ class Graph
 			return true
 
 		onMouseUp = (e) =>
+			if @inRange
+				@ghost.remove()
+				@graphElement.removeEventListener 'mousemove', moveGhostNode
+				return
+
 			targetNode = e.target
 
 			# if we landed in anything within a node container
@@ -420,7 +438,7 @@ class Graph
 							classSpec.STYLE.PLACEHOLDER.FILL
 					.text (d) =>
 						d.name
-						"id: #{d.nid}, index: #{@cola.nodes().indexOf(d)}"
+						# "id: #{d.nid}, index: #{@cola.nodes().indexOf(d)}"
 					.call wrap, classSpec.WIDTH, @cola
 
 		enter.append 'title' # todo: inserts title multiple times
@@ -615,8 +633,8 @@ class Graph
 			newConstraints
 
 		return if !@clickedNode?
-		console.log 'which node clicked', @clickedNode.nid
-		clickedNode = @clickedNode.__data__ # clicked node is stored as DOM element
+		clickedNode = @nodeIDMap[@clickedNode.__data__.nid] # clicked node is stored as DOM element
+		clickedNodeIndex = clickedNode.index
 		clickedSemester = clickedNode.parent
 
 		map = {}
@@ -625,7 +643,7 @@ class Graph
 			if constraint.type is 'alignment' and constraint.group is clickedSemester.gid
 				for index, offset of constraint.offsets
 					map[index] = offset
-					if clickedNode.index is offset.node
+					if clickedNodeIndex is offset.node
 						saveIndex = parseInt(index)
 		
 		directionals = [LEFT, UP, RIGHT, DOWN] = [37..40]
@@ -648,7 +666,7 @@ class Graph
 
 					# graph the relevant live node objects for updating their positions
 					for node in @cola.nodes()
-						if node.index is clickedNode.index
+						if node.index is clickedNodeIndex
 							node1 = node
 						if node.index is map[saveIndex].node # since i switched them
 							node2 = node
@@ -664,43 +682,6 @@ class Graph
 					@cola.constraints(newConstraints)
 					@cola.start()
 
-			if key in [LEFT, RIGHT]
-				semesters = @cola.groups()
-				for index, semester of semesters
-					if semester.gid is clickedSemester.gid
-						clickedSemesterIndex = parseInt index
-
-				moveOffset = if key is LEFT then -1 else 1
-
-				# todo: handle empty semeseters case
-				newSemesterIndex = clickedSemesterIndex+moveOffset
-				newSemester = semesters[newSemesterIndex]
-				# if 0 <= newSemesterIndex and newSemesterIndex < semesters.length
-					# @dispatch actionDeleteClass(
-					# 		clickedNode.nid,
-					# 		@getPositiondata @cola.nodes(), @cola.groups()
-					# )
-
-					# className = clickedNode.name
-
-					# nodeData =
-					# 	className: className
-					# 	semester: newSemester.gid # parent group
-					# 	nid: clickedNode.nid
-					# 	type: classSpec.TYPE
-					# 	width: classSpec.WIDTH
-					# 	height: classSpec.HEIGHT
-					# @nodeCount += 1
-
-					# action = actionAddClass(
-					# 		nodeData,
-					# 		[],
-					# 		@getPositiondata @cola.nodes(), @cola.groups()
-					# 	)
-					# @dispatch action
-
-					# console.log 'id', clickedNode.nid
-					# @clickedNodeID = @clickedNode.nid
 	# pure
 	getPositiondata: (_nodes, _groups) =>
 		nodes = []

@@ -725,7 +725,6 @@ webpackJsonp([0],[
 	    this.update = bind(this.update, this);
 	    this.tick = bind(this.tick, this);
 	    this.clickedNode = null;
-	    this.clickedNodeID = null;
 	    this.opacityChanged = false;
 	    d3.select('body').on('keydown', this.moveNode);
 	    this.width = 1800;
@@ -828,6 +827,7 @@ webpackJsonp([0],[
 	      node = ref1[index];
 	      this.nodeIDMap[node.nid] = node;
 	    }
+	    console.log('cliekcen onode', this.clickedNode);
 	    this.group = this.updateGroups(this.group, this.cola.groups());
 	    this.link = this.updateLinks(this.link, this.cola.links());
 	    this.node = this.updateNodes(this.node, this.cola.nodes());
@@ -931,18 +931,29 @@ webpackJsonp([0],[
 	    })(this);
 	    moveGhostNode = (function(_this) {
 	      return function(e) {
-	        var ref1, x, y;
-	        _this.refPoint.x = e.clientX;
-	        _this.refPoint.y = e.clientY;
-	        ref1 = _this.refPoint.matrixTransform(_this.svg[0][0].getScreenCTM().inverse()), x = ref1.x, y = ref1.y;
-	        _this.ghost.attr('x', x).attr('y', y);
+	        var inXrange, inYrange, offset, oldX, oldY, ref1, ref2, x, y;
+	        ref1 = _this.currentPosition, oldX = ref1[0], oldY = ref1[1];
+	        offset = 25;
+	        inXrange = oldX - offset < e.clientX && e.clientX < oldX + offset;
+	        inYrange = oldY - offset < e.clientY && e.clientY < oldY + offset;
+	        if (inXrange && inYrange) {
+	          _this.inRange = true;
+	          return false;
+	        } else {
+	          _this.inRange = false;
+	          _this.ghost.style('opacity', 0.3);
+	          _this.cola.nodes()[_this.moveNode.index].hidden = true;
+	          _this.refPoint.x = e.clientX;
+	          _this.refPoint.y = e.clientY;
+	          ref2 = _this.refPoint.matrixTransform(_this.svg[0][0].getScreenCTM().inverse()), x = ref2.x, y = ref2.y;
+	          _this.ghost.attr('x', x).attr('y', y);
+	        }
 	        return false;
 	      };
 	    })(this);
 	    onMouseDown = (function(_this) {
 	      return function() {
 	        var child, ghostFill, j, len, rect, ref1, ref2, ref3, targetNode, x, y;
-	        console.log('mousedown');
 	        _this.currentPosition = [d3.event.clientX, d3.event.clientY];
 	        targetNode = d3.event.target;
 	        _this.moveNode = targetNode.__data__;
@@ -963,9 +974,8 @@ webpackJsonp([0],[
 	          }
 	        }
 	        ghostFill = rect.getAttribute('style').match(/fill: (.*?);/)[1];
-	        _this.svg.append('rect').attr('class', 'move-node-ghost').attr('width', classSpec.WIDTH).attr('height', classSpec.HEIGHT).attr('rx', 5).attr('ry', 5).attr('x', x).attr('y', y).style('opacity', 0.3).style('fill', ghostFill != null ? ghostFill : 'grey');
+	        _this.svg.append('rect').attr('class', 'move-node-ghost').attr('width', classSpec.WIDTH).attr('height', classSpec.HEIGHT).attr('rx', 5).attr('ry', 5).attr('x', x).attr('y', y).style('opacity', 0).style('fill', ghostFill != null ? ghostFill : 'grey');
 	        _this.ghost = _this.svg.select('.move-node-ghost');
-	        _this.cola.nodes()[_this.moveNode.index].hidden = true;
 	        _this.graphElement.addEventListener('mousemove', moveGhostNode);
 	        _this.graphElement.addEventListener('mouseup', onMouseUp);
 	        return true;
@@ -974,6 +984,11 @@ webpackJsonp([0],[
 	    onMouseUp = (function(_this) {
 	      return function(e) {
 	        var datum, nodeData, targetNode;
+	        if (_this.inRange) {
+	          _this.ghost.remove();
+	          _this.graphElement.removeEventListener('mousemove', moveGhostNode);
+	          return;
+	        }
 	        targetNode = e.target;
 	        if (targetNode.className.animVal.indexOf('class-node') !== -1) {
 	          while (targetNode.className.animVal !== 'node-cont') {
@@ -1091,8 +1106,7 @@ webpackJsonp([0],[
 	      }
 	    }).text((function(_this) {
 	      return function(d) {
-	        d.name;
-	        return "id: " + d.nid + ", index: " + (_this.cola.nodes().indexOf(d));
+	        return d.name;
 	      };
 	    })(this)).call(wrap, classSpec.WIDTH, this.cola);
 	    enter.append('title').text(function(d) {
@@ -1251,7 +1265,7 @@ webpackJsonp([0],[
 	  };
 
 	  Graph.prototype.moveNode = function() {
-	    var DOWN, LEFT, RIGHT, UP, _, clickedNode, clickedSemester, clickedSemesterIndex, constraint, directionals, index, j, k, key, len, len1, map, maxIndex, moveOffset, newConstraints, newSemester, newSemesterIndex, node, node1, node2, offset, ref1, ref2, ref3, ref4, ref5, ref6, ref7, saveIndex, semester, semesters, swapIndex, updateConstraints;
+	    var DOWN, LEFT, RIGHT, UP, _, clickedNode, clickedNodeIndex, clickedSemester, constraint, directionals, index, j, k, key, len, len1, map, maxIndex, moveOffset, newConstraints, node, node1, node2, offset, ref1, ref2, ref3, ref4, ref5, ref6, ref7, saveIndex, swapIndex, updateConstraints;
 	    updateConstraints = (function(_this) {
 	      return function(semesterID, modifyConstraint) {
 	        var constraint, j, len, newConstraint, newConstraints, ref1;
@@ -1286,8 +1300,8 @@ webpackJsonp([0],[
 	    if (this.clickedNode == null) {
 	      return;
 	    }
-	    console.log('which node clicked', this.clickedNode.nid);
-	    clickedNode = this.clickedNode.__data__;
+	    clickedNode = this.nodeIDMap[this.clickedNode.__data__.nid];
+	    clickedNodeIndex = clickedNode.index;
 	    clickedSemester = clickedNode.parent;
 	    map = {};
 	    ref1 = this.cola.constraints();
@@ -1298,7 +1312,7 @@ webpackJsonp([0],[
 	        for (index in ref2) {
 	          offset = ref2[index];
 	          map[index] = offset;
-	          if (clickedNode.index === offset.node) {
+	          if (clickedNodeIndex === offset.node) {
 	            saveIndex = parseInt(index);
 	          }
 	        }
@@ -1324,7 +1338,7 @@ webpackJsonp([0],[
 	          ref5 = this.cola.nodes();
 	          for (k = 0, len1 = ref5.length; k < len1; k++) {
 	            node = ref5[k];
-	            if (node.index === clickedNode.index) {
+	            if (node.index === clickedNodeIndex) {
 	              node1 = node;
 	            }
 	            if (node.index === map[saveIndex].node) {
@@ -1345,20 +1359,8 @@ webpackJsonp([0],[
 	            };
 	          })(this));
 	          this.cola.constraints(newConstraints);
-	          this.cola.start();
+	          return this.cola.start();
 	        }
-	      }
-	      if (key === LEFT || key === RIGHT) {
-	        semesters = this.cola.groups();
-	        for (index in semesters) {
-	          semester = semesters[index];
-	          if (semester.gid === clickedSemester.gid) {
-	            clickedSemesterIndex = parseInt(index);
-	          }
-	        }
-	        moveOffset = key === LEFT ? -1 : 1;
-	        newSemesterIndex = clickedSemesterIndex + moveOffset;
-	        return newSemester = semesters[newSemesterIndex];
 	      }
 	    }
 	  };
