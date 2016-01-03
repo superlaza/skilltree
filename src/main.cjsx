@@ -52,7 +52,7 @@ Promise.all([graphProm, majorProm]).then (res) ->
 
 	ReactDOM.render(
 		<Provider store={store}>
-			<div>
+			<div style={{display: 'flex'}}>
 				<MajorRequirements_ majorData={majorData}/>
 				<Plan_  graphData={graphData}
 						majorData={majorData}/>

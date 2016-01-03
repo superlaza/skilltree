@@ -33,11 +33,11 @@ Plan = React.createClass
 			position: 'absolute'
 			display: 'none'
 		}
+		# <button onClick={addSemester}> add semester</button>
 		<div id='graph' ref='graph'>
 			<input 	id='class-select'
 					style={selectorStyle}
 				/>
-			<button onClick={addSemester}> add semester</button>
 		</div>
 
 

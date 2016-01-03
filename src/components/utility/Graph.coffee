@@ -452,7 +452,7 @@ class Graph
 							classSpec.STYLE.PLACEHOLDER.FILL
 					.text (d) =>
 						d.name
-						# "id: #{d.nid}, index: #{@cola.nodes().indexOf(d)}"
+						"id: #{d.nid}, index: #{@cola.nodes().indexOf(d)}"
 					.call wrap, classSpec.WIDTH, @cola
 
 		enter.append 'title' # todo: inserts title multiple times

@@ -54,35 +54,67 @@ POS2State = (planOfStudy, graphData) ->
 		}
 		initialState.nodes.push btnAddClass
 
+		if 'placeholders' of semester
+			for placeholder in semester.placeholders
+				newNode =
+					opaque: true
+					type: classSpec.TYPE
+					width: classSpec.WIDTH
+					height: classSpec.HEIGHT
+					status: classSpec.status.ENROLLED
+				newNode.name = placeholder
+				newNode.nid = "placeholder#{nodeCount}"
+				nodeCount -= 1
+
+				newNodeIndex = initialState.nodes.length
+				group.push newNodeIndex
+				alignmentConstraint.offsets.push {
+					node: newNodeIndex
+					offset: constraintSpec.alignment.OFFSET.x
+				}
+				# initialState.constraints.unshift
+				# 	axis: 'y'
+				# 	_type: 'displacement'
+				# 	left: groupAnchorIndex # root node of group
+				# 	right: newNodeIndex# new anchor index
+				# 	gap: 20
+				# 	equality: 'true'
+
+				initialState.nodes.push newNode
+
 		for course in semester.courses
 			# an array signifies a list of non-class placeholders
-			if Array.isArray course
-				for placeholder in course
-					newNode =
-						opaque: true
-						type: classSpec.TYPE
-						width: classSpec.WIDTH
-						height: classSpec.HEIGHT
-						status: classSpec.status.ENROLLED
-					newNode.name = placeholder
-					newNode.nid = "placeholder#{nodeCount}"
-					nodeCount -= 1
+			if Array.isArray course # just pick first option for now
+				option = course[0]
+				newNode =
+					opaque: true
+					type: classSpec.TYPE
+					width: classSpec.WIDTH
+					height: classSpec.HEIGHT
+					status: classSpec.status.ENROLLED
+				if option of graphData
+					newNode.name = graphData[option].name
+					newNode.nid = option
+				else
+					console.log "#{option} is not in graphData"
+					newNode.name = option
+					newNode.nid = option
 
-					newNodeIndex = initialState.nodes.length
-					group.push newNodeIndex
-					alignmentConstraint.offsets.push {
-						node: newNodeIndex
-						offset: constraintSpec.alignment.OFFSET.x
-					}
-					# initialState.constraints.unshift
-					# 	axis: 'y'
-					# 	_type: 'displacement'
-					# 	left: groupAnchorIndex # root node of group
-					# 	right: newNodeIndex# new anchor index
-					# 	gap: 20
-					# 	equality: 'true'
-
-					initialState.nodes.push newNode
+				newNodeIndex = initialState.nodes.length
+				group.push newNodeIndex
+				alignmentConstraint.offsets.push {
+					node: newNodeIndex
+					offset: constraintSpec.alignment.OFFSET.x
+				}
+				# initialState.constraints.unshift
+				# 	axis: 'y'
+				# 	_type: 'displacement'
+				# 	left: groupAnchorIndex # root node of group
+				# 	right: newNodeIndex# new anchor index
+				# 	gap: 20
+				# 	equality: 'true'
+				
+				initialState.nodes.push newNode
 
 			else
 				newNode =

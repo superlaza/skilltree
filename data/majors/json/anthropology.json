@@ -5,7 +5,7 @@
 	"requirements": {
 		"GEP": {
 			"hours": 36,
-			"subgruops": {
+			"subgroups": {
 				"Communication Foundation": {
 					"hours": 9,
 					"required": [
@@ -118,7 +118,8 @@
 			"hours": 12,
 			"required": [
 				"ANT3610",
-				"ANT4034", ["ANT3145", "ANT3115"],
+				"ANT4034",
+				["ANT3145", "ANT3115"],
 				["ANT4516", "ANT4586C"]
 			]
 		},
@@ -217,71 +218,93 @@
 			}
 		}
 	},
-	"POS": [{
+	"POS": [
+	{
 		"semester": "Freshman Year - Fall",
 		"courses": [
 			"ANT2000",
 			"ENC1101",
-			"COM1000", ["GEP-MATH", "GEP"]
-		]
-	}, {
+			"COM1000"
+		],
+		"placeholders": ["GEP-MATH", "GEP"]
+	}, 
+	{
 		"semester": "Freshman Year - Spring",
 		"courses": [
 			"ANT2511",
-			"ENC1102", ["GEP", "GEP", "GEP"]
-		]
-	}, {
+			"ENC1102"
+		],
+		"placeholders": ["GEP", "GEP", "GEP"]
+	}, 
+	{
 		"semester": "Sophomore Year - Fall",
 		"courses": [
 			"ANT2140",
-			"ANT2410", [
-				"Restricted Elective",
-				"GEP",
-				"Free Elective"
-			]
+			"ANT2410"
+		],
+		"placeholders":  [
+			"Restricted Elective",
+			"GEP",
+			"Free Elective"
 		]
-	}, {
+	},
+	{
+		"semester": "Sophomore Year - Spring",
+		"courses": [
+			"ANT3610"
+		],
+		"placeholders":  [
+			"Restricted Elective",
+			"Restricted Elective",
+			"GEP",
+			"Elective / Minor"
+		]
+	}, 
+	{
 		"semester": "Junior Year - Fall",
 		"courses": [
-			"ANT3115",
-			"ANT3145", [
-				"Restricted Elective",
-				"Restricted Elective",
-				"Foreign Language",
-				"Elective / Minor"
-			]
+			["ANT3115", "ANT3145"]
+		],
+		"placeholders": [
+			"Restricted Elective",
+			"Restricted Elective",
+			"Foreign Language",
+			"Elective / Minor"
 		]
-	}, {
+	}, 
+	{
 		"semester": "Junior Year - Spring",
 		"courses": [
-			"ANT4034", [
-				"Restricted Elective",
-				"Foreign Language",
-				"Elective / Minor",
-				"Elective / Minor"
-			]
+			"ANT4034"
+		],
+		"placeholders":  [
+			"Restricted Elective",
+			"Foreign Language",
+			"Elective / Minor",
+			"Elective / Minor"
 		]
-	}, {
+	}, 
+	{
 		"semester": "Senior Year - Fall",
 		"courses": [
-			"ANT4516",
-			"ANT4586", [
-				"Restricted Elective",
-				"Elective / Minor",
-				"Elective / Minor",
-				"Free Elective"
-			]
+			["ANT4516", "ANT4586C"]
+		],
+		"placeholders": [
+			"Restricted Elective",
+			"Elective / Minor",
+			"Elective / Minor",
+			"Free Elective"
 		]
-	}, {
+	}, 
+	{
 		"semester": "Senior Year - Spring",
-		"courses": [
-			[
-				"Restricted Elective",
-				"Area Study Elective",
-				"Free Elective",
-				"Elective / Minor",
-				"Elective / Minor"
-			]
+		"courses": [],
+		"placeholders": [
+			"Restricted Elective",
+			"Area Study Elective",
+			"Free Elective",
+			"Elective / Minor",
+			"Elective / Minor"
 		]
 	}]
 }

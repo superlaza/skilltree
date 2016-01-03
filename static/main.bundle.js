@@ -50,7 +50,11 @@ webpackJsonp([0],[
 	  });
 	  return ReactDOM.render(React.createElement(Provider, {
 	    "store": store
-	  }, React.createElement("div", null, React.createElement(MajorRequirements_, {
+	  }, React.createElement("div", {
+	    "style": {
+	      display: 'flex'
+	    }
+	  }, React.createElement(MajorRequirements_, {
 	    "majorData": majorData
 	  }), React.createElement(Plan_, {
 	    "graphData": graphData,
@@ -1049,7 +1053,8 @@ webpackJsonp([0],[
 	      }
 	    }).text((function(_this) {
 	      return function(d) {
-	        return d.name;
+	        d.name;
+	        return "id: " + d.nid + ", index: " + (_this.cola.nodes().indexOf(d));
 	      };
 	    })(this)).call(wrap, classSpec.WIDTH, this.cola);
 	    enter.append('title').text(function(d) {
@@ -34967,7 +34972,7 @@ webpackJsonp([0],[
 	ref = __webpack_require__(179), classSpec = ref.classSpec, addClassSpec = ref.addClassSpec, constraintSpec = ref.constraintSpec;
 
 	POS2State = function(planOfStudy, graphData) {
-	  var alignmentConstraint, btnAddClass, course, displacementConstraint, group, groupAnchorIndex, groupIndex, i, index, initialState, j, k, l, len, len1, len2, len3, newNode, newNodeIndex, node, nodeCount, nodeIndexMap, option, placeholder, ref1, ref2, ref3, ref4, semester;
+	  var alignmentConstraint, btnAddClass, course, displacementConstraint, group, groupAnchorIndex, groupIndex, i, index, initialState, j, k, l, len, len1, len2, len3, newNode, newNodeIndex, node, nodeCount, nodeIndexMap, option, placeholder, ref1, ref2, ref3, ref4, ref5, semester;
 	  initialState = {
 	    nodes: [],
 	    links: [],
@@ -35017,30 +35022,56 @@ webpackJsonp([0],[
 	      offset: constraintSpec.alignment.OFFSET.x
 	    });
 	    initialState.nodes.push(btnAddClass);
-	    ref1 = semester.courses;
-	    for (j = 0, len1 = ref1.length; j < len1; j++) {
-	      course = ref1[j];
+	    if ('placeholders' in semester) {
+	      ref1 = semester.placeholders;
+	      for (j = 0, len1 = ref1.length; j < len1; j++) {
+	        placeholder = ref1[j];
+	        newNode = {
+	          opaque: true,
+	          type: classSpec.TYPE,
+	          width: classSpec.WIDTH,
+	          height: classSpec.HEIGHT,
+	          status: classSpec.status.ENROLLED
+	        };
+	        newNode.name = placeholder;
+	        newNode.nid = "placeholder" + nodeCount;
+	        nodeCount -= 1;
+	        newNodeIndex = initialState.nodes.length;
+	        group.push(newNodeIndex);
+	        alignmentConstraint.offsets.push({
+	          node: newNodeIndex,
+	          offset: constraintSpec.alignment.OFFSET.x
+	        });
+	        initialState.nodes.push(newNode);
+	      }
+	    }
+	    ref2 = semester.courses;
+	    for (k = 0, len2 = ref2.length; k < len2; k++) {
+	      course = ref2[k];
 	      if (Array.isArray(course)) {
-	        for (k = 0, len2 = course.length; k < len2; k++) {
-	          placeholder = course[k];
-	          newNode = {
-	            opaque: true,
-	            type: classSpec.TYPE,
-	            width: classSpec.WIDTH,
-	            height: classSpec.HEIGHT,
-	            status: classSpec.status.ENROLLED
-	          };
-	          newNode.name = placeholder;
-	          newNode.nid = "placeholder" + nodeCount;
-	          nodeCount -= 1;
-	          newNodeIndex = initialState.nodes.length;
-	          group.push(newNodeIndex);
-	          alignmentConstraint.offsets.push({
-	            node: newNodeIndex,
-	            offset: constraintSpec.alignment.OFFSET.x
-	          });
-	          initialState.nodes.push(newNode);
+	        option = course[0];
+	        newNode = {
+	          opaque: true,
+	          type: classSpec.TYPE,
+	          width: classSpec.WIDTH,
+	          height: classSpec.HEIGHT,
+	          status: classSpec.status.ENROLLED
+	        };
+	        if (option in graphData) {
+	          newNode.name = graphData[option].name;
+	          newNode.nid = option;
+	        } else {
+	          console.log(option + " is not in graphData");
+	          newNode.name = option;
+	          newNode.nid = option;
 	        }
+	        newNodeIndex = initialState.nodes.length;
+	        group.push(newNodeIndex);
+	        alignmentConstraint.offsets.push({
+	          node: newNodeIndex,
+	          offset: constraintSpec.alignment.OFFSET.x
+	        });
+	        initialState.nodes.push(newNode);
 	      } else {
 	        newNode = {
 	          opaque: true,
@@ -35067,18 +35098,18 @@ webpackJsonp([0],[
 	      }
 	    }
 	    nodeIndexMap = {};
-	    ref2 = initialState.nodes;
-	    for (index in ref2) {
-	      node = ref2[index];
-	      nodeIndexMap[node.nid] = parseInt(index);
-	    }
 	    ref3 = initialState.nodes;
 	    for (index in ref3) {
 	      node = ref3[index];
+	      nodeIndexMap[node.nid] = parseInt(index);
+	    }
+	    ref4 = initialState.nodes;
+	    for (index in ref4) {
+	      node = ref4[index];
 	      if (node.nid in graphData) {
-	        ref4 = graphData[node.nid].prereqs;
-	        for (l = 0, len3 = ref4.length; l < len3; l++) {
-	          option = ref4[l];
+	        ref5 = graphData[node.nid].prereqs;
+	        for (l = 0, len3 = ref5.length; l < len3; l++) {
+	          option = ref5[l];
 	          initialState.links.push({
 	            source: parseInt(index),
 	            target: nodeIndexMap[option],
@@ -35149,9 +35180,7 @@ webpackJsonp([0],[
 	    }, React.createElement("input", {
 	      "id": 'class-select',
 	      "style": selectorStyle
-	    }), React.createElement("button", {
-	      "onClick": addSemester
-	    }, " add semester"));
+	    }));
 	  }
 	});
 
@@ -35181,7 +35210,7 @@ webpackJsonp([0],[
 
 	MajorRequirements = React.createClass({
 	  render: function() {
-	    var _, details, ref, req, reqList;
+	    var _, course, courseList, details, i, j, len, len1, option, ref, ref1, ref2, ref3, req, reqList, reqSat, sub, subDetails;
 	    console.log('reqs props', ((function() {
 	      var results;
 	      results = [];
@@ -35190,13 +35219,70 @@ webpackJsonp([0],[
 	      }
 	      return results;
 	    }).call(this)).length);
+	    courseList = [];
 	    reqList = [];
 	    ref = this.props.majorData.requirements;
 	    for (req in ref) {
 	      details = ref[req];
+	      reqSat = true;
+	      if ('subgroups' in details) {
+	        ref1 = details.subgroups;
+	        for (sub in ref1) {
+	          subDetails = ref1[sub];
+	          if ('subgroups' in subDetails) {
+	            console.log(subDetails.subgroups);
+	          } else {
+	            ref2 = subDetails.required;
+	            for (i = 0, len = ref2.length; i < len; i++) {
+	              course = ref2[i];
+	              if (Array.isArray(course)) {
+	                reqSat = reqSat && ((function() {
+	                  var j, len1, results;
+	                  results = [];
+	                  for (j = 0, len1 = course.length; j < len1; j++) {
+	                    option = course[j];
+	                    results.push(option in this.props.courses);
+	                  }
+	                  return results;
+	                }).call(this)).some(function(v) {
+	                  return v;
+	                });
+	              } else {
+	                reqSat = reqSat && course in this.props.courses;
+	              }
+	            }
+	          }
+	        }
+	      } else {
+	        ref3 = details.required;
+	        for (j = 0, len1 = ref3.length; j < len1; j++) {
+	          course = ref3[j];
+	          if (Array.isArray(course)) {
+	            reqSat = reqSat && ((function() {
+	              var k, len2, results;
+	              results = [];
+	              for (k = 0, len2 = course.length; k < len2; k++) {
+	                option = course[k];
+	                results.push(option in this.props.courses);
+	              }
+	              return results;
+	            }).call(this)).some(function(v) {
+	              return v;
+	            });
+	          } else {
+	            reqSat = reqSat && course in this.props.courses;
+	          }
+	        }
+	      }
+	      console.log(req, reqSat);
 	      reqList.push(React.createElement("div", {
 	        "key": reqList.length
-	      }, req));
+	      }, React.createElement("span", {
+	        "style": {
+	          color: (reqSat ? 'green' : 'red'),
+	          fontSize: 'small'
+	        }
+	      }, req)));
 	    }
 	    return React.createElement("div", {
 	      "id": 'major-requirements',
