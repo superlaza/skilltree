@@ -4,16 +4,65 @@
 	"type": "Bachelor of Arts",
 	"requirements": {
 		"GEP": {
-			"hour": 36,
-			"subgroups": {
-				"Communication Foundations": {
-					"hours": 9
+			"hours": 36,
+			"subgruops": {
+				"Communication Foundation": {
+					"hours": 9,
+					"required": [
+						"ENC1101",
+						"ENC1102",
+						[
+							"SPC1608",
+							"SPC1603C",
+							"COM1000"
+						]
+					]
 				},
-				"Cultural & Historical Foundations": {
-					"hours": 9
+				"Cultural and Historical Foundation": {
+					"hours": 9,
+					"required": [
+						[
+							"EUH2000",
+							"EUH2001",
+							"HUM2020",
+							"HUM2210",
+							"HUM2230",
+							"AMH2010",
+							"WOH2012",
+							"WOH2022"
+						],
+						[
+							"ARH2050",
+							"ARH2051",
+							"MUL2010",
+							"THE2000",
+							"FIL1000",
+							"REL2300",
+							"PHI2010",
+							"LIT2110"
+						],
+						[
+							"_0",
+							"_1"
+						]
+					]
 				},
-				"Mathematical Foundations": {
+				"Mathematical Foundation": {
 					"hours": 6,
+					"required": [
+						[
+							"MAC1105C",
+							"MAC2311C",
+							"MGF1106",
+							"MGF1107"
+						],
+						[
+							"CGS1060C",
+							"STA1063C",
+							"STA2014C",
+							"STA2023"
+						]
+					],
 					"suggested": [
 						[
 							"MGF1106",
@@ -22,16 +71,38 @@
 						"STA2014C"
 					]
 				},
-				"Social Foundations": {
+				"Social Foundation": {
 					"hours": 6,
+					"required": [
+						[
+							"ECO2013",
+							"ECO2023",
+							"POS2041",
+							"AMH2020"
+						],
+						[
+							"PSY2012",
+							"SYG2000",
+							"ANT2000"
+						]
+					],
 					"suggested": [
 						"ANT2000", ["GEP D.1"]
 					]
 				},
-				"Science Foundations": {
+				"Science Foundation": {
 					"hours": 6,
 					"required": [
-						"ANT2511", ["GEP E.1"]
+						"ANT2511", 
+						[
+							"AST2002",
+							"PSC1121",
+							"PHY2020",
+							"PHY2053C",
+							"PHY2048C",
+							"CHM1020",
+							"CHM2045C"
+						]
 					]
 				}
 			}

@@ -2,7 +2,7 @@ webpackJsonp([0],[
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var DevTools, POS2State, Plan_, Provider, React, ReactDOM, addClassSpec, classSpec, compose, constraintSpec, createStore, finalCreateStore, graphProm, im, majorProm, model, reducer, ref, ref1, store;
+	var DevTools, MajorRequirements_, POS2State, Plan_, Provider, React, ReactDOM, addClassSpec, classSpec, compose, constraintSpec, createStore, finalCreateStore, graphProm, im, majorProm, model, reducer, ref, ref1, store;
 
 	ref = __webpack_require__(1), createStore = ref.createStore, compose = ref.compose;
 
@@ -14,7 +14,9 @@ webpackJsonp([0],[
 
 	reducer = __webpack_require__(177);
 
-	Plan_ = __webpack_require__(181).Plan_;
+	Plan_ = __webpack_require__(414).Plan_;
+
+	MajorRequirements_ = __webpack_require__(415).MajorRequirements_;
 
 	DevTools = __webpack_require__(188);
 
@@ -48,7 +50,9 @@ webpackJsonp([0],[
 	  });
 	  return ReactDOM.render(React.createElement(Provider, {
 	    "store": store
-	  }, React.createElement("div", null, React.createElement(Plan_, {
+	  }, React.createElement("div", null, React.createElement(MajorRequirements_, {
+	    "majorData": majorData
+	  }), React.createElement(Plan_, {
 	    "graphData": graphData,
 	    "majorData": majorData
 	  }), React.createElement(DevTools, null))), document.getElementById('react'));
@@ -613,73 +617,7 @@ webpackJsonp([0],[
 
 /***/ },
 /* 180 */,
-/* 181 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Graph, Plan, Plan_, React, actionAddSemester, connect, mapStateToProps;
-
-	React = __webpack_require__(11);
-
-	Graph = __webpack_require__(182).Graph;
-
-	connect = __webpack_require__(168).connect;
-
-	actionAddSemester = __webpack_require__(187).actionAddSemester;
-
-	Plan = React.createClass({
-	  componentDidMount: function() {
-	    var dispatch, graphData, majorData, ref, state;
-	    ref = this.props, dispatch = ref.dispatch, state = ref.state, graphData = ref.graphData, majorData = ref.majorData;
-	    return this.graph = new Graph(this.refs.graph, state, dispatch, graphData);
-	  },
-	  componentDidUpdate: function() {
-	    var dispatch, graphData, ref, state;
-	    ref = this.props, dispatch = ref.dispatch, state = ref.state, graphData = ref.graphData;
-	    console.log('newstate?', state);
-	    this.graph.update(state);
-	    return window.dispatch = dispatch;
-	  },
-	  render: function() {
-	    var addSemester, dispatch, selectorStyle;
-	    dispatch = this.props.dispatch;
-	    addSemester = (function(_this) {
-	      return function() {
-	        var groups, links, nodes, ref;
-	        ref = _this.graph.getGraph(), nodes = ref.nodes, groups = ref.groups, links = ref.links;
-	        return dispatch(actionAddSemester(_this.graph.getPositiondata(nodes, groups)));
-	      };
-	    })(this);
-	    selectorStyle = {
-	      position: 'absolute',
-	      display: 'none'
-	    };
-	    return React.createElement("div", {
-	      "id": 'graph',
-	      "ref": 'graph'
-	    }, React.createElement("input", {
-	      "id": 'class-select',
-	      "style": selectorStyle
-	    }), React.createElement("button", {
-	      "onClick": addSemester
-	    }, " add semester"));
-	  }
-	});
-
-	mapStateToProps = function(state) {
-	  return {
-	    state: state.toJS()
-	  };
-	};
-
-	Plan_ = connect(mapStateToProps)(Plan);
-
-	module.exports = {
-	  Plan: Plan,
-	  Plan_: Plan_
-	};
-
-
-/***/ },
+/* 181 */,
 /* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -35162,6 +35100,135 @@ webpackJsonp([0],[
 	};
 
 	module.exports = POS2State;
+
+
+/***/ },
+/* 414 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Graph, Plan, Plan_, React, actionAddSemester, connect, mapStateToProps;
+
+	React = __webpack_require__(11);
+
+	Graph = __webpack_require__(182).Graph;
+
+	connect = __webpack_require__(168).connect;
+
+	actionAddSemester = __webpack_require__(187).actionAddSemester;
+
+	Plan = React.createClass({
+	  componentDidMount: function() {
+	    var dispatch, graphData, majorData, ref, state;
+	    ref = this.props, dispatch = ref.dispatch, state = ref.state, graphData = ref.graphData, majorData = ref.majorData;
+	    return this.graph = new Graph(this.refs.graph, state, dispatch, graphData);
+	  },
+	  componentDidUpdate: function() {
+	    var dispatch, graphData, ref, state;
+	    ref = this.props, dispatch = ref.dispatch, state = ref.state, graphData = ref.graphData;
+	    console.log('newstate?', state);
+	    this.graph.update(state);
+	    return window.dispatch = dispatch;
+	  },
+	  render: function() {
+	    var addSemester, dispatch, selectorStyle;
+	    dispatch = this.props.dispatch;
+	    addSemester = (function(_this) {
+	      return function() {
+	        var groups, links, nodes, ref;
+	        ref = _this.graph.getGraph(), nodes = ref.nodes, groups = ref.groups, links = ref.links;
+	        return dispatch(actionAddSemester(_this.graph.getPositiondata(nodes, groups)));
+	      };
+	    })(this);
+	    selectorStyle = {
+	      position: 'absolute',
+	      display: 'none'
+	    };
+	    return React.createElement("div", {
+	      "id": 'graph',
+	      "ref": 'graph'
+	    }, React.createElement("input", {
+	      "id": 'class-select',
+	      "style": selectorStyle
+	    }), React.createElement("button", {
+	      "onClick": addSemester
+	    }, " add semester"));
+	  }
+	});
+
+	mapStateToProps = function(state) {
+	  return {
+	    state: state.toJS()
+	  };
+	};
+
+	Plan_ = connect(mapStateToProps)(Plan);
+
+	module.exports = {
+	  Plan: Plan,
+	  Plan_: Plan_
+	};
+
+
+/***/ },
+/* 415 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var MajorRequirements, MajorRequirements_, React, connect, mapStateToProps;
+
+	React = __webpack_require__(11);
+
+	connect = __webpack_require__(168).connect;
+
+	MajorRequirements = React.createClass({
+	  render: function() {
+	    var _, details, ref, req, reqList;
+	    console.log('reqs props', ((function() {
+	      var results;
+	      results = [];
+	      for (_ in this.props.courses) {
+	        results.push(_);
+	      }
+	      return results;
+	    }).call(this)).length);
+	    reqList = [];
+	    ref = this.props.majorData.requirements;
+	    for (req in ref) {
+	      details = ref[req];
+	      reqList.push(React.createElement("div", {
+	        "key": reqList.length
+	      }, req));
+	    }
+	    return React.createElement("div", {
+	      "id": 'major-requirements',
+	      "ref": 'major_requirements'
+	    }, reqList);
+	  }
+	});
+
+	mapStateToProps = function(state) {
+	  var course, courses, i, len, ref;
+	  courses = {};
+	  ref = state.toJS().nodes;
+	  for (i = 0, len = ref.length; i < len; i++) {
+	    course = ref[i];
+	    if (course.type !== 'btnAddClass') {
+	      courses[course.nid] = {
+	        status: course.status,
+	        name: course.name
+	      };
+	    }
+	  }
+	  return {
+	    courses: courses
+	  };
+	};
+
+	MajorRequirements_ = connect(mapStateToProps)(MajorRequirements);
+
+	module.exports = {
+	  MajorRequirements_: MajorRequirements_,
+	  MajorRequirements: MajorRequirements
+	};
 
 
 /***/ }

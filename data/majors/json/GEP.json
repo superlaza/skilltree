@@ -1,0 +1,105 @@
+{
+	"GEP": {
+		"hours": 36,
+		"subgruops": {
+			"Communication Foundation": {
+				"hours": 9,
+				"required": [
+					"ENC1101",
+					"ENC1102",
+					[
+						"SPC1608",
+						"SPC1603C",
+						"COM1000"
+					]
+				]
+			},
+			"Cultural and Historical Foundation": {
+				"hours": 9,
+				"required": [
+					[
+						"EUH2000",
+						"EUH2001",
+						"HUM2020",
+						"HUM2210",
+						"HUM2230",
+						"AMH2010",
+						"WOH2012",
+						"WOH2022"
+					],
+					[
+						"ARH2050",
+						"ARH2051",
+						"MUL2010",
+						"THE2000",
+						"FIL1000",
+						"REL2300",
+						"PHI2010",
+						"LIT2110"
+					],
+					[
+						"_0",
+						"_1"
+					]
+				]
+			},
+			"Mathematical Foundation": {
+				"hours": 6,
+				"required": [
+					[
+						"MAC1105C",
+						"MAC2311C",
+						"MGF1106",
+						"MGF1107"
+					],
+					[
+						"CGS1060C",
+						"STA1063C",
+						"STA2014C",
+						"STA2023"
+					]
+				]
+			},
+			"Social Foundation": {
+				"hours": 6,
+				"required": [
+					[
+						"ECO2013",
+						"ECO2023",
+						"POS2041",
+						"AMH2020"
+					],
+					[
+						"PSY2012",
+						"SYG2000",
+						"ANT2000"
+					]
+				]
+			},
+			"Science Foundation": {
+				"hours": 6,
+				"required": [
+					[
+						"AST2002",
+						"PSC1121",
+						"PHY2020",
+						"PHY2053C",
+						"PHY2048C",
+						"CHM1020",
+						"CHM2045C"
+					],
+					[
+						"BSC1005",
+						"BSC1050",
+						"BSC2010C",
+						"EVR1001",
+						"GLY1030",
+						"GEO1200",
+						"ANT2511",
+						"MCB1310"
+					]
+				]
+			}
+		}
+	}
+}

@@ -6,7 +6,8 @@ ReactDOM 	= require 'react-dom'
 {Provider}	= require 'react-redux'
 reducer	= require './reducers/planReducer.coffee'
 
-{Plan_} 	= require './components/plan.cjsx'
+{Plan_} 				= require './components/Plan.cjsx'
+{MajorRequirements_}	= require './components/MajorRequirements.cjsx'
 
 # initialize devtools
 DevTools 	= require './dev/DevTools.cjsx'
@@ -52,6 +53,7 @@ Promise.all([graphProm, majorProm]).then (res) ->
 	ReactDOM.render(
 		<Provider store={store}>
 			<div>
+				<MajorRequirements_ majorData={majorData}/>
 				<Plan_  graphData={graphData}
 						majorData={majorData}/>
 				<DevTools />
