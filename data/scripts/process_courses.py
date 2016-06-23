@@ -1,5 +1,5 @@
 import re, json, operator
-from py2neo import authenticate, Graph, Node, Relationship
+from py2neo import authenticate, Graph as NGraph, Node, Relationship
 import matplotlib.pyplot as plt
 
 from collections import defaultdict
@@ -39,6 +39,19 @@ class Course:
 		self.body  	 = properties['body']
 		self.name 	 = properties['name']
 		self.prereqs = properties['prereqs']
+
+
+	@property
+	def node(self):
+		props = {
+			'code': self.prefix+self.number,
+			'name': self.name,
+			'college': self.college,
+			'credits': self.credits,
+			'desc': self.body
+		}
+
+		return Node("Course", **props) 
 
 	@property
 	def json(self):	
@@ -166,7 +179,7 @@ def process_courses():
 						courseNodes[prefix+number] = {
 							'id': id,
 							'node': Node("Course", name=(prefix+number)),
-							'name': prefix+number
+							'code': prefix+number
 						}
 
 						id += 1
@@ -229,16 +242,20 @@ json.dump(graph.repr(), open("../courseAdjList.json", 'wb'), indent=4)
 
 def add2neo(courses):
 	authenticate("localhost:7474", 'neo4j', 'admin')
-	graph = Graph()
+	graph = NGraph()
 	for course in courses:
+		print course.string
 		name = course.prefix+course.number
 
 		for pre in course.prereqs:
-			print 'adding rel', name, pre
+			# print 'adding rel', name, pre
 			try:
-				graph.create(Relationship(courseNodes[name]['node'], 'REQUIRES', courseNodes[pre]['node']))
+				graph.create(Relationship(course.node, 'REQUIRES', course.node))
 			except:
 				print 'could not add', name, pre
+
+# print courses[0].node
+add2neo(courses)
 
 def major_data():
 	majors = json.load(open('../majors.json', 'rb'))

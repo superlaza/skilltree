@@ -13,7 +13,7 @@ groupSpec			= Specs.groupSpec
 {actionAddClass, actionDeleteClass} = require '../../actions/PlanActions.coffee'
 
 class Graph
-	constructor: (@graphElement, @graph) ->
+	constructor: (@graphElement, @graph, @dispatch, @adjList) ->
 		# event result persistence
 		@clickedNode = null
 
@@ -139,18 +139,131 @@ class Graph
 
 		@cola.nodes(graph.nodes)
 			.links(graph.links)
-			# .groups(graph.groups)
-			# .constraints(graph.constraints)
+			.groups(graph.groups)
+			.constraints(graph.constraints)
 
-		# @cola.on 'tick', @tick
+		@cola.on 'tick', @tick
 
-		# @group = @updateGroups @group, @cola.groups()
+		@nodeIDMap = {} # this isn't implemented everywhere yet
+		for index, node of @cola.nodes()
+			@nodeIDMap[node.nid] = node
+		
+		console.log 'cliekcen onode', @clickedNode
+		@group = @updateGroups @group, @cola.groups()
 		@link = @updateLinks @link, @cola.links()
 		@node = @updateNodes @node, @cola.nodes()
 		
 		@cola.start()
 
 	updateNodes: (selection, data) =>
+		wrap = (text, width, cola) =>
+			text.each () ->
+				text = d3.select(this)
+				datum = this.__data__
+				words = text.text().split(/\s+/).reverse()
+				word = undefined
+				line = []
+				lineNumber = 0
+				# lineHeight = 1.1 # measured in ems
+				lineHeight = 18
+				y = text.attr('y')
+				tspan = text.text(null)
+							.append('tspan')
+							.attr 'class', 'class-node-tspan'
+							.attr('x', 0)
+							.attr('y', 0)
+							# .attr('dy', dy + 'em')
+				while word = words.pop()
+					line.push word
+					tspan.text line.join(' ')
+					if tspan.node().getComputedTextLength() > width
+						line.pop()
+						tspan.text line.join(' ')
+						line = [ word ]
+						tspan = text.append('tspan')
+									.attr 'class', 'class-node-tspan'
+									.attr('x', 0)
+									.attr('y', 0)
+									# .attr('dy', ++lineNumber * lineHeight + 'em')
+									.attr('dy', ++lineNumber * lineHeight + 'px')
+									.text(word)
+
+				nodes = cola.nodes()
+				# change in simulation
+				if datum.index?
+					height = nodes[datum.index].height
+					nodes[datum.index].height += lineNumber*lineHeight
+				else
+					for _node in nodes # can't use var name `node`
+						if _node.nid is datum.nid
+							height = _node.height
+							_node.height += lineNumber*lineHeight
+
+				# change in render
+				for child in this.parentNode.parentNode.children
+					if child.nodeName is 'rect'
+						height = parseInt child.getAttribute('height')
+						child.setAttribute 'height', "#{height+lineNumber*lineHeight}"
+				
+				# cola.start()
+				return
+		  return
+
+
+		setVisibility = =>
+			eventType = d3.event.type
+			datum = d3.event.target.__data__
+
+			# hide/show links on class nodes
+			if datum.type is classSpec.TYPE
+				neighbors = [datum.index]
+				for index, link of @cola.links()
+					{source, target} = link
+					if source.index is datum.index or target.index is datum.index
+						link.opaque = if eventType is 'mouseenter' then true else false
+						if source.index is datum.index
+							neighbors.push target.index
+						else
+							neighbors.push source.index
+				# fade classes that aren't connected
+				for node in @cola.nodes()
+					if node.type is classSpec.TYPE and node.index not in neighbors
+						node.opaque = if eventType is 'mouseenter' then false else true
+				@opacityChanged = true
+				@tick() # draw changes with a flag to signifiy we're changing opacity
+				@opacityChanged = false
+			# set visibility of delete button
+			for child in d3.event.target.children
+				if child.className.animVal is btnDeleteClassSpec.CLASS
+					child.setAttribute('visibility', if eventType is 'mouseenter' then 'visible' else 'hidden')
+					break
+
+		moveGhostNode = (e) =>
+			[oldX, oldY] = @currentPosition
+			offset = 25
+			inXrange = oldX-offset < e.clientX and e.clientX < oldX+offset
+			inYrange = oldY-offset < e.clientY and e.clientY < oldY+offset
+
+			# not much of a drag
+			if inXrange and inYrange
+				@inRange = true
+				return false
+			else
+				@inRange = false
+				@ghost.style 'opacity', 0.3
+				@cola.nodes()[@moveNode.index].hidden = true # set to true a bazillion times
+
+				@refPoint.x = e.clientX
+				@refPoint.y = e.clientY
+				# convert to global screen coordinates
+				{x,y} = @refPoint.matrixTransform @svg[0][0].getScreenCTM().inverse()
+				
+				@ghost
+				.attr 'x', x
+				.attr 'y', y
+
+			false
+
 		onMouseDown = =>
 			# get coordinates to filter simple click
 			@currentPosition = [d3.event.clientX, d3.event.clientY]
@@ -259,11 +372,24 @@ class Graph
 
 		node = selection.data data,
 					(d) ->
-						d.code
+						d.nid
 		node
 			# .call @cola.drag
 			.on 'click', @onNodeClick
 			.on 'mousedown', onMouseDown
+
+		# when heights are changed for text wrapping, this
+		# ensures that those heights get re-registered to the model
+		node.selectAll('.class-node-text')
+			.call (text, cola = @cola, nmap=@nodeIDMap) =>
+				text.each () ->
+					datum = this.__data__
+					nodes = cola.nodes()
+					# this is data from the pre-existing render being added to model
+					nmap[datum.nid].height = datum.height
+					return
+				return
+
 
 		enter = node.enter()
 			.insert 'g', '.node-cont'
@@ -272,7 +398,98 @@ class Graph
 					if d.opaque then 1 else addClassSpec.OPACITY
 				# .call @cola.drag
 				.on 'click', @onNodeClick
+				.on 'mouseenter', setVisibility
+				.on 'mouseleave', setVisibility
 				.on 'mousedown', onMouseDown
+		enter.append 'rect'
+				.attr 'class', (d) ->
+					classStem = 'cola node'
+					switch d.type
+						when addClassSpec.TYPE
+							classStem+=" #{addClassSpec.CLASS}"
+						when classSpec.TYPE
+							classStem+=" #{classSpec.CLASS}"
+							switch d.status
+								when classSpec.status.ENROLLED
+									classStem+=" #{classSpec.status.ENROLLED}"
+								when classSpec.status.OPTION
+									classStem+=" #{classSpec.status.OPTION}"
+								when classSpec.status.PREREQ
+									classStem+=" #{classSpec.status.PREREQ}"
+					
+				.attr 'width',
+					(d) =>
+						if d.hidden then 0 else d.width - (2 * @pad)
+				.attr 'height',
+					(d) => 
+						if d.hidden then 0 else d.height - (2 * @pad)
+				.attr 'rx', 5
+				.attr 'ry', 5
+				.style 'fill', 
+					(d) => 
+						switch d.type
+							when classSpec.TYPE
+								switch d.status
+									when classSpec.status.PREREQ
+										return 'rgb(255,29,25)'
+							
+								if d.nid.indexOf('placeholder') isnt -1
+									classSpec.STYLE.PLACEHOLDER.FILL
+								else
+									@color @graph.groups.length
+
+		textGroup = enter.append 'g'
+				.attr 'transform', (d) ->
+					"translate(#{d.width/2},#{d.height/2})"
+				.attr 'class', 'cola label class-node-label'
+				# .call @cola.drag
+				.append 'text'
+					.attr 'class', 'class-node-text'
+					.style 'fill', (d) ->
+						if d.nid.indexOf('placeholder') isnt -1
+							'#BDBDBD'
+						else
+							classSpec.STYLE.PLACEHOLDER.FILL
+					.text (d) =>
+						d.name
+						"id: #{d.nid}, index: #{@cola.nodes().indexOf(d)}"
+					.call wrap, classSpec.WIDTH, @cola
+
+		enter.append 'title' # todo: inserts title multiple times
+				.text (d) ->
+					d.name
+
+		# only add delete button to class types
+		enter = enter.filter (d) -> d.type is 'class'
+
+		# this whole button is just me being lazy
+		# listen, it was late, didn't want to learn anything new
+		deleteButton = enter.append 'g'
+				.attr 'transform', 'scale(0.13) translate(-150, -80)'
+				.attr 'class', btnDeleteClassSpec.CLASS
+				.attr 'visibility', 'hidden'
+				.on 'click', =>
+					targetNode = d3.event.target
+					while targetNode.className.animVal isnt 'node-cont'
+						targetNode = targetNode.parentNode
+					datum = targetNode.__data__
+					@dispatch actionDeleteClass(
+							datum.nid,
+							@getPositiondata @cola.nodes(), @cola.groups()
+					)
+
+		appendButton = (path) ->
+			deleteButton.append 'path'
+							.attr 'd', path
+							.style 'fill', '#e00'
+							.style 'fill-opacity', 1
+							.style 'fill-rule', 'evenodd'
+							.style 'stroke', 'none'
+							.style 'stroke-width', '0.25pt'
+							.style 'stroke-linecap', 'butt'
+							.style 'stroke-linejoin', 'miter'
+							.style 'stroke-opacity', 1
+		appendButton path for path in ['M 100,60 L 60,100 L 230,270 L 270,230 L 100,60 z', 'M 60,230 L 230,60 L 270,100 L 100,270 L 60,230 z']
 
 		node.exit().remove()
 

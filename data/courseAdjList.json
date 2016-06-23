@@ -613,10 +613,6 @@
         "prereqs": [], 
         "name": "Imperialism & Decolonization in South Asia"
     }, 
-    "ENV5517": {
-        "prereqs": [], 
-        "name": "Engineering Chemical and Biological  Processes"
-    }, 
     "PUP3204": {
         "prereqs": [
             "ENC1102"
@@ -717,12 +713,6 @@
             "PSY2012"
         ], 
         "name": "Psychological Measurement"
-    }, 
-    "DAA2570C": {
-        "prereqs": [
-            "DAA2200C"
-        ], 
-        "name": "Jazz Dance I"
     }, 
     "FRE3410": {
         "prereqs": [
@@ -1906,10 +1896,6 @@
         "prereqs": [], 
         "name": "Opera Skills"
     }, 
-    "MVB5453": {
-        "prereqs": [], 
-        "name": "Trombone V"
-    }, 
     "LAE4464": {
         "prereqs": [
             "ENC1101"
@@ -2964,13 +2950,11 @@
         ], 
         "name": "Environment and Society"
     }, 
-    "HFT3444": {
+    "AST3110": {
         "prereqs": [
-            "ECO2013", 
-            "ECO2023", 
-            "HFT2254"
+            "AST2002"
         ], 
-        "name": "Hospitality Information Systems"
+        "name": "Solar System Astronomy"
     }, 
     "ARH4130": {
         "prereqs": [
@@ -7640,9 +7624,9 @@
         "prereqs": [], 
         "name": "Physics of Energy and the Environment"
     }, 
-    "PLA4240": {
+    "ANT3179": {
         "prereqs": [], 
-        "name": "Negotiation Alternatives in Law"
+        "name": "Australian Archaeology and Indigenous  Cultures"
     }, 
     "CAP5100": {
         "prereqs": [], 
@@ -8700,9 +8684,12 @@
         "prereqs": [], 
         "name": "Basic Conducting"
     }, 
-    "MVJ1214": {
-        "prereqs": [], 
-        "name": "Jazz Bass I"
+    "REE4933": {
+        "prereqs": [
+            "REE3043", 
+            "REE3433"
+        ], 
+        "name": "Advanced Topics in Real Estate"
     }, 
     "NGR5660": {
         "prereqs": [], 
@@ -9010,12 +8997,6 @@
             "SPN2240"
         ], 
         "name": "Advanced Spanish Oral Communication"
-    }, 
-    "SPN1121C": {
-        "prereqs": [
-            "SPN1120C"
-        ], 
-        "name": "Honors Elementary Spanish Language and  Civilization II"
     }, 
     "PCB3522H": {
         "prereqs": [
@@ -9615,9 +9596,9 @@
         "prereqs": [], 
         "name": "French Horn V"
     }, 
-    "ANT3179": {
+    "MVB5453": {
         "prereqs": [], 
-        "name": "Australian Archaeology and Indigenous  Cultures"
+        "name": "Trombone V"
     }, 
     "MVB5451": {
         "prereqs": [], 
@@ -10595,6 +10576,12 @@
             "ECO3223"
         ], 
         "name": "International Macroeconomics"
+    }, 
+    "DAA3508C": {
+        "prereqs": [
+            "DAA2571C"
+        ], 
+        "name": "Jazz Dance III"
     }, 
     "CEN4333": {
         "prereqs": [], 
@@ -12981,6 +12968,10 @@
         ], 
         "name": "Information Management and  Entrepreneurship"
     }, 
+    "ENV5517": {
+        "prereqs": [], 
+        "name": "Engineering Chemical and Biological  Processes"
+    }, 
     "AST3211": {
         "prereqs": [
             "AST2002"
@@ -13368,10 +13359,6 @@
         ], 
         "name": "Condensed Matter Physics"
     }, 
-    "STA2014C": {
-        "prereqs": [], 
-        "name": "Principles of Statistics"
-    }, 
     "ARH3720": {
         "prereqs": [
             "ARH2050", 
@@ -13632,6 +13619,12 @@
             "STA3032"
         ], 
         "name": "Highway Engineering"
+    }, 
+    "DAA2570C": {
+        "prereqs": [
+            "DAA2200C"
+        ], 
+        "name": "Jazz Dance I"
     }, 
     "RTV4681C": {
         "prereqs": [
@@ -14318,11 +14311,9 @@
         "prereqs": [], 
         "name": "Marketing Research"
     }, 
-    "DAA3508C": {
-        "prereqs": [
-            "DAA2571C"
-        ], 
-        "name": "Jazz Dance III"
+    "BSC1050": {
+        "prereqs": [], 
+        "name": "Biology and Environment"
     }, 
     "MAR3611": {
         "prereqs": [
@@ -15773,6 +15764,10 @@
         ], 
         "name": "Audiologic Rehabilitation"
     }, 
+    "TPP5156C": {
+        "prereqs": [], 
+        "name": "Acting Studio I"
+    }, 
     "INR4224": {
         "prereqs": [
             "ENC1102"
@@ -15895,12 +15890,9 @@
         ], 
         "name": "History of Economic Thought"
     }, 
-    "REE4933": {
-        "prereqs": [
-            "REE3043", 
-            "REE3433"
-        ], 
-        "name": "Advanced Topics in Real Estate"
+    "MVJ1214": {
+        "prereqs": [], 
+        "name": "Jazz Bass I"
     }, 
     "NGR5720": {
         "prereqs": [], 
@@ -16463,10 +16455,6 @@
     "MCB5314": {
         "prereqs": [], 
         "name": "Industrial Perspectives Seminar"
-    }, 
-    "TPP5156C": {
-        "prereqs": [], 
-        "name": "Acting Studio I"
     }, 
     "SPM3130": {
         "prereqs": [], 
@@ -17178,9 +17166,9 @@
         "prereqs": [], 
         "name": "Young Children With Special Needs"
     }, 
-    "BSC1050": {
+    "STA2014C": {
         "prereqs": [], 
-        "name": "Biology and Environment"
+        "name": "Principles of Statistics"
     }, 
     "SSE4361": {
         "prereqs": [
@@ -17945,6 +17933,10 @@
         "prereqs": [], 
         "name": "Legal Issues of the Elderly"
     }, 
+    "PLA4240": {
+        "prereqs": [], 
+        "name": "Negotiation Alternatives in Law"
+    }, 
     "ECT3365": {
         "prereqs": [], 
         "name": "General Methods/Testing Evaluation in  Career & Technical Education"
@@ -18487,11 +18479,13 @@
         "prereqs": [], 
         "name": "The Role of the Professional Nurse"
     }, 
-    "AST3110": {
+    "HFT3444": {
         "prereqs": [
-            "AST2002"
+            "ECO2013", 
+            "ECO2023", 
+            "HFT2254"
         ], 
-        "name": "Solar System Astronomy"
+        "name": "Hospitality Information Systems"
     }, 
     "ART5910": {
         "prereqs": [], 
@@ -18823,6 +18817,12 @@
             "ENC1102"
         ], 
         "name": "Honors Writing with Communities and  Nonprofits"
+    }, 
+    "SPN1121C": {
+        "prereqs": [
+            "SPN1120C"
+        ], 
+        "name": "Honors Elementary Spanish Language and  Civilization II"
     }, 
     "STA4641": {
         "prereqs": [

@@ -1,4 +1,4 @@
-data/majors/pdf
-node_modules/
-skilltree.sublime-workspace
-skilltree.sublime-project
+node_modules
+config.cfg
+*.bundle.js
+data/neo4j
