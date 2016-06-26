@@ -17,8 +17,8 @@ fs = require('fs');
 app = express()
 
 neo4j = require('neo4j');
-db = new neo4j.GraphDatabase("http://#{user}:#{pw}@localhost:7474");
-
+# db = new neo4j.GraphDatabase("http://#{user}:#{pw}@localhost:7474");
+db = new neo4j.GraphDatabase("http://#{user}:#{pw}@db:7474");
 
 
 app.use '/model.json', (req, res) ->
@@ -97,8 +97,7 @@ app.use '/model.json', (req, res) ->
 app.use express.static('static')
 app.use express.static('data')
 
-
-server = app.listen(process.env.PORT || 3001, ->
+server = app.listen(process.env.PORT || 3000, ->
 	host = server.address().address
 	port = server.address().port
 	console.log 'Example app listening at http://%s:%s', host, port

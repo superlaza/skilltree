@@ -1,4 +1,4 @@
-import re, json, operator
+import re, json, operator, os
 from py2neo import authenticate, Graph as NeoGraph, Node, Relationship
 
 from collections import defaultdict
@@ -128,7 +128,7 @@ class Graph:
 	    json.dump({
 	    	"nodes": nodes,
 	    	"links": links
-	    }, open('./data/data.json', 'wb'), indent=4)
+	    }, open(os.path.realpath(os.getcwd()+'/data.json'), 'wb'), indent=4)
 
 	def filterCollege(self, college):
 		adjList = {}
@@ -214,7 +214,7 @@ def extract_courses():
 
 		return body, name, prereqs
 	
-	with open('./data/course_list.txt', 'r') as courses_file:
+	with open(os.path.realpath(os.getcwd()+'/course_list.txt'), 'r') as courses_file:
 		line = courses_file.readline()
 		# print line
 		while(line!=''):
@@ -262,7 +262,7 @@ print 'uploading graph...'
 graph.upload()
 
 def major_data():
-	majors = json.load(open('./data/majors.json', 'rb'))
+	majors = json.load(open(os.path.realpath(os.getcwd()+'/majors.json'), 'rb'))
 
 	maj_similarity = defaultdict(dict)
 	majorList = sorted(majors.keys())
@@ -320,7 +320,7 @@ def major_data():
 						'strength': maj_similarity[maj1][maj2]
 					})
 
-	json.dump({'nodes': nodes, 'links': links}, open("./data/majorMap.json", 'wb'), indent=4)
+	json.dump({'nodes': nodes, 'links': links}, open(os.path.realpath(os.getcwd()+'/majorMap.json'), 'wb'), indent=4)
 
 
 	# print [(i, nodes[i]['name']) for i in range(len(nodes))]

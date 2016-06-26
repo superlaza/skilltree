@@ -1,0 +1,5 @@
+config = {
+	'url': '',
+	'user': '',
+	'password': ''
+}

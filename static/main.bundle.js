@@ -17129,7 +17129,7 @@ webpackJsonp([0],[
 	    var color, container, drag, dragended, dragged, dragstarted, force, graph, height, link, node, nodeById, rect, svg, width, zoom, zoomed;
 	    graph = this.props.course_data;
 	    console.log(d3);
-	    width = 960;
+	    width = 9600;
 	    height = 500;
 	    color = d3.scale.category20();
 	    zoomed = function() {

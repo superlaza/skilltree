@@ -2,3 +2,7 @@ node_modules
 config.cfg
 *.bundle.js
 data/neo4j
+*settings.py
+*.pyc
+dbms/
+databases/

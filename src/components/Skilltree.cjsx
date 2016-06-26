@@ -18,7 +18,7 @@ Skilltree = React.createClass
 
 		# @graph = new Graph(this.refs.graph, graph)
 
-		width = 960
+		width = 9600
 		height = 500
 		color = d3.scale.category20()
 

@@ -1,0 +1,32 @@
+version: '2'
+services:
+  db:
+    image: neo4j
+    environment:
+      NEO4J_AUTH: neo4j/admin
+    volumes:
+      - ./neo_data:/data
+    cap_add:
+      - SYS_RESOURCE
+  task:
+    # image: python:2-onbuild
+    build:
+      context: ./dockerfiles/python
+      dockerfile: ./Dockerfile
+    command: bash -c "while ! curl -s db:7474 > /dev/null; do echo neo4j service not available, sleeping...; sleep 3; done; python ./data/scripts/process_courses.py;"
+    volumes:
+      - .:/usr/src/app
+    links:
+      - db
+  web:
+    container_name: web
+    ports:
+      - "3000:3000"
+      - "35729:35729"
+    build:
+      context: .
+      dockerfile: ./dockerfiles/node/Dockerfile
+    # command: bash -c "cd /user/src/app && webpack --watch --watch-poll && node app/index.js"
+    command: tail -f /dev/null
+    volumes:
+      - ./:/usr/src/app
