@@ -14,11 +14,10 @@ Skilltree = React.createClass
 
 		# {dispatch, state, graphData, majorData} = @props
 		graph = @props.course_data
-		console.log d3
 
 		# @graph = new Graph(this.refs.graph, graph)
 
-		width = 9600
+		width = 960
 		height = 500
 		color = d3.scale.category20()
 
@@ -65,6 +64,48 @@ Skilltree = React.createClass
 				.attr('height', height)
 				.call(zoom)
 
+		# build the arrow.
+		svg.append("svg:defs").selectAll("marker")
+		    .data(["end"])     # Different link/path types can be defined here
+		  .enter().append("svg:marker")   # This section adds in the arrows
+		    .attr("id", String)
+		    .attr("viewBox", "0 -5 10 10")
+		    .attr("refX", 30)
+		    .attr("refY", 0)
+		    .attr("markerWidth", 3)
+		    .attr("markerHeight", 3)
+		    .attr("orient", "auto")
+		  .append("svg:path")
+		    .attr("d", "M0,-5L10,0L0,5");
+
+		# gradient = svg.append("svg:defs")
+		# 				  .append("svg:linearGradient")
+		# 				    .attr("id", "gradient")
+		# 				    .attr("x1", "0%")
+		# 				    .attr("y1", "0%")
+		# 				    .attr("x2", "100%")
+		# 				    .attr("y2", "0%")
+
+		# gradient.append("svg:stop")
+		#     .attr("offset", "0%")
+		#     .attr("stop-color", "rgb(31, 119, 180)")
+		#     .attr("stop-opacity", 1)
+
+		# gradient.append("svg:stop")
+		#     .attr("offset", "50%")
+		#     .attr("stop-color", "rgb(31, 119, 180)")
+		#     .attr("stop-opacity", 1)
+
+		# gradient.append("svg:stop")
+		#     .attr("offset", "50%")
+		#     .attr("stop-color", "red")
+		#     .attr("stop-opacity", 1)
+
+		# gradient.append("svg:stop")
+		#     .attr("offset", "100%")
+		#     .attr("stop-color", "red")
+		#     .attr("stop-opacity", 1)
+
 		rect = svg.append('rect')
 				  .attr('width', width)
 				  .attr('height', height)
@@ -98,8 +139,10 @@ Skilltree = React.createClass
 				  .enter()
 				  .append('line')
 				  	.attr('class', 'link')
+				  	.attr("marker-end", "url(#end)")
 				  	.style("stroke-width", 3)
-				  	.style("stroke", "blueviolet")
+				  	.style("stroke", "grey")
+				  	# .style("stroke", "url(#gradient)")
 
 		node = svg.selectAll('.node')
 				  .data(graph.nodes)

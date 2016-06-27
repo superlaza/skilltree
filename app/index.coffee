@@ -1,34 +1,39 @@
+fs = require('fs');
 express 		= require 'express'
 falcorExpress 	= require 'falcor-express'
 Router 			= require 'falcor-router'
 
 cola = require 'webcola'
+neo4j = require('neo4j');
 
 graphData 		= require '../data/majorMap.json'
 graphData 		= require '../data/colatest.json'
 graphData     = require '../data/courseAdjList.json'
 majorData 		= require '../data/majors/json/anthropology.json'
 
-fs = require('fs');
 
 {user, pw} = JSON.parse(fs.readFileSync('./config.cfg').toString())
 
 
+env = 'dev'
+
 app = express()
 
-neo4j = require('neo4j');
-# db = new neo4j.GraphDatabase("http://#{user}:#{pw}@localhost:7474");
-db = new neo4j.GraphDatabase("http://#{user}:#{pw}@db:7474");
+host = if env=='dev' then 'localhost' else 'db'
+db = new neo4j.GraphDatabase("http://#{user}:#{pw}@#{host}:7474");
 
 
 app.use '/model.json', (req, res) ->
 	callback = (err, results) ->
-		
+	
+	# filterNode = ''
+	filterNode = "where course.college='COS-MATH'"
+	filterLink = "where source.college='COS-MATH' and target.college='COS-MATH'"
 
 	getCourses = new Promise(
 		(resolve, reject) ->
 			db.cypher({
-					query: 'MATCH (course:Course) RETURN course',
+					query: "MATCH (course:Course) #{filterNode} RETURN course",
 					params: {},
 			}, (err, results)=>
 					throw err if err
@@ -45,7 +50,7 @@ app.use '/model.json', (req, res) ->
 	getPrereqs = new Promise(
 		(resolve, reject) ->
 			db.cypher({
-					query: 'MATCH p=(source)-[r:REQUIRES]->(target) RETURN source.code as source, target.code as target',
+					query: "MATCH p=(source)-[r:REQUIRES]->(target) #{filterLink} RETURN source.code as source, target.code as target",
 					params: {},
 			}, (err, results)=>
 					throw err if err
