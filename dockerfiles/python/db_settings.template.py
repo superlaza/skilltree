@@ -1,5 +1,0 @@
-config = {
-	'url': '',
-	'user': '',
-	'password': ''
-}

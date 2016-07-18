@@ -12,14 +12,15 @@ graphData     = require '../data/courseAdjList.json'
 majorData 		= require '../data/majors/json/anthropology.json'
 
 
-{user, pw} = JSON.parse(fs.readFileSync('./config.cfg').toString())
+{user, pw} = JSON.parse(fs.readFileSync('./app/config.cfg').toString())
 
 
-env = 'dev'
+env = 'docker'
 
 app = express()
 
 host = if env=='dev' then 'localhost' else 'db'
+console.log "http://#{user}:#{pw}@#{host}:7474"
 db = new neo4j.GraphDatabase("http://#{user}:#{pw}@#{host}:7474");
 
 

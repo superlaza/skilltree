@@ -7,7 +7,7 @@ from pprint import pprint
 
 from db_settings import config
 
-
+env = 'docker'
 #notes
 # not matching 0-5(0,1-5) 
 
@@ -83,14 +83,15 @@ class Graph:
 		self.adjList[source.id]['children'].append(target)
 
 	def upload(self):
-		# url = config['url']
-		url = 'http://db:7474'
+		url = config['url']
 		user = config['user']
 		password = config['password']
 
-		# authenticate(url, user, password)
-		graph = NeoGraph("http://{}:{}@db:7474/db/data/".format(user, password))
-		# graph = NeoGraph()
+		if env == 'dev':
+			authenticate(url, user, password)
+			graph = NeoGraph()
+		else:
+			graph = NeoGraph("http://{}:{}@db:7474/db/data/".format(user, password))
 
 		for node_id, props in self.adjList.items():
 			course = props['node']
